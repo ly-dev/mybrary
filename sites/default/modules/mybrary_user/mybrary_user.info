@@ -1,0 +1,11 @@
+name = Mybrary User
+description = Mybrary User
+core = 7.x
+package = Mybrary
+version = 7.x-1.0-beta1
+dependencies[] = features
+dependencies[] = text
+features[features_api][] = api:2
+features[field_base][] = field_full_name
+features[field_instance][] = user-user-field_full_name
+project path = sites/default/modules

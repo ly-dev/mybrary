@@ -1,0 +1,52 @@
+<?php
+
+/**
+ * Implements hook_menu().
+ */
+function mybrary_facebook_menu ()
+{
+    $items['welcome'] = array(
+            'page callback' => 'mybrary_facebook_welcome_page',
+            'file' => 'mybrary_facebook.page.inc',
+            'type' => MENU_NORMAL_ITEM,
+            'access callback' => TRUE
+    );
+    
+    $items['api/ajax'] = array(
+            'page callback' => 'mybrary_facebook_ajax_page_callback',
+            'delivery callback' => 'mybrary_facebook_ajax_delivery_callback',
+            'file' => 'mybrary_facebook.api.inc',
+            'type' => MENU_CALLBACK,
+            'access callback' => TRUE
+    );
+    
+    return $items;
+}
+
+/**
+ * Hook to manually map Facebook data to a Drupal user account upon connecting.
+ *
+ * This hook is fired before a Drupal user account is created by the Facebook
+ * OAuth module.
+ *
+ * @param $edit
+ *   A user account array, not yet including the UID. Make modifications to this
+ *   array if other modules will then save this information for you in
+ *   hook_user_presave() or hook_user_insert().
+ * @param $fbuser
+ *   The Facebook user account. Note that the contents of this object may change
+ *   depending on what access the user has granted.
+ * @return
+ *   None. Modify the $edit array by reference.
+ *
+ * @see hook_fboauth_user_save()
+ */
+function mybrary_facebook_fboauth_user_presave(&$edit, $fbuser) {
+    if (isset($fbuser->name)) {
+        $edit['field_full_name'] = array(
+                LANGUAGE_NONE => array(
+                        array('value'=>$fbuser->name)
+                )
+        );
+    }
+}
