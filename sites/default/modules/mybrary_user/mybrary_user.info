@@ -1,7 +1,7 @@
 name = Mybrary User
 description = Mybrary User
 core = 7.x
-package = Mybrary
+package = Features
 version = 7.x-1.0-beta1
 dependencies[] = features
 dependencies[] = text

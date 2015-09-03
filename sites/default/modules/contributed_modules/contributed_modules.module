@@ -1,0 +1,10 @@
+<?php
+function contributed_modules_block_info_alter(&$blocks, $theme, $code_blocks) 
+{
+    // Remove Drupal Core placed blocks
+    $blocks['search']['form']['status'] = 0;
+    $blocks['system']['help']['status'] = 0;
+    $blocks['system']['navigation']['status'] = 0;
+    $blocks['system']['powered-by']['status'] = 0;
+    $blocks['user']['login']['status'] = 0;
+}

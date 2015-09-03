@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Basic Page Suite feature.
+ */
+
+include_once 'basic_page_suite.features.inc';

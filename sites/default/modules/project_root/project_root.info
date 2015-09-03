@@ -1,0 +1,14 @@
+name = Project Root
+description = Required by the manifest to enable site functionality during deployment
+core = 7.x
+package = Features
+version = 7.x-1.0-beta1
+project = project_root
+dependencies[] = contributed_modules
+dependencies[] = project_shared
+dependencies[] = article_suite
+dependencies[] = basic_page_suite
+dependencies[] = mybrary_user
+dependencies[] = mybrary_facebook
+features[features_api][] = api:2
+project path = sites/default/modules
