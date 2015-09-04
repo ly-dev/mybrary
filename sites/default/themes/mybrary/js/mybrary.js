@@ -50,6 +50,9 @@ var Drupal = Drupal || { 'settings' : {}, 'behaviors' : {}, 'locale' : {} };
 			if (settings.mybrary && settings.mybrary.initialized)
 				return;
 			
+			if (typeof settings.mybrary == 'undefined')
+				settings.mybrary = {};
+			
             settings.mybrary.initialized = true;
 	    }
 	};

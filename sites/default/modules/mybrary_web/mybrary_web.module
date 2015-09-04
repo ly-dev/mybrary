@@ -6,6 +6,7 @@
 function mybrary_web_menu ()
 {
     $items['welcome'] = array(
+            'title' => t('Dashboard'),
             'page callback' => 'mybrary_web_welcome_page',
             'file' => 'mybrary_web.page.inc',
             'type' => MENU_NORMAL_ITEM,
@@ -13,4 +14,18 @@ function mybrary_web_menu ()
     );
     
     return $items;
+}
+
+/**
+ * Implements hook_angularjs_services
+ *
+ * @param string $version            
+ * @return array
+ */
+function mybrary_web_angularjs_services ($version = NULL)
+{
+    return array(
+            drupal_get_path('module', 'mybrary_web') .
+                     '/js/mybrary_web.service.api.js' => array()
+    );
 }

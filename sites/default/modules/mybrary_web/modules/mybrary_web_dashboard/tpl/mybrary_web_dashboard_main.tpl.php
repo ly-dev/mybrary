@@ -1,0 +1,1 @@
+<div>{{myTitle}}</div>

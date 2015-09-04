@@ -1,0 +1,26 @@
+<?php
+
+/**
+ * Implements hook_menu().
+ */
+function mybrary_web_dashboard_menu() {
+  $items = array();
+
+  $items['dashboard'] = array(
+            'title' => t('Dashboard'),
+            'page callback' => 'mybrary_web_dashboard',
+            'file' => 'mybrary_web_dashboard.page.inc',
+            'type' => MENU_NORMAL_ITEM,
+            'access callback' => TRUE
+  );
+  
+  $items['dashboard/main'] = array(
+            'title' => t('Dashboard'),
+            'page callback' => 'mybrary_web_dashboard_main',
+            'file' => 'mybrary_web_dashboard.page.inc',
+            'type' => MENU_NORMAL_ITEM,
+            'access callback' => TRUE
+  );
+  
+  return $items;
+}
