@@ -1,0 +1,4 @@
+name = Mybrary Web
+description = Web UI related stuffs for Mybrary
+package = Mybrary
+core = 7.x

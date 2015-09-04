@@ -1,0 +1,16 @@
+<?php
+
+/**
+ * Implements hook_menu().
+ */
+function mybrary_web_menu ()
+{
+    $items['welcome'] = array(
+            'page callback' => 'mybrary_web_welcome_page',
+            'file' => 'mybrary_web.page.inc',
+            'type' => MENU_NORMAL_ITEM,
+            'access callback' => TRUE
+    );
+    
+    return $items;
+}

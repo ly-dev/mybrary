@@ -8,16 +8,10 @@ core = 7.x
 ;; -------------------------
 ;;          page_top
 ;; -------------------------
-;;          highlighted
+;;          header
 ;; -------------------------
-;;          header (menu, slideshow)
-;; -------------------------
-;; sidebar  | help
-;;          |---------------
-;;          | content
-;;          |
-;;          |
-;;          |
+;; 			content
+;;
 ;; -------------------------
 ;;          footer
 ;; -------------------------
@@ -27,9 +21,7 @@ core = 7.x
 ;;;;;;;;;;;;;;;;;;;;;
 
 regions[page_top]       = 'Page top'
-regions[highlighted]    = 'Highlighted'
 regions[header]         = 'Header'
-regions[help]           = 'Help'
 regions[content]        = 'Content'
 regions[footer]         = 'Footer'
 regions[page_bottom]    = 'Page bottom'
@@ -38,25 +30,23 @@ regions[page_bottom]    = 'Page bottom'
 ; --------------
 regions_hidden[] = 'page_top'
 regions_hidden[] = 'page_bottom'
-regions_hidden[] = 'header'
-regions_hidden[] = 'footer'
 
 ;;;;;;;;;;;;;;;;;;;;;
 ;; Stylesheets
 ;;;;;;;;;;;;;;;;;;;;;
 
-; Bootstrap
-; --------------
-stylesheets[all][] = css/bootstrap.css
-
 ; Fontawesome
 ; copy from vendors/fontawesome/css
 ; --------------
-stylesheets[all][] = css/font-awesome.min.css
+stylesheets[all][] = 'lib/fontawesome/css/font-awesome.min.css'
+
+; Bootstrap
+; --------------
+stylesheets[all][] = 'css/bootstrap.css'
 
 ; Project
 ; --------------
-stylesheets[all][] = css/mybrary.css
+stylesheets[all][] = 'css/mybrary.css'
 
 
 ; ;;;;;;;;;;;;;;;;;;;;;
@@ -64,9 +54,19 @@ stylesheets[all][] = css/mybrary.css
 ; ;;;;;;;;;;;;;;;;;;;;;
 
 ; Bootstrap
-; copy from vendors/bootstrap/dist/js/bootstrap.min.js
 ; --------------
-scripts[] = 'js/bootstrap.min.js'
+scripts[] = 'lib/bootstrap/dist/js/bootstrap.min.js'
+
+; Loadash
+; --------------
+scripts[] = 'lib/lodash/lodash.min.js'
+
+; Angular
+; --------------
+scripts[] = 'lib/angular/angular.min.js'
+scripts[] = 'lib/angular-animate/angular-animate.min.js.map'
+scripts[] = 'lib/angular-sanitize/angular-sanitize.min.js'
+scripts[] = 'lib/angular-ui-router/release/angular-ui-router.min.js'
 
 ; Project
 ; --------------

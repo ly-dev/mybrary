@@ -1,6 +1,0 @@
-name = Mybrary Facebook
-description = Facebook related stuffs for Mybrary
-package = Mybrary
-core = 7.x
-dependencies[] = fboauth
-dependencies[] = mybrary_user
