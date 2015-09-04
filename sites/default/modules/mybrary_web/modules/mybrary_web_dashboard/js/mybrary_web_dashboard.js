@@ -13,5 +13,6 @@ angular.module('app_dashboard', ['ngRoute','app_api'])
 
 .controller('DashboardController', ['AppApi', '$scope', function(AppApi, $scope) {
     $scope.myTitle = "DashboardController";
+    $scope.test = AppApi.test();
 }]);
 
