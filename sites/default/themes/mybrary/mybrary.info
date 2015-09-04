@@ -57,17 +57,6 @@ stylesheets[all][] = 'css/mybrary.css'
 ; --------------
 scripts[] = 'lib/bootstrap/dist/js/bootstrap.min.js'
 
-; Loadash
-; --------------
-scripts[] = 'lib/lodash/lodash.min.js'
-
-; Angular
-; --------------
-scripts[] = 'lib/angular/angular.min.js'
-scripts[] = 'lib/angular-animate/angular-animate.min.js.map'
-scripts[] = 'lib/angular-sanitize/angular-sanitize.min.js'
-scripts[] = 'lib/angular-ui-router/release/angular-ui-router.min.js'
-
 ; Project
 ; --------------
 scripts[] = 'js/mybrary.js'

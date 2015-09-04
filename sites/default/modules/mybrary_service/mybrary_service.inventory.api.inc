@@ -27,8 +27,10 @@ function mybrary_service_inventory_list ($data)
     
     $result = array();
     
-    $result = services_error(t('List action has not been implemented yet.'), 404);
+    $data['a'] = $data['a'] . ' successfully!'; 
+    $result = $data;
     
+   
     return $result;
 }
 
