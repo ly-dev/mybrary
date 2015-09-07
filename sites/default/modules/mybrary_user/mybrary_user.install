@@ -31,7 +31,8 @@ function _mybrary_user_schema_definition ()
                             'type' => 'int',
                             'unsigned' => TRUE,
                             'size' => 'normal',
-                            'not null' => TRUE
+                            'not null' => TRUE,
+                            'default' => MYBRARY_USER_TYPE_UNKNOWN
                     ),
                     'ext_id' => array(
                             'description' => t('external id, e.g. facebook id'),
@@ -87,7 +88,8 @@ function _mybrary_user_schema_definition ()
                             'type' => 'int',
                             'unsigned' => TRUE,
                             'size' => 'normal',
-                            'not null' => TRUE
+                            'not null' => TRUE,
+                            'default' => MYBRARY_USER_RELATIONSHIP_STATUS_UNKNOWN
                     ),
                     'update_timestamp' => array(
                             'description' => t('timestamp of updating'),

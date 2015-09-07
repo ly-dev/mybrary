@@ -2,8 +2,9 @@
 /**
  * User type constant
  */
-define("MYBRARY_USER_TYPE_DRUPAL", 0);
-define("MYBRARY_USER_TYPE_FACEBOOK", 1);
+define("MYBRARY_USER_TYPE_UNKNOWN", 0);
+define("MYBRARY_USER_TYPE_DRUPAL", 1);
+define("MYBRARY_USER_TYPE_FACEBOOK", 2);
 
 /**
  * User relationship status constant
@@ -31,7 +32,7 @@ define("MYBRARY_USER_RELATIONSHIP_STATUS_REJECTED", 2);
 function mybrary_user_fboauth_user_save($account, $fbuser) {
     
     // Save the Facebook user info into a custom table.
-    $userData = array(
+    $mydate = array(
             'uid' => $account->uid,
             'type' => MYBRARY_USER_TYPE_FACEBOOK,
             'ext_id' => $fbuser->id,
@@ -39,8 +40,98 @@ function mybrary_user_fboauth_user_save($account, $fbuser) {
             'data' => NULL,
             'update_timestamp' => time(),
     );
-    drupal_write_record('mybrary_user_ext', $userData);
+    drupal_write_record('mybrary_user_ext', $mydate);
+}
+
+/**
+ * Alter the list of Facebook Actions provided through hook_fboauth_actions().
+ *
+ * @see fboauth_fboauth_actions().
+ */
+function mybrary_user_fboauth_actions_alter(&$actions) {
+    // Replace the normal login callback with custom login callback.
+    $actions['connect']['callback'] = 'mybrary_user_fboauth_action_connect';
+}
+
+
+/**
+ * Customized Facebook OAuth callback for initiating a Facebook connection.
+ */
+function mybrary_user_fboauth_action_connect($app_id, $access_token) {
+    global $user;
     
-    // Create the possible relationship
+    // call the original function to initialize the connection
+    module_load_include('inc', 'fboauth', 'includes/fboauth.fboauth');
+    fboauth_action_connect($app_id, $access_token);
     
+    $fbuser = fboauth_graph_query('me', $access_token);
+    if ($fbuser) {
+        $uid = fboauth_uid_load($fbuser->id);
+        // fb user connected (redundent check)
+        if ($uid && ($account = user_load($uid))) {
+            // fb user logged in
+            if ($account->uid == $user->uid) {
+
+                // Get all friends to create the user relationship.
+                $fbResponse = fboauth_graph_query('me/friends', $access_token);
+                if ($fbResponse) {
+                    $fbFriendIds = array();
+                    foreach($fbResponse->data as $fbFriend) {
+                        $fbFriendIds[] = $fbFriend->id;
+                    }
+                }
+                
+                // Get users not in relationship to create.
+                $result = db_select('mybrary_user_ext', 'u')->fields('u', array('uid'))
+                ->condition('u.ext_id', $fbFriendIds, 'IN')
+                ->condition('u.type', MYBRARY_USER_TYPE_FACEBOOK)
+                ->execute();
+                
+                // Create the Facebook user relationship.
+                while ($row = $result->fetchAssoc()) {
+                    
+                    // Detecte existing relationship.
+                    if(!(db_query('SELECT 1 FROM {mybrary_user_net} WHERE uid_from = :uid_from AND uid_to = :uid_to', 
+                    array(':uid_from'=>$user->uid, ':uid_to'=>$row['uid']))->fetchField())) {
+                        $mydate = array(
+                                'uid_from' => $user->uid,
+                                'uid_to' => $row['uid'],
+                                'update_timestamp' => time(),
+                        );
+                        drupal_write_record('mybrary_user_net', $mydate);
+                    }
+                    
+                    // Detecte existing relationship.
+                    if(!(db_query('SELECT 1 FROM {mybrary_user_net} WHERE uid_from = :uid_from AND uid_to = :uid_to', 
+                    array(':uid_from'=>$row['uid'], ':uid_to'=>$user->uid))->fetchField())) {
+                        $mydate = array(
+                                'uid_from' => $row['uid'],
+                                'uid_to' => $user->uid,
+                                'update_timestamp' => time(),
+                        );
+                        drupal_write_record('mybrary_user_net', $mydate);
+                    }
+                }
+                
+                //@TODO replace below auto confirm relationship with user interactive
+                $result = db_update('mybrary_user_net')
+                ->fields(array(
+                    'status' => MYBRARY_USER_RELATIONSHIP_STATUS_CONFIRMED
+                ))
+                ->condition('uid_from', $user->uid)
+                ->condition('status', MYBRARY_USER_RELATIONSHIP_STATUS_UNKNOWN)
+                ->execute();
+                
+                $result = db_update('mybrary_user_net')
+                ->fields(array(
+                    'status' => MYBRARY_USER_RELATIONSHIP_STATUS_CONFIRMED
+                ))
+                ->condition('uid_to', $user->uid)
+                ->condition('status', MYBRARY_USER_RELATIONSHIP_STATUS_UNKNOWN)
+                ->execute();
+                
+                //@TODO remove the not existing anymore relationship
+            }
+        }
+    }
 }
