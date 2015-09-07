@@ -1,51 +1,46 @@
 <?php
 /**
- * Hook to manually map Facebook data to a Drupal user account upon connecting.
+ * User type constant
+ */
+define("MYBRARY_USER_TYPE_DRUPAL", 0);
+define("MYBRARY_USER_TYPE_FACEBOOK", 1);
+
+/**
+ * User relationship status constant
+ */
+define("MYBRARY_USER_RELATIONSHIP_STATUS_UNKNOWN", 0);
+define("MYBRARY_USER_RELATIONSHIP_STATUS_CONFIRMED", 1);
+define("MYBRARY_USER_RELATIONSHIP_STATUS_REJECTED", 2);
+
+/**
+ * Hook to manually save Facebook data after a user has connected.
  *
- * This hook is fired before a Drupal user account is created by the Facebook
+ * This hook is fired after a Drupal user account is created by the Facebook
  * OAuth module.
  *
- * @param $edit
- *   A user account array, not yet including the UID. Make modifications to this
- *   array if other modules will then save this information for you in
- *   hook_user_presave() or hook_user_insert().
+ * @param $account
+ *   A full Drupal user account object.
  * @param $fbuser
  *   The Facebook user account. Note that the contents of this object may change
  *   depending on what access the user has granted.
  * @return
- *   None. Modify the $edit array by reference.
+ *   None.
  *
- * @see hook_fboauth_user_save()
+ * @see hook_fboauth_user_presave()
  */
-function mybrary_facebook_fboauth_user_presave(&$edit, $fbuser) {
-    if (isset($fbuser->name)) {
-        $edit['field_full_name'] = array(
-                LANGUAGE_NONE => array(
-                        array('value'=>$fbuser->name)
-                )
-        );
-    }
-}
-
-/**
- * Implements hook_field_attach_submit ($entity_type, $entity, $form, &$form_state, $options = array())
- */
-function mybrary_user_field_attach_submit ($entity_type, $entity, $form,
-        &$form_state, $options = array())
-{
-    // Copy top-level form values that are for fields to entity properties
-    if ($entity_type == 'user') {
-
-        $fields_values = array_intersect_key($form_state['input'],
-                field_info_instances($entity_type, 'user'));
-
-        foreach ($fields_values as $key => $value)
-        {
-            switch ($key)
-            {
-                default:
-                    $entity->$key = $value;
-            }
-        }
-    }
+function mybrary_user_fboauth_user_save($account, $fbuser) {
+    
+    // Save the Facebook user info into a custom table.
+    $userData = array(
+            'uid' => $account->uid,
+            'type' => MYBRARY_USER_TYPE_FACEBOOK,
+            'ext_id' => $fbuser->id,
+            'ext_name' => $fbuser->name,
+            'data' => NULL,
+            'update_timestamp' => time(),
+    );
+    drupal_write_record('mybrary_user_ext', $userData);
+    
+    // Create the possible relationship
+    
 }

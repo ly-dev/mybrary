@@ -78,7 +78,7 @@
 		<?php print render($page['header']); ?>
     </div></div> <!-- /.section, /#header -->
     
-    <div id="content" class="column"><div class="section">
+    <div id="content"><div class="section">
 		<?php print render($page['content']); ?>
     </div></div> <!-- /.section, /#content -->
     

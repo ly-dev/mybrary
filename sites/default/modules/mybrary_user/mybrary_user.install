@@ -1,0 +1,118 @@
+<?php
+
+/**
+ * Implements hook_schema().
+ */
+function mybrary_user_schema ()
+{
+    return _mybrary_user_schema_definition();
+}
+
+/**
+ * Central place to define the current schema
+ */
+function _mybrary_user_schema_definition ()
+{
+    $schema = array();
+    
+    // add since update_7100
+    $schema['mybrary_user_ext'] = array(
+            'description' => t('Extended user profile'),
+            'fields' => array(
+                    'uid' => array(
+                            'description' => t('user id, primary key'),
+                            'type' => 'int',
+                            'unsigned' => TRUE,
+                            'size' => 'normal',
+                            'not null' => FALSE
+                    ),
+                    'type' => array(
+                            'description' => t('user type'),
+                            'type' => 'int',
+                            'unsigned' => TRUE,
+                            'size' => 'normal',
+                            'not null' => TRUE
+                    ),
+                    'ext_id' => array(
+                            'description' => t('external id, e.g. facebook id'),
+                            'type' => 'varchar',
+                            'length' => 255,
+                            'not null' => FALSE
+                    ),
+                    'ext_name' => array(
+                            'description' => t('external name, e.g. facebook name'),
+                            'type' => 'varchar',
+                            'length' => 255,
+                            'not null' => FALSE
+                    ),
+                    'data' => array(
+                            'description' => t('properties, encoded as json data'),
+                            'type' => 'blob',
+                            'size' => 'big',
+                            'not null' => FALSE
+                    ),
+                    'update_timestamp' => array(
+                            'description' => t('timestamp of updating'),
+                            'type' => 'int',
+                            'unsigned' => TRUE,
+                            'size' => 'normal',
+                            'not null' => TRUE
+                    )
+            ),
+            'primary key' => array(
+                    'uid'
+            )
+    );
+    
+    // add since update_7100
+    $schema['mybrary_user_net'] = array(
+            'description' => t('User network'),
+            'fields' => array(
+                    'uid_from' => array(
+                            'description' => t('from  user id, source of the relationship'),
+                            'type' => 'int',
+                            'unsigned' => TRUE,
+                            'size' => 'normal',
+                            'not null' => TRUE
+                    ),
+                    'uid_to' => array(
+                            'description' => t('to user id, target of the relationship'),
+                            'type' => 'int',
+                            'unsigned' => TRUE,
+                            'size' => 'normal',
+                            'not null' => TRUE
+                    ),
+                    'status' => array(
+                            'description' => t('status of the relationship'),
+                            'type' => 'int',
+                            'unsigned' => TRUE,
+                            'size' => 'normal',
+                            'not null' => TRUE
+                    ),
+                    'update_timestamp' => array(
+                            'description' => t('timestamp of updating'),
+                            'type' => 'int',
+                            'unsigned' => TRUE,
+                            'size' => 'normal',
+                            'not null' => TRUE
+                    )
+            ),
+            'primary key' => array(
+                    'uid_from',
+                    'uid_to'
+            )
+    );
+    
+    return $schema;
+}
+
+/**
+ * Create new database table {mybrary_user_ext}.
+ * Create new database table {mybrary_user_net}.
+ */
+function mybrary_user_update_7100 ()
+{
+    $schema = _mybrary_user_schema_definition();
+    db_create_table('mybrary_user_ext', $schema['mybrary_user_ext']);
+    db_create_table('mybrary_user_net', $schema['mybrary_user_net']);
+}
