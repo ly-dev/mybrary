@@ -1,0 +1,100 @@
+<?php
+
+/**
+ * Implements hook_schema().
+ */
+function mybrary_transaction_schema ()
+{
+    return _mybrary_transaction_schema_definition();
+}
+
+/**
+ * Central place to define the current schema
+ */
+function _mybrary_transaction_schema_definition ()
+{
+    $schema = array();
+
+    $schema['mybrary_transaction_head'] = array(
+            'description' => t('Transaction Head'),
+            'fields' => array(
+                    'transaction_id' => array(
+                            'description' => t('transaction id, primary key'),
+                            'type' => 'int',
+                            'unsigned' => TRUE,
+                            'size' => 'normal',
+                            'not null' => FALSE
+                    ),
+                    'entity_id' => array(
+                            'description' => t('nid of entity bundle item'),
+                            'type' => 'int',
+                            'unsigned' => TRUE,
+                            'size' => 'normal',
+                            'not null' => FALSE
+                    ),
+                    'uid_borrower' => array(
+                            'description' => t(('from  transaction id, source of the relationship (item borrower)')),
+                            'type' => 'int',
+                            'unsigned' => TRUE,
+                            'size' => 'normal',
+                            'not null' => FALSE
+                    ),
+                    'uid_owner' => array(
+                            'description' => t(('to  transaction id, source of the relationship (item owner)')),
+                            'type' => 'int',
+                            'unsigned' => TRUE,
+                            'size' => 'normal',
+                            'not null' => FALSE
+                    ),
+            ),
+            'primary key' => array(
+                    'transaction_id'
+            )
+    );
+
+    $schema['mybrary_transaction_items'] = array(
+            'description' => t('Transaction Items'),
+            'fields' => array(
+                    'instance_id' => array(
+                            'description' => t('instance id, primary key'),
+                            'type' => 'int',
+                            'unsigned' => TRUE,
+                            'size' => 'normal',
+                            'not null' => FALSE
+                    ),
+                    'transaction_id' => array(
+                            'description' => t('transaction id'),
+                            'type' => 'int',
+                            'unsigned' => TRUE,
+                            'size' => 'normal',
+                            'not null' => FALSE
+                    ),
+                    'status' => array(
+                            'description' => t('status of the transaction'),
+                            'type' => 'int',
+                            'unsigned' => TRUE,
+                            'size' => 'normal',
+                            'not null' => FALSE,
+                            'default' => MYBRARY_TRANSACTION_STATUS_UNKNOWN
+                    ),
+                    'update_timestamp' => array(
+                            'description' => t('timestamp of updating'),
+                            'type' => 'int',
+                            'unsigned' => TRUE,
+                            'size' => 'normal',
+                            'not null' => TRUE
+                    ),
+                    'text' => array(
+                            'description' => t('text for messaging, feedback etc'),
+                            'type' => 'blob',
+                            'size' => 'big',
+                            'not null' => FALSE
+                    )
+            ),
+            'primary key' => array(
+                    'instance_id'
+            )
+    );
+    
+    return $schema;
+}

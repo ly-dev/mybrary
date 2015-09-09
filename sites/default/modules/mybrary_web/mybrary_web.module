@@ -26,6 +26,41 @@ function mybrary_web_angularjs_services ($version = NULL)
 {
     return array(
             drupal_get_path('module', 'mybrary_web') .
-                     '/js/mybrary_web.service.api.js' => array()
+                     '/js/mybrary_web.service.log.js' => array(),
+            drupal_get_path('module', 'mybrary_web') .
+                     '/js/mybrary_web.service.helper.js' => array(),
+            drupal_get_path('module', 'mybrary_web') .
+                    '/js/mybrary_web.service.api.js' => array()
     );
+}
+
+/**
+ * Initializes an AngularJS application setting the application name, the base path
+ * and adds the library
+ *
+ * @param string $name
+ *          The application name
+ *
+ * @param string $base_href
+ *          The base href, defaults to current page if nothing is entered
+ */
+function mybrary_web_init_application($name, $base_href = NULL)
+{
+    global $base_url;
+    
+    angularjs_init_application($name, $base_href);
+    
+    // use ui-route
+    drupal_add_js(drupal_get_path('module', 'mybrary_web') . '/lib/angular-ui-router/release/angular-ui-router.min.js');
+    
+    
+    // Add CSRF token and base url required by service api.
+    $js_settings = array(
+            'mybrary_web' => array(
+                    'csrf_token' => drupal_get_token('services'),
+                    'service_base_url' =>  $base_url
+            )
+    );
+    
+    drupal_add_js($js_settings, 'setting');    
 }

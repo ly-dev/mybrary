@@ -11,7 +11,8 @@ function mybrary_service_inventory_resource_access($op = 'view', $args = array()
         case 'create':
         case 'update':
         case 'delete':
-            return TRUE;
+        default:
+            return user_is_logged_in();
     }
 }
 
@@ -25,13 +26,13 @@ function mybrary_service_inventory_list ($data)
 {
     global $user;
     
-    $result = array();
+    $response = array();
     
     $data['a'] = $data['a'] . ' successfully!'; 
-    $result = $data;
+    $response = $data;
     
    
-    return $result;
+    return $response;
 }
 
 /**
@@ -44,11 +45,11 @@ function mybrary_service_inventory_view ($data)
 {
     global $user;
 
-    $result = array();
+    $response = array();
 
-    $result = services_error(t('View action has not been implemented yet.'), 404);
+    $response = services_error(t('View action has not been implemented yet.'), 404);
 
-    return $result;
+    return $response;
 }
 
 /**
@@ -61,11 +62,11 @@ function mybrary_service_inventory_create ($data)
 {
     global $user;
 
-    $result = array();
+    $response = array();
 
-    $result = services_error(t('Create action has not been implemented yet.'), 404);
+    $response = services_error(t('Create action has not been implemented yet.'), 404);
 
-    return $result;
+    return $response;
 }
 
 /**
@@ -78,11 +79,11 @@ function mybrary_service_inventory_update ($data)
 {
     global $user;
 
-    $result = array();
+    $response = array();
 
-    $result = services_error(t('Update action has not been implemented yet.'), 404);
+    $response = services_error(t('Update action has not been implemented yet.'), 404);
 
-    return $result;
+    return $response;
 }
 
 /**
@@ -95,9 +96,9 @@ function mybrary_service_inventory_delete ($data)
 {
     global $user;
 
-    $result = array();
+    $response = array();
 
-    $result = services_error(t('Delete action has not been implemented yet.'), 404);
+    $response = services_error(t('Delete action has not been implemented yet.'), 404);
 
-    return $result;
+    return $response;
 }

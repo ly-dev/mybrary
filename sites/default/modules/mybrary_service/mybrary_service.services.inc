@@ -37,6 +37,19 @@ function mybrary_service_default_services_endpoint() {
     ),
   );
   $endpoint->resources = array(
+    'connection' => array(
+      'actions' => array(
+        'invite' => array(
+          'enabled' => '1',
+        ),
+        'list' => array(
+          'enabled' => '1',
+        ),
+        'view' => array(
+          'enabled' => '1',
+        ),
+      ),
+    ),
     'inventory' => array(
       'actions' => array(
         'list' => array(
@@ -52,6 +65,13 @@ function mybrary_service_default_services_endpoint() {
           'enabled' => '1',
         ),
         'delete' => array(
+          'enabled' => '1',
+        ),
+      ),
+    ),
+    'term' => array(
+      'actions' => array(
+        'list' => array(
           'enabled' => '1',
         ),
       ),

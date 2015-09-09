@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Mybrary Inventory feature.
+ */
+
+include_once 'mybrary_inventory.features.inc';

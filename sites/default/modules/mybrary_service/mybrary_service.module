@@ -12,6 +12,31 @@ include_once 'mybrary_service.features.inc';
 function mybrary_service_services_resources ()
 {
     return array(
+            'term' => array(
+                    'actions' => array(
+                            'list' => array(
+                                    'help' => t('List all term'),
+                                    'file' => array(
+                                            'type' => 'inc',
+                                            'module' => 'mybrary_service',
+                                            'name' => 'mybrary_service.term.api'
+                                    ),
+                                    'callback' => 'mybrary_service_term_list',
+                                    'access callback' => 'mybrary_service_term_resource_access',
+                                    'access arguments' => array('list'),
+                                    'access arguments append' => TRUE,
+                                    'args' => array(
+                                            array(
+                                                    'name' => 'data',
+                                                    'type' => 'array',
+                                                    'description' => t('Parameters of the action'),
+                                                    'source' => 'data',
+                                                    'optional' => FALSE
+                                            )
+                                    )
+                            )
+                    )
+            ),
             'inventory' => array(
                     'actions' => array(
                             'list' => array(
@@ -219,6 +244,82 @@ function mybrary_service_services_resources ()
                                     'access arguments' => array('view'),
                                     'access arguments append' => TRUE,
                                     'args' => array(
+                                            array(
+                                                    'name' => 'data',
+                                                    'type' => 'array',
+                                                    'description' => t('Parameters of the action'),
+                                                    'source' => 'data',
+                                                    'optional' => FALSE
+                                            )
+                                    )
+                            )
+                    )
+            ),
+            'connection' => array(
+                    'actions' => array(
+                            'invite' => array(
+                                    'help' => t('Invite friend'),
+                                    'file' => array(
+                                            'type' => 'inc',
+                                            'module' => 'mybrary_service',
+                                            'name' => 'mybrary_service.connection.api'
+                                    ),
+                                    'callback' => 'mybrary_service_connection_invite',
+                                    'access callback' => 'mybrary_service_connection_resource_access',
+                                    'access arguments' => array('invite'),
+                                    'access arguments append' => TRUE,
+                                    'args' => array(
+                                            array(
+                                                    'name' => 'data',
+                                                    'type' => 'array',
+                                                    'description' => t('Parameters of the action'),
+                                                    'source' => 'data',
+                                                    'optional' => FALSE
+                                            )
+                                    )
+                            ),
+                            'list' => array(
+                                    'help' => t('List connection'),
+                                    'file' => array(
+                                            'type' => 'inc',
+                                            'module' => 'mybrary_service',
+                                            'name' => 'mybrary_service.connection.api'
+                                    ),
+                                    'callback' => 'mybrary_service_connection_list',
+                                    'access callback' => 'mybrary_service_connection_resource_access',
+                                    'access arguments' => array('list'),
+                                    'access arguments append' => TRUE,
+                                    'args' => array(
+                                            array(
+                                                    'name' => 'data',
+                                                    'type' => 'array',
+                                                    'description' => t('Parameters of the action'),
+                                                    'source' => 'data',
+                                                    'optional' => FALSE
+                                            )
+                                    )
+                            ),
+                            'view' => array(
+                                    'help' => t('View friend'),
+                                    'file' => array(
+                                            'type' => 'inc',
+                                            'module' => 'mybrary_service',
+                                            'name' => 'mybrary_service.connection.api'
+                                    ),
+                                    'callback' => 'mybrary_service_connection_view',
+                                    'access callback' => 'mybrary_service_connection_resource_access',
+                                    'access arguments' => array('view'),
+                                    'access arguments append' => TRUE,
+                                    'args' => array(
+                                            array(
+                                                    'name' => 'id',
+                                                    'type' => 'string',
+                                                    'description' => t('friend user id'),
+                                                    'source' => array(
+                                                            'path' => 1
+                                                    ),
+                                                    'optional' => FALSE
+                                            ),
                                             array(
                                                     'name' => 'data',
                                                     'type' => 'array',

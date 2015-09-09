@@ -1,0 +1,4 @@
+name = Mybrary Transaction
+description = User Transaction Describing Tool Borrowing in Mybrary
+package = Mybrary
+core = 7.x

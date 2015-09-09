@@ -1,0 +1,26 @@
+<?php
+
+/**
+ * Implements hook_menu().
+ */
+function mybrary_web_connection_menu() {
+  $items = array();
+
+  $items['connection'] = array(
+            'title' => t('Connection'),
+            'page callback' => 'mybrary_web_connection',
+            'file' => 'mybrary_web_connection.page.inc',
+            'type' => MENU_NORMAL_ITEM,
+            'access callback' => 'user_is_logged_in'
+  );
+  
+  $items['connection/main'] = array(
+            'title' => t('Connection'),
+            'page callback' => 'mybrary_web_connection_main',
+            'file' => 'mybrary_web_connection.page.inc',
+            'type' => MENU_NORMAL_ITEM,
+            'access callback' => 'user_is_logged_in'
+  );
+  
+  return $items;
+}

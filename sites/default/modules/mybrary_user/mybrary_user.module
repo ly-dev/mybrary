@@ -51,6 +51,14 @@ function mybrary_user_fboauth_user_save($account, $fbuser) {
 function mybrary_user_fboauth_actions_alter(&$actions) {
     // Replace the normal login callback with custom login callback.
     $actions['connect']['callback'] = 'mybrary_user_fboauth_action_connect';
+    
+    // force to add the required permissions
+    $permissions = array(
+            'email',
+            'user_friends',
+            'publish_actions'
+    );
+    $actions['connect']['permissions'] = $actions['connect']['permissions'] + $permissions;
 }
 
 
@@ -59,6 +67,8 @@ function mybrary_user_fboauth_actions_alter(&$actions) {
  */
 function mybrary_user_fboauth_action_connect($app_id, $access_token) {
     global $user;
+    
+    //@TODO logout the current user if current user has not been associated with a facebook account.
     
     // call the original function to initialize the connection
     module_load_include('inc', 'fboauth', 'includes/fboauth.fboauth');

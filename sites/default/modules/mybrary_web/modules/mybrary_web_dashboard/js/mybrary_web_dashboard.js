@@ -1,18 +1,28 @@
 'use strict';
 
-angular.module('app_dashboard', ['ngRoute','app_api'])
+angular.module('app_dashboard', ['ui.router', 'app_log', 'app_helper',  'app_api'])
 
-.config(['$routeProvider', function($routeProvider) {
-    $routeProvider
-    .when('/', {
-    	templateUrl: Drupal.settings.angularjsApp.basePath + '/dashboard/main',
-    	controller: 'DashboardController', 
-    })
-	.otherwise({redirectTo:'/'});
+.config(['$stateProvider', '$urlRouterProvider', function($stateProvider, $urlRouterProvider) {
+	// For any unmatched url, redirect to /
+	$urlRouterProvider.otherwise("/main");
+	
+	// Now set up the states
+	$stateProvider
+    .state('main', {
+		url: "/main",
+		templateUrl: Drupal.settings.angularjsApp.basePath + '/dashboard/main',
+    	controller: 'DashboardController',
+    	resolve:{
+            friendsPromise:  ['AppApi', function(AppApi) {
+               return AppApi.connectionList();
+            }]
+        }
+    });
 }])
 
-.controller('DashboardController', ['AppApi', '$scope', function(AppApi, $scope) {
-    $scope.myTitle = "DashboardController";
-    $scope.test = AppApi.test();
+.controller('DashboardController', ['AppLog', 'AppHelper', 'AppApi', '$scope', 'friendsPromise', function(AppLog, AppHelper, AppApi, $scope, friendsPromise) {
+    AppLog.debug("DashboardController");
+    
+	$scope.friends = friendsPromise;
 }]);
 

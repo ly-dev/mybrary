@@ -1,0 +1,5 @@
+name = Mybrary Web - Connection
+description = Connection related stuffs for Mybrary
+package = Mybrary
+core = 7.x
+dependencies[] = mybrary_web

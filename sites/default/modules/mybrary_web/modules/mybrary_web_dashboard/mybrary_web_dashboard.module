@@ -11,7 +11,7 @@ function mybrary_web_dashboard_menu() {
             'page callback' => 'mybrary_web_dashboard',
             'file' => 'mybrary_web_dashboard.page.inc',
             'type' => MENU_NORMAL_ITEM,
-            'access callback' => TRUE
+            'access callback' => 'user_is_logged_in'
   );
   
   $items['dashboard/main'] = array(
@@ -19,7 +19,7 @@ function mybrary_web_dashboard_menu() {
             'page callback' => 'mybrary_web_dashboard_main',
             'file' => 'mybrary_web_dashboard.page.inc',
             'type' => MENU_NORMAL_ITEM,
-            'access callback' => TRUE
+            'access callback' => 'user_is_logged_in'
   );
   
   return $items;
