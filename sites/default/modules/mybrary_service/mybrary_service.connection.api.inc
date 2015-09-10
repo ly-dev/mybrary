@@ -66,9 +66,13 @@ function mybrary_service_connection_invite_facebook ($data)
         
         $fbResponse = fboauth_graph_query('me/feed', $access_token, $params, 'POST');
         
-        if (!empty($fbResponse) && !empty($fbResponse->id)) {
-            $response['status'] = 'success';
-            $response['message'] = t('Successfully posted a notice on facebook.');
+        if (!empty($fbResponse)) {
+            if (!empty($fbResponse->id)) {
+                $response['status'] = 'success';
+                $response['message'] = t('Successfully posted on facebook. Please wait for more friends to join you.');
+            } elseif (!empty($fbResponse->error)) {
+                $response['message'] = $fbResponse->error->message;
+            }
         }
         $response['data'] = $fbResponse;
         

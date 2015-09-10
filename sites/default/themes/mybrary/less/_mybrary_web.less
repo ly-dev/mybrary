@@ -1,0 +1,45 @@
+//
+// mybrary_web
+// --------------------------------------------------
+
+@zindex-app-loading-backdrop:       2000;
+@app-loading-backdrop-bg:           #000;
+@app-loading-backdrop-opacity:      0.5;
+
+.app-loading-backdrop {
+    display: none;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: @zindex-app-loading-backdrop;
+    background-color: @app-loading-backdrop-bg;
+    opacity: @app-loading-backdrop-opacity;
+    
+    &.active {
+        display: block;
+    }
+    
+    .app-loading-content {
+        display:block;
+        position: absolute;
+        top: 50%;
+        left: 25%;
+        margin-top: -64px;
+        width: 50%;
+        height: 128px;
+        background-image: url(../images/ajax-loader.gif);
+        background-position: top center;
+        background-repeat:no-repeat;
+        background-color: transparent;
+        overflow:hidden;
+        padding-top: 64px;
+        text-align: center;
+        
+        &>span {
+            font-size: 1em;
+            color: white;
+        }
+    }
+}

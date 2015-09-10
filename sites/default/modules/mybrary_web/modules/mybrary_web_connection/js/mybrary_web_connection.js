@@ -30,17 +30,25 @@ angular.module('app_connection', ['ui.router', 'app_log', 'app_helper',  'app_ap
 			message: 'Just updated my personal DIY tools inventory to share among friends.'
 	};
 	
+	$scope.validPostItForm = function() {
+		return 	($scope.postItForm && $scope.postItForm.message.length > 0);
+	};
+	
 	$scope.postIt = function() {
-		if ($scope.postItForm && $scope.postItForm.message.length > 0) {
+		if ($scope.validPostItForm) {
+			AppHelper.showLoading();
+			
 			var data = {
 					channel: 'facebook',
 					message: $scope.postItForm.message
 			};
+			
 			AppApi.connectionInvite(data).then(function(response) {
-				AppLog.debug(response);
+				AppHelper.hideLoading();
+
+				AppHelper.showAlert(response.message, response.status);
+				jQuery('#modalInviteFriend button[data-dismiss=modal]').click();
 			});
-		} else {
-			AppLog.debug('empty message');
 		}
 	}
 }]);

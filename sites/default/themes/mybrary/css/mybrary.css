@@ -44,3 +44,37 @@ body {
 .clear {
   clear: both;
 }
+.app-loading-backdrop {
+  display: none;
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 2000;
+  background-color: #000000;
+  opacity: 0.5;
+}
+.app-loading-backdrop.active {
+  display: block;
+}
+.app-loading-backdrop .app-loading-content {
+  display: block;
+  position: absolute;
+  top: 50%;
+  left: 25%;
+  margin-top: -64px;
+  width: 50%;
+  height: 128px;
+  background-image: url(../images/ajax-loader.gif);
+  background-position: top center;
+  background-repeat: no-repeat;
+  background-color: transparent;
+  overflow: hidden;
+  padding-top: 64px;
+  text-align: center;
+}
+.app-loading-backdrop .app-loading-content > span {
+  font-size: 1em;
+  color: white;
+}
