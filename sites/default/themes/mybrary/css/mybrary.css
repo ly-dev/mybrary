@@ -1,18 +1,16 @@
 @font-face {
   font-family: 'The-Sans-Bold-Regular';
+  /* src: url('../fonts/TheSans-Bold-Plain-webfont.eot'); */
   src: url('../fonts/TheSans-Bold-Plain-webfont.eot?#iefix') format('embedded-opentype'), url('../fonts/TheSans-Bold-Plain-webfont.woff2') format('woff2'), url('../fonts/TheSans-Bold-Plain-webfont.woff') format('woff'), url('../fonts/TheSans-Bold-Plain-webfont.ttf') format('truetype'), url('../fonts/TheSans-Bold-Plain-webfont.svg#the_sans_bold-regular') format('svg');
   font-weight: normal;
   font-style: normal;
-  
-  /* src: url('../fonts/TheSans-Bold-Plain-webfont.eot'); */
 }
 @font-face {
   font-family: 'The-Sans-Semi-Bold-Regular';
+  /* src: url('../fonts/TheSans-SemiBold-Plain-webfont.eot'); */
   src: url('../fonts/TheSans-SemiBold-Plain-webfont.eot?#iefix') format('embedded-opentype'), url('../fonts/TheSans-SemiBold-Plain-webfont.woff2') format('woff2'), url('../fonts/TheSans-SemiBold-Plain-webfont.woff') format('woff'), url('../fonts/TheSans-SemiBold-Plain-webfont.ttf') format('truetype'), url('../fonts/TheSans-SemiBold-Plain-webfont.svg#the_sans_semi_bold-regular') format('svg');
   font-weight: normal;
   font-style: normal;
-  
-  /* src: url('../fonts/TheSans-SemiBold-Plain-webfont.eot'); */
 }
 @font-face {
   font-family: 'ChaparralPro-Regular';

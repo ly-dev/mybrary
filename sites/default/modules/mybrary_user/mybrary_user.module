@@ -92,34 +92,36 @@ function mybrary_user_fboauth_action_connect($app_id, $access_token) {
                 }
                 
                 // Get users not in relationship to create.
-                $result = db_select('mybrary_user_ext', 'u')->fields('u', array('uid'))
-                ->condition('u.ext_id', $fbFriendIds, 'IN')
-                ->condition('u.type', MYBRARY_USER_TYPE_FACEBOOK)
-                ->execute();
-                
-                // Create the Facebook user relationship.
-                while ($row = $result->fetchAssoc()) {
+                if (!empty($fbFriendIds)) {
+                    $result = db_select('mybrary_user_ext', 'u')->fields('u', array('uid'))
+                    ->condition('u.ext_id', $fbFriendIds, 'IN')
+                    ->condition('u.type', MYBRARY_USER_TYPE_FACEBOOK)
+                    ->execute();
                     
-                    // Detecte existing relationship.
-                    if(!(db_query('SELECT 1 FROM {mybrary_user_net} WHERE uid_from = :uid_from AND uid_to = :uid_to', 
-                    array(':uid_from'=>$user->uid, ':uid_to'=>$row['uid']))->fetchField())) {
-                        $mydate = array(
-                                'uid_from' => $user->uid,
-                                'uid_to' => $row['uid'],
-                                'update_timestamp' => time(),
-                        );
-                        drupal_write_record('mybrary_user_net', $mydate);
-                    }
-                    
-                    // Detecte existing relationship.
-                    if(!(db_query('SELECT 1 FROM {mybrary_user_net} WHERE uid_from = :uid_from AND uid_to = :uid_to', 
-                    array(':uid_from'=>$row['uid'], ':uid_to'=>$user->uid))->fetchField())) {
-                        $mydate = array(
-                                'uid_from' => $row['uid'],
-                                'uid_to' => $user->uid,
-                                'update_timestamp' => time(),
-                        );
-                        drupal_write_record('mybrary_user_net', $mydate);
+                    // Create the Facebook user relationship.
+                    while ($row = $result->fetchAssoc()) {
+                        
+                        // Detecte existing relationship.
+                        if(!(db_query('SELECT 1 FROM {mybrary_user_net} WHERE uid_from = :uid_from AND uid_to = :uid_to', 
+                        array(':uid_from'=>$user->uid, ':uid_to'=>$row['uid']))->fetchField())) {
+                            $mydate = array(
+                                    'uid_from' => $user->uid,
+                                    'uid_to' => $row['uid'],
+                                    'update_timestamp' => time(),
+                            );
+                            drupal_write_record('mybrary_user_net', $mydate);
+                        }
+                        
+                        // Detecte existing relationship.
+                        if(!(db_query('SELECT 1 FROM {mybrary_user_net} WHERE uid_from = :uid_from AND uid_to = :uid_to', 
+                        array(':uid_from'=>$row['uid'], ':uid_to'=>$user->uid))->fetchField())) {
+                            $mydate = array(
+                                    'uid_from' => $row['uid'],
+                                    'uid_to' => $user->uid,
+                                    'update_timestamp' => time(),
+                            );
+                            drupal_write_record('mybrary_user_net', $mydate);
+                        }
                     }
                 }
                 

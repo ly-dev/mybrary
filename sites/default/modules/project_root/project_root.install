@@ -2,10 +2,15 @@
 
 function project_root_install()
 {
+    // set theme to mybrary
     project_root_set_theme('mybrary');
     
     // set home page
     variable_set('site_frontpage', 'welcome');
+    
+    // enable visitor to register and no need admin approval, no need email verification
+    variable_set('user_register', '1');
+    variable_set('user_email_verification', '0');
 }
 
 function project_root_set_theme($theme_name)
