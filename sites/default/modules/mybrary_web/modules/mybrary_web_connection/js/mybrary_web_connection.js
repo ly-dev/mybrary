@@ -13,18 +13,18 @@ angular.module('app_connection', ['ui.router', 'app_log', 'app_helper',  'app_ap
 		templateUrl: Drupal.settings.angularjsApp.basePath + '/connection/main',
     	controller: 'ConnectionController',
     	resolve:{
-            friendsPromise:  ['AppApi', function(AppApi) {
+            connectionListPromise:  ['AppApi', function(AppApi) {
                return AppApi.connectionList();
             }]
         }
     });
 }])
 
-.controller('ConnectionController', ['AppLog', 'AppHelper', 'AppApi', '$scope', 'friendsPromise', function(AppLog, AppHelper, AppApi, $scope, friendsPromise) {
+.controller('ConnectionController', ['AppLog', 'AppHelper', 'AppApi', '$scope', 'connectionListPromise', function(AppLog, AppHelper, AppApi, $scope, connectionListPromise) {
     AppLog.debug("ConnectionController");
 
     
-	$scope.friends = friendsPromise;
+	$scope.friends = connectionListPromise;
 	
 	$scope.postItForm = {
 			message: 'Just updated my personal DIY tools inventory to share among friends.'

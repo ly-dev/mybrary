@@ -26,12 +26,56 @@ function mybrary_service_inventory_list ($data)
 {
     global $user;
     
+    $response = NULL;
+    
+    // list own inventory by default
+    $uid = $user->uid;
+    if ($data) {
+        //@TODO check access to friend or fof
+        if ($data['uid']) {
+            $uid = $data['uid'];
+        }
+    }
+    
+    $query = new EntityFieldQuery();
+    $query->entityCondition('entity_type', 'node')
+    ->entityCondition('bundle', 'item')
+    ->propertyCondition('status', NODE_PUBLISHED)
+    ->propertyCondition('uid', $uid);
+    
+    $result = $query->execute();
+    
     $response = array();
+    if (isset($result['node'])) {
+        $entities = entity_load('node', array_keys($result['node']));
+        
+        if (!empty($entities)) {
+            // required fields to return and related options, 'field name'=>option array
+            $filterRequiredFields = array(
+                    'nid'=>array('is_property'=>TRUE),
+                    'title'=>array('is_property'=>TRUE),
+                    'body'=>array('values_convertor'=>'single_value'),
+                    'field_type'=>array('values_convertor'=>'single_value'),
+                    'field_manufacturer'=>array('values_convertor'=>'single_value'),
+                    'field_image'=>array('value_convertor'=>'image'),
+            );
+            
+            // all available fields
+            $fieldInfo = field_info_instances('node', 'item');
+            $fieldKeys = array_keys($fieldInfo);
+            
+            foreach($entities as $nid=>$entity)
+            {
+                foreach ($filterRequiredFields as $fik => $fio) {
+                    
+                    if (($fio && $fio['is_property']) || in_array($fik, $fieldKeys)) {
+                        $response[$entity->nid][$fik] = _mybrary_service_get_entity_field_value($entity, $fik, $fio);
+                    }
+                }
+            }
+        }
+    }
     
-    $data['a'] = $data['a'] . ' successfully!'; 
-    $response = $data;
-    
-   
     return $response;
 }
 

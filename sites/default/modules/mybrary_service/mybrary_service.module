@@ -333,39 +333,81 @@ function mybrary_service_services_resources ()
             )
     );
 }
-
+   
 /**
- * Alter results of the services call.
- *
- * @param $controller Controller
- *            definition
- * @param array $args
- *            Arguments passed to services callback
- * @param array $result
- *            Array of results that can be altered
- *
- * @see services_controller_execute()
- * @see services.runtime.inc
+ * Get rid of wrapper for field value
+ * _mybrary_service_get_field_value ($entity, $fik, $fio).
+ * 
+ * @param Entity $entity
+ * @param string $fik, field name
+ * @param array $fio, field value processing options
+ * @return single value or array
  */
-function mybrary_service_services_request_postprocess_alter ($controller, $args, &$result) {
-}
-
-/**
- * _mybrary_service_flat_field_value ($fik, $value).
- */
-function _mybrary_service_flat_field_value ($fik, $value)
+function _mybrary_service_get_entity_field_value ($entity, $fik, $fio)
 {
-    if (! empty($value)) {
-        // these fields need to return array, others need to flat
-        $multipleValueFields = array(
-        );
-
-        if (! in_array($fik, $multipleValueFields) && count($value) == 1) {
-            $value = $value[0];
+   $values = NULL;
+    
+   if ($fio && $fio['is_property'] && isset($entity->{$fik})) {
+       $values = $entity->{$fik};
+       
+   } elseif (!empty($entity->{$fik}) && !empty($entity->{$fik}[$entity->language])) {
+        $values = array();
+        
+        // process each item in the field
+        foreach($entity->{$fik}[$entity->language] as $v)
+        {
+            $valueConvertorName = "default";
+            if ($fio && isset($fio['value_convertor']) 
+            && function_exists("_mybrary_service_entity_field_value_convertor_{$fio['value_convertor']}")) {
+                $valueConvertorName = $fio['value_convertor'];
+            }
+            
+            $values[] = call_user_func("_mybrary_service_entity_field_value_convertor_{$valueConvertorName}", $v, $entity, $fik, $fio);
         }
-    } else {
-        $value = null;
+    }
+    
+    // process the whole field
+    $valuesConvertorName = "default";
+    if ($fio && isset($fio['values_convertor'])
+    && function_exists("_mybrary_service_entity_field_values_convertor_{$fio['values_convertor']}")) {
+        $valuesConvertorName = $fio['values_convertor'];
     }
 
-    return $value;
+    $values= call_user_func("_mybrary_service_entity_field_values_convertor_{$valuesConvertorName}", $values, $entity, $fik, $fio);
+    
+    return $values;
+}
+
+/********************************************************************
+ * entity field convertors
+ *******************************************************************/
+
+function _mybrary_service_entity_field_value_convertor_default ($v, $entity, $fik, $fio) {
+    return (isset($v['value']) ? $v['value'] : (isset($v['tid']) ? $v['tid'] : (isset($v['nid']) ? $v['nid'] : $v)));
+}
+
+function _mybrary_service_entity_field_value_convertor_image ($v, $entity, $fik, $fio) {
+    $a=1;
+    return array(
+        'filename'=> $v['filename'],
+        'url'=> file_create_url($v['uri']),
+    );
+}
+
+/********************************************************************
+ * entity field values convertors
+ *******************************************************************/
+
+function _mybrary_service_entity_field_values_convertor_default ($values, $entity, $fik, $fio) {
+    // do nothing
+    return $values;     
+}
+
+function _mybrary_service_entity_field_values_convertor_single_value ($values, $entity, $fik, $fio) {
+    if (!empty($values)) {
+        $values = $values[0];
+    } else {
+        $values = NULL;
+    }
+    return $values;
 }

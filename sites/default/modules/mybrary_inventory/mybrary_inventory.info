@@ -6,6 +6,7 @@ version = 7.x-1.0-beta1
 dependencies[] = project_shared
 dependencies[] = text
 features[features_api][] = api:2
+features[field_instance][] = node-item-body
 features[field_instance][] = node-item-field_image
 features[field_instance][] = node-item-field_manufacturer
 features[field_instance][] = node-item-field_model

@@ -13,16 +13,24 @@ angular.module('app_dashboard', ['ui.router', 'app_log', 'app_helper',  'app_api
 		templateUrl: Drupal.settings.angularjsApp.basePath + '/dashboard/main',
     	controller: 'DashboardController',
     	resolve:{
-            friendsPromise:  ['AppApi', function(AppApi) {
+            connectionListPromise:  ['AppApi', function(AppApi) {
                return AppApi.connectionList();
-            }]
+            }],
+            termListPromise:  ['AppApi', function(AppApi) {
+                return AppApi.termList();
+             }],
+             inventoryListPromise:  ['AppApi', function(AppApi) {
+                return AppApi.inventoryList();
+             }]
         }
     });
 }])
 
-.controller('DashboardController', ['AppLog', 'AppHelper', 'AppApi', '$scope', 'friendsPromise', function(AppLog, AppHelper, AppApi, $scope, friendsPromise) {
+.controller('DashboardController', ['AppLog', 'AppHelper', 'AppApi', '$scope', 'connectionListPromise', 'termListPromise', 'inventoryListPromise', function(AppLog, AppHelper, AppApi, $scope, connectionListPromise, termListPromise, inventoryListPromise) {
     AppLog.debug("DashboardController");
     
-	$scope.friends = friendsPromise;
+	$scope.friends = connectionListPromise;
+    $scope.terms = termListPromise;
+	$scope.items = inventoryListPromise;
 }]);
 

@@ -8,17 +8,17 @@
     </div>
 	<p></p>
 	<div class="row">
-		<div id="app-alert-container" class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-        </div>
+		<div id="app-alert-container" class="col-xs-12 col-sm-12 col-md-12 col-lg-12"/>
     </div>
 	<p></p>
 	<div class="row">
 		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-			<div class="list-group friend-group">
+			<div class="list-group">
 				<div class="list-group-item">My Connection</div>
-				<button type="button" class="list-group-item friend-item" ng-repeat="friend in friends">
-					<img ng-src="https://graph.facebook.com/v2.4/{{friend.externalId}}/picture?height=64&width=64" alt="{{friend.externalName}}">
-					<span>{{friend.externalName}}</span>
+				<button type="button" class="list-group-item" ng-if="angular.isEmpty(friends)">Oops! Nothing found.</button>
+				<button type="button" class="list-group-item" ng-repeat="(id, friend) in friends">
+					<img ng-src="{{friend.pictureUrl}}" alt="avatar" class="app-icon app-icon-avatar-small">
+					<span>{{friend.name}}</span>
 				</button>
 			</div>
 		</div>

@@ -67,6 +67,12 @@ angular.module('app_api', ['app_log', 'app_helper'])
         	return response.data;
         });
 	};
+	
+	service.inventoryList = function(data) {
+        return service.callRestApi('POST', '/inventory/list', data).then(function(response) {
+        	return response.data;
+        });
+	};
 
 	return service;
 }])

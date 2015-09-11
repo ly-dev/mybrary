@@ -147,3 +147,28 @@ function mybrary_user_fboauth_action_connect($app_id, $access_token) {
         }
     }
 }
+
+/**
+ * Implements hook_user_delete().
+ */
+function mybrary_user_user_delete($account) {
+    // Delete any existing extended user info and relationship.
+    db_delete('mybrary_user_ext')
+    ->condition('uid', $account->uid)
+    ->execute();
+
+    db_delete('mybrary_user_net')
+    ->condition('uid_from', $account->uid)
+    ->execute();
+    
+    db_delete('mybrary_user_net')
+    ->condition('uid_to', $account->uid)
+    ->execute();
+}
+
+/**
+ * Implements hook_user_cancel().
+ */
+function mybrary_user_user_cancel($edit, $account, $method) {
+    mybrary_user_user_delete($account);
+}

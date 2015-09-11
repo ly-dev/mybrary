@@ -13,20 +13,24 @@ angular.module('app_inventory', ['ui.router', 'app_log', 'app_helper',  'app_api
 		templateUrl: Drupal.settings.angularjsApp.basePath + '/inventory/main',
     	controller: 'InventoryController',
     	resolve:{
-            termsPromise:  ['AppApi', function(AppApi) {
+            termListPromise:  ['AppApi', function(AppApi) {
                return AppApi.termList();
             }],
-            friendsPromise:  ['AppApi', function(AppApi) {
-               return AppApi.connectionList();
+            inventoryListPromise:  ['AppApi', function(AppApi) {
+               return AppApi.inventoryList();
             }]
         }
     });
 }])
 
-.controller('InventoryController', ['AppLog', 'AppHelper', 'AppApi', '$scope', 'termsPromise', 'friendsPromise', function(AppLog, AppHelper, AppApi, $scope, termsPromise, friendsPromise) {
+.controller('InventoryController', ['AppLog', 'AppHelper', 'AppApi', '$scope', 'termListPromise', 'inventoryListPromise', function(AppLog, AppHelper, AppApi, $scope, termListPromise, inventoryListPromise) {
     AppLog.debug("InventoryController");
 
-    
-	$scope.friends = friendsPromise;
+    $scope.terms = termListPromise;
+	$scope.items = inventoryListPromise;
+	
+	$scope.modalItem = {
+			title: "my modal"
+	}
 }]);
 

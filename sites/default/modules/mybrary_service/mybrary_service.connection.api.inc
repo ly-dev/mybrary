@@ -54,7 +54,8 @@ function mybrary_service_connection_invite_facebook ($data)
         
         $params = array(
             'link' => url('', array('absolute' => TRUE)),
-            'picture' => 'http://iphicles.global-initiative.com/chchweb/sites/default/files/logo.png',
+            //@TODO replace below default picture
+            'picture' => 'http://backend.global-initiative.com/sites/backend.global-initiative.com/files/field/image/Cornerstone.jpg',
             'name' => t('Join me now!'),
             'caption' => variable_get('site_name'),
             'description' => (isset($data['message']) ? $data['message']
@@ -92,23 +93,29 @@ function mybrary_service_connection_invite_facebook ($data)
 function mybrary_service_connection_list ($data)
 {
     global $user;
+    global $base_path;
     
-    $response = array();
+    $response = NULL;
     
     if ($user->uid) {
         try {
             $query = db_select('mybrary_user_net', 'n');
-            $query->join('mybrary_user_ext', 'e', 'n.uid_to = e.uid');
-            $query->fields('e', array('uid', 'ext_id', 'ext_name'))
-            ->condition('n.uid_from', $user->uid);
+            $query->join('users', 'u', 'n.uid_to = u.uid');
+            $query->join('mybrary_user_ext', 'e', 'e.uid = u.uid');
+            $query->leftJoin('file_managed', 'f', 'u.picture = f.fid');
+            $query->fields('u', array('uid', 'name'));
+            $query->addField('e', 'ext_id', 'externalId');
+            $query->addField('e', 'ext_name', 'externalName');
+            $query->addField('e', 'type', 'externalType');
+            $query->addField('f', 'uri', 'pictureUri');
+            $query->condition('n.uid_from', $user->uid);
             $dbResult = $query->execute();
             
+            $response = array();
             while ($row = $dbResult->fetchAssoc()) {
-                $response[] = array(
-                    'uid' => $row['uid'],
-                    'externalId' => $row['ext_id'],
-                    'externalName' => $row['ext_name'],
-                );
+                $row['pictureUrl'] = ($row['pictureUri'] ? file_create_url($row['pictureUri'])
+                            : $base_path . drupal_get_path('theme', 'mybrary') . '/images/unknown-user.png');
+                $response[$row['uid']] = $row;
             }
         } catch (Exception $e) {
             $response = services_error($e->getMessage(), 500);
