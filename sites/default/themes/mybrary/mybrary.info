@@ -53,6 +53,10 @@ stylesheets[all][] = 'css/mybrary.css'
 ; ;; Scripts
 ; ;;;;;;;;;;;;;;;;;;;;;
 
+; Lodash
+; --------------
+scripts[] = 'lib/lodash/lodash.min.js'
+
 ; Bootstrap
 ; --------------
 scripts[] = 'lib/bootstrap/dist/js/bootstrap.min.js'

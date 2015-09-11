@@ -15,7 +15,7 @@
 		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
 			<div class="list-group">
 				<div class="list-group-item">My Connection</div>
-				<button type="button" class="list-group-item" ng-if="angular.isEmpty(friends)">Oops! Nothing found.</button>
+				<button type="button" class="list-group-item" ng-if="_.isEmpty(friends)">Oops! Nothing found.</button>
 				<button type="button" class="list-group-item" ng-repeat="(id, friend) in friends">
 					<img ng-src="{{friend.pictureUrl}}" alt="avatar" class="app-icon app-icon-avatar-small">
 					<span>{{friend.name}}</span>
@@ -38,13 +38,12 @@
 			<div class="modal-body">
 				<form>
 					<div class="form-group" ng-class="{'has-error has-feedback' : !validPostItForm()}">
-						<label for="post-message" class="control-label">Message:</label>
-						<textarea class="form-control" id="post-message" name="post-message" ng-model="postItForm.message"></textarea>
 						<span class="glyphicon glyphicon-warning-sign form-control-feedback" aria-hidden="true" ng-show="!validPostItForm()"></span>
-						<span class="help-block" ng-show="!validPostItForm()">Please enter an invitation message.</span>
+						<span class="help-block" ng-show="!validPostItForm()">Please enter your message.</span>
+						<textarea class="form-control" id="post-message" name="post-message" placeholder="Your message" ng-model="postItForm.message"></textarea>
 					</div>
 					<div class="form-group">
-						<label for=post-link class="control-label">App link: <?php print url('', array('absolute' => TRUE)); ?></label>
+						<label for=post-link class="control-label">Shared app link: <?php print url('', array('absolute' => TRUE)); ?></label>
 					</div>
 				</form>
 			</div>

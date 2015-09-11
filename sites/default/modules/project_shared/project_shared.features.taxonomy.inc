@@ -32,28 +32,5 @@ function project_shared_taxonomy_default_vocabularies() {
         ),
       ),
     ),
-    'manufacturer' => array(
-      'name' => 'Manufacturer',
-      'machine_name' => 'manufacturer',
-      'description' => '',
-      'hierarchy' => 0,
-      'module' => 'taxonomy',
-      'weight' => 0,
-      'rdf_mapping' => array(
-        'rdftype' => array(
-          0 => 'skos:ConceptScheme',
-        ),
-        'name' => array(
-          'predicates' => array(
-            0 => 'dc:title',
-          ),
-        ),
-        'description' => array(
-          'predicates' => array(
-            0 => 'rdfs:comment',
-          ),
-        ),
-      ),
-    ),
   );
 }

@@ -15,7 +15,7 @@
 		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
 			<div class="list-group">
 				<div class="list-group-item">My Inventory</div>
-				<button type="button" class="list-group-item" ng-if="angular.isEmpty(items)">Oops! Nothing found.</button>
+				<button type="button" class="list-group-item" ng-if="_.isEmpty(items)">Oops! Nothing found.</button>
 				<button type="button" class="list-group-item" ng-repeat="(id, item) in items">
 					<img ng-src="{{item.field_image[0].url}}" alt="picture" class="app-icon app-icon-avatar-small">
 					<span>{{item.title}}</span>
@@ -37,20 +37,66 @@
 			</div>
 			<div class="modal-body">
 				<form>
-					<div class="form-group" ng-class="{'has-error has-feedback' : !validPostItForm()}">
-						<label for="post-message" class="control-label">Message:</label>
-						<textarea class="form-control" id="post-message" name="post-message" ng-model="postItForm.message"></textarea>
-						<span class="glyphicon glyphicon-warning-sign form-control-feedback" aria-hidden="true" ng-show="!validPostItForm()"></span>
-						<span class="help-block" ng-show="!validPostItForm()">Please enter an invitation message.</span>
+					<div class="form-group" ng-class="{'has-error has-feedback' : formItem.errors['image']}">
+						<span class="help-block" ng-show="formItem.errors['image']">{{formItem.errors['image']}}</span>
+						<span class="glyphicon glyphicon-warning-sign form-control-feedback" aria-hidden="true" ng-show="formItem.errors['image']"></span>
+
+						<div ng-show="imageCrop.step == 1">
+                        	<input type="file" id="form-item-image" name="form-item-image" placeholder="Tool name" onchange="angular.element(this).scope().fileChanged(event)">
+                        </div>
+                       <div ng-show="imageCrop.step == 2">
+                           <image-crop			 
+                             data-height="220"
+                             data-width="220"
+                             data-shape="square"
+                             data-step="imageCrop.step"
+                             src="imageCrop.raw"
+                             data-result="imageCrop.result"
+                             data-result-blob="imageCrop.resultBlob"
+                             crop="initCrop"
+                             padding="40"
+                             max-size="300"
+                           ></image-crop>		   
+                           <button ng-click="clearImage()">Cancel</button>
+                           <button ng-click="initCrop = true">Crop</button>		
+                       </div>		  
+                       
+                       <div ng-show="imageCrop.step == 3">
+                       
+                         <h2>Result</h2>
+                       
+                         <p>The data-result-blob property is a Blob object, which is necessary in some upload libraries like <a href="https://github.com/nervgh/angular-file-upload" target="_blank">Angular File Upload</a></p>
+                         <p>Image using the data uri:</p>
+                         <img ng-src="{{imageCrop.result}}"></img>
+                         <p>The Base64 String used in the image above:</p>         
+                         <textarea class="result-datauri">{{imageCrop.result }}</textarea>
+                         <button ng-click="clearImage()">Clear</button>	
+                       
+                      </div>                        
+                        
+					</div>				
+					<div class="form-group" ng-class="{'has-error has-feedback' : formItem.errors['title']}">
+						<span class="help-block" ng-show="formItem.errors['title']">{{formItem.errors['title']}}</span>
+						<span class="glyphicon glyphicon-warning-sign form-control-feedback" aria-hidden="true" ng-show="formItem.errors['title']"></span>
+                        <input type="text" class="form-control" id="form-item-title" name="form-item-title" placeholder="Tool name" ng-model="formItem.data['title']">
+					</div>				
+					<div class="form-group" ng-class="{'has-error has-feedback' : formItem.errors['category']}">
+						<span class="help-block" ng-show="formItem.errors['category']">{{formItem.errors['category']}}</span>
+						<span class="glyphicon glyphicon-warning-sign form-control-feedback" aria-hidden="true" ng-show="formItem.errors['category']"></span>
+						<select class="form-control" id="form-item-category" name="form-item-category" ng-options="option.name for option in cateogories track by option.tid" ng-model="formItem.data['category']">
+						</select>
 					</div>
 					<div class="form-group">
-						<label for=post-link class="control-label">App link: <?php print url('', array('absolute' => TRUE)); ?></label>
-					</div>
+                        <input type="text" class="form-control" id="form-item-model" name="form-item-model" placeholder="Tool model (optional)" ng-model="formItem.data['model']">
+					</div>									
+					<div class="form-group">
+						<textarea class="form-control" id="form-item-body" name="form-item-body" placeholder="Tool description (optional)" ng-model="formItem.data['body']"></textarea>
+					</div>									
 				</form>
 			</div>
 			<div class="modal-footer">
 				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-				<button type="button" class="btn btn-primary" ng-click="postIt()" ng-disabled="!validPostItForm()">Post it</button>
+				<button type="button" class="btn btn-primary" ng-click="saveItem()" ng-disabled="!validFormItem()">Save</button>
 			</div>
 		</div>
 	</div>
