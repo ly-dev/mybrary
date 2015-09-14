@@ -57,6 +57,7 @@ function mybrary_service_inventory_list ($data)
                     'field_type'=>array('values_convertor'=>'single_value'),
                     'field_model'=>array('values_convertor'=>'single_value'),
                     'field_image'=>array('value_convertor'=>'image'),
+                    'field_shared'=>array('value_convertor'=>'single_value'),
             );
             
             // all available fields
@@ -139,6 +140,7 @@ function mybrary_service_inventory_update ($data)
         if ($node) {
             $node->title = $data['title'];
             $node->field_type[$node->language] = array(array('tid' => $data['field_type']));
+            $node->field_shared[$node->language] = array(array('value' => $data['field_shared']));
             $node->field_model[$node->language] = array(array('value' => $data['field_model']));
             $node->body[$node->language] = array(array('value' => $data['body']));
             
@@ -155,7 +157,7 @@ function mybrary_service_inventory_update ($data)
                 
                 $response = array(
                         'status' => 'success',
-                        'message' => t('Successfully saved inventory item: !name.', array('!name' => $node->title))
+                        'message' => t('Successfully saved item: !name.', array('!name' => $node->title))
                 );
             } catch (Exception $e) {
                 $response = services_error($e->getMessage(), 500);

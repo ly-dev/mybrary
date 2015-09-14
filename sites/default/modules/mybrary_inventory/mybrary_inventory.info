@@ -9,6 +9,7 @@ features[features_api][] = api:2
 features[field_instance][] = node-item-body
 features[field_instance][] = node-item-field_image
 features[field_instance][] = node-item-field_model
+features[field_instance][] = node-item-field_shared
 features[field_instance][] = node-item-field_type
 features[node][] = item
 features_exclude[dependencies][features] = features

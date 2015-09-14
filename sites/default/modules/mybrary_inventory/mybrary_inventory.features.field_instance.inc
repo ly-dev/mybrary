@@ -145,6 +145,47 @@ function mybrary_inventory_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance: 'node-item-field_shared'
+  $field_instances['node-item-field_shared'] = array(
+    'bundle' => 'item',
+    'default_value' => array(
+      0 => array(
+        'value' => 0,
+      ),
+    ),
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'hidden',
+        'module' => 'list',
+        'settings' => array(),
+        'type' => 'list_default',
+        'weight' => 6,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_shared',
+    'label' => 'Shared',
+    'required' => 1,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(),
+      'type' => 'options_select',
+      'weight' => 7,
+    ),
+  );
+
   // Exported field_instance: 'node-item-field_type'
   $field_instances['node-item-field_type'] = array(
     'bundle' => 'item',
@@ -190,6 +231,7 @@ function mybrary_inventory_field_default_field_instances() {
   t('Body');
   t('Image');
   t('Model');
+  t('Shared');
   t('Type');
 
   return $field_instances;

@@ -26,12 +26,16 @@ angular.module('app_inventory', ['ui.router', 'ImageCropper', 'app_log', 'app_he
     
     $scope.terms = termListPromise;
     $scope.categories = AppApi.prepareTermOptionsByType(termListPromise, 'categories');
+    $scope.sharedOptions = [
+        {id: 0, label: "not shared"},
+        {id: 1, label: "shared"}
+    ];
 	
 	var refreshList = function() {
 		AppApi.inventoryList().then(function(data) {
 			$scope.items = data;
 			$scope.itemsMeta = {
-				count: _.values(data).length
+				count: _.values($scope.items).length
 			};
 			
 			AppHelper.hideLoading();
@@ -90,14 +94,21 @@ angular.module('app_inventory', ['ui.router', 'ImageCropper', 'app_log', 'app_he
 		}
 		
 		if (_.isEmpty($scope.formItemData['field_type'] )) {
-			$scope.formItemErrors['field_type'] = "Please choose category.";
+			$scope.formItemErrors['field_type'] = "Please select category.";
 			result = false;
 		} else {
 			$scope.formItemErrors['field_type'] = null;
 		}
 
+		if (_.isEmpty($scope.formItemData['field_shared'] )) {
+			$scope.formItemErrors['field_shared'] = "Please select share status.";
+			result = false;
+		} else {
+			$scope.formItemErrors['field_shared'] = null;
+		}
+
 		if ($scope.imageCrop.step != 3) {
-			$scope.formItemErrors['field_image'] = "Please choose image.";
+			$scope.formItemErrors['field_image'] = "Please select image.";
 			result = false;
 		} else {
 			$scope.formItemErrors['field_image'] = null;
@@ -132,6 +143,7 @@ angular.module('app_inventory', ['ui.router', 'ImageCropper', 'app_log', 'app_he
 		$scope.formItemData = {
 			'title': "New tool",
 			'field_type': null,
+			'field_shared': "0",
 			'field_model': "",
 			'body': ""
 		};

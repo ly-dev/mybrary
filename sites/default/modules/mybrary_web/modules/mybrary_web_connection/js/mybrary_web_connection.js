@@ -11,20 +11,25 @@ angular.module('app_connection', ['ui.router', 'app_log', 'app_helper',  'app_ap
     .state('main', {
 		url: "/main",
 		templateUrl: Drupal.settings.angularjsApp.basePath + '/connection/main',
-    	controller: 'ConnectionController',
-    	resolve:{
-            connectionListPromise:  ['AppApi', function(AppApi) {
-               return AppApi.connectionList();
-            }]
-        }
+    	controller: 'ConnectionController'
     });
 }])
 
-.controller('ConnectionController', ['AppLog', 'AppHelper', 'AppApi', '$scope', 'connectionListPromise', function(AppLog, AppHelper, AppApi, $scope, connectionListPromise) {
+.controller('ConnectionController', ['AppLog', 'AppHelper', 'AppApi', '$scope', function(AppLog, AppHelper, AppApi, $scope) {
     AppLog.debug("ConnectionController");
-
+    AppHelper.showLoading();
     
-	$scope.friends = connectionListPromise;
+	var refreshList = function() {
+		AppApi.connectionList().then(function(data) {
+			$scope.friends = data;
+			$scope.friendsMeta = {
+				count: _.values($scope.friends).length
+			};
+			
+			AppHelper.hideLoading();
+		});
+	}
+	refreshList();
 	
 	$scope.postItForm = {
 			message: 'Just updated my personal DIY tools inventory to share among friends.'
