@@ -55,6 +55,7 @@ function mybrary_service_inventory_list ($data)
                     'title'=>array('is_property'=>TRUE),
                     'body'=>array('values_convertor'=>'single_value'),
                     'field_type'=>array('values_convertor'=>'single_value'),
+                    'field_model'=>array('values_convertor'=>'single_value'),
                     'field_image'=>array('value_convertor'=>'image'),
             );
             
@@ -137,9 +138,9 @@ function mybrary_service_inventory_update ($data)
         
         if ($node) {
             $node->title = $data['title'];
-            $node->field_type[$node->language][]['tid'] = $data['field_type'];
-            $node->field_model[$node->language][]['value'] = $data['field_model'];
-            $node->body[$node->language][]['value'] = $data['body'];
+            $node->field_type[$node->language] = array(array('tid' => $data['field_type']));
+            $node->field_model[$node->language] = array(array('value' => $data['field_model']));
+            $node->body[$node->language] = array(array('value' => $data['body']));
             
             try {
                 if (!empty($data['field_image']) && !empty($data['field_image']['name']) && !empty($data['field_image']['data'])) {

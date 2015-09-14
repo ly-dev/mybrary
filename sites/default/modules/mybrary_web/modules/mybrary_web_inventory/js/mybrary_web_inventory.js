@@ -15,116 +15,142 @@ angular.module('app_inventory', ['ui.router', 'ImageCropper', 'app_log', 'app_he
     	resolve:{
             termListPromise:  ['AppApi', function(AppApi) {
                return AppApi.termList();
-            }],
-            inventoryListPromise:  ['AppApi', function(AppApi) {
-               return AppApi.inventoryList();
             }]
         }
     });
 }])
 
-.controller('InventoryController', ['AppLog', 'AppHelper', 'AppApi', '$scope', 'termListPromise', 'inventoryListPromise', function(AppLog, AppHelper, AppApi, $scope, termListPromise, inventoryListPromise) {
+.controller('InventoryController', ['AppLog', 'AppHelper', 'AppApi', '$scope', 'termListPromise', function(AppLog, AppHelper, AppApi, $scope, termListPromise) {
     AppLog.debug("InventoryController");
-
-    $scope.cateogories = AppApi.prepareTermOptionsByType(termListPromise, 'categories');
-	$scope.items = inventoryListPromise;
+    AppHelper.showLoading();
+    
+    $scope.terms = termListPromise;
+    $scope.categories = AppApi.prepareTermOptionsByType(termListPromise, 'categories');
+	
+	var refreshList = function() {
+		AppApi.inventoryList().then(function(data) {
+			$scope.items = data;
+			$scope.itemsMeta = {
+				count: _.values(data).length
+			};
+			
+			AppHelper.hideLoading();
+		});
+	}
+	refreshList();
 	
 	$scope.modalItem = {
 			title: "my modal",
 	}
-	
-	$scope.formItem = {
-			data: {
-				'title': "New tool",
-				'category' : null,
-				'model': "",
-				'image': {},
-				'body': ""
-			},
-			errors: {
-				'title': null,
-				'category': null,
-				'model': null,
-				'image': "Please choose an image.",
-				'body': null
-			}
-	};
-	
-	$scope.validFormItem = function() {
-		var result = true;
-		
-		if (_.isEmpty($scope.formItem.data['title'] )) {
-			$scope.formItem.errors['title'] = "Please give a name.";
-			result = false;
-		} else {
-			$scope.formItem.errors['title'] = null;
-		}
-		
-		if (_.isEmpty($scope.formItem.data['category'] )) {
-			$scope.formItem.errors['category'] = "Please choose a category.";
-			result = false;
-		} else {
-			$scope.formItem.errors['category'] = null;
-		}
 
-		if ($scope.formItem.errors['image'] != null && $scope.formItem.data.image.step != 3) {
-			result = false;
-		}
-		
-		return result;
-	};
+	$scope.formItemData = {};
+	$scope.formItemErrors = {};
 	
+	// image related functions
+	$scope.imageCrop = {};
 	$scope.fileChanged = function(e) {			
 		var files = e.target.files;
 	
  		var fileReader = new FileReader();
- 		$scope.formItem.data.image.file = files[0];
+ 		$scope.imageCrop.file = files[0];
 		fileReader.readAsDataURL(files[0]);		
 		
 		fileReader.onload = function(e) {
-			$scope.formItem.data.image.raw = this.result;
-			$scope.formItem.errors['image'] = null
+			$scope.imageCrop.raw = this.result;
 			$scope.$apply();
 		};
 		
 	};
 	
      $scope.clearImage = function() {
-		 $scope.formItem.data.image.step = 1;
-		 delete $scope.formItem.data.image.file;
-		 delete $scope.formItem.data.image.raw;
-		 delete $scope.formItem.data.image.result;
-		 delete $scope.formItem.data.image.resultBlob;
-		 $scope.formItem.errors['image'] = "Please choose an image."; 
+		 $scope.imageCrop.step = 1;
+		 delete $scope.imageCrop.file;
+		 delete $scope.imageCrop.raw;
+		 delete $scope.imageCrop.result;
+		 delete $scope.imageCrop.resultBlob;
+	};
+	
+    $scope.resetImage = function(item) {
+		 delete $scope.imageCrop.file;
+		 delete $scope.imageCrop.raw;
+		 delete $scope.imageCrop.resultBlob;
+		 
+		 $scope.imageCrop.step = 3;
+		 $scope.imageCrop.result = item.field_image[0].url;
+	};	
+	
+	$scope.validFormItem = function() {
+		var result = true;
+		
+		if (_.isEmpty($scope.formItemData['title'] )) {
+			$scope.formItemErrors['title'] = "Please enter name.";
+			result = false;
+		} else {
+			$scope.formItemErrors['title'] = null;
+		}
+		
+		if (_.isEmpty($scope.formItemData['field_type'] )) {
+			$scope.formItemErrors['field_type'] = "Please choose category.";
+			result = false;
+		} else {
+			$scope.formItemErrors['field_type'] = null;
+		}
+
+		if ($scope.imageCrop.step != 3) {
+			$scope.formItemErrors['field_image'] = "Please choose image.";
+			result = false;
+		} else {
+			$scope.formItemErrors['field_image'] = null;
+		}
+		
+		return result;
 	};
 	
 	$scope.saveItem = function() {
 		if ($scope.validFormItem) {
 			AppHelper.showLoading();
 			
-			var data = {
-				title: $scope.formItem.data.title,
-				field_type: $scope.formItem.data.category,
-				field_model: $scope.formItem.data.model,
-				body:$scope.formItem.data.body
-			};
+			var data = angular.copy($scope.formItemData);
 			
 			// only update if image changed
-			if ($scope.formItem.data.image.file) {
+			if ($scope.imageCrop.file && $scope.imageCrop.step == 3) {
 				data['field_image'] = {
-					name: $scope.formItem.data.image.file.name,
-					data: $scope.formItem.data.image.result
+					name: $scope.imageCrop.file.name,
+					data: $scope.imageCrop.result
 				};
 			}
 			
 			AppApi.inventoryUpdate(data).then(function(response) {
-				AppHelper.hideLoading();
-
+				refreshList();
 				AppHelper.showAlert(response.message, response.status);
 				jQuery('#modalItem button[data-dismiss=modal]').click();
 			});
 		}
 	}
+	
+	$scope.newItem = function (event) {
+		$scope.formItemData = {
+			'title': "New tool",
+			'field_type': null,
+			'field_model': "",
+			'body': ""
+		};
+		
+		$scope.clearImage();
+		
+		jQuery("#modalItem").modal('show');
+	}
+	
+	$scope.editItem = function (item) {
+		$scope.formItemData = angular.copy(item);
+		
+		$scope.resetImage(item);
+		
+		jQuery("#modalItem").modal('show');
+	}
+	
+	// initialize modal
+	jQuery("#modalItem").modal({show:false});
 	
 }]);
 
