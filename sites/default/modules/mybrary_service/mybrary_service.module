@@ -81,27 +81,6 @@ function mybrary_service_services_resources ()
                                             )
                                     )
                             ),
-                            'create' => array(
-                                    'help' => t('Create inventory'),
-                                    'file' => array(
-                                            'type' => 'inc',
-                                            'module' => 'mybrary_service',
-                                            'name' => 'mybrary_service.inventory.api'
-                                    ),
-                                    'callback' => 'mybrary_service_inventory_create',
-                                    'access callback' => 'mybrary_service_inventory_resource_access',
-                                    'access arguments' => array('create'),
-                                    'access arguments append' => TRUE,
-                                    'args' => array(
-                                            array(
-                                                    'name' => 'data',
-                                                    'type' => 'array',
-                                                    'description' => t('Parameters of the action'),
-                                                    'source' => 'data',
-                                                    'optional' => FALSE
-                                            )
-                                    )
-                            ),
                             'update' => array(
                                     'help' => t('Update inventory'),
                                     'file' => array(
@@ -179,27 +158,6 @@ function mybrary_service_services_resources ()
                                     'callback' => 'mybrary_service_transaction_view',
                                     'access callback' => 'mybrary_service_transaction_resource_access',
                                     'access arguments' => array('view'),
-                                    'access arguments append' => TRUE,
-                                    'args' => array(
-                                            array(
-                                                    'name' => 'data',
-                                                    'type' => 'array',
-                                                    'description' => t('Parameters of the action'),
-                                                    'source' => 'data',
-                                                    'optional' => FALSE
-                                            )
-                                    )
-                            ),
-                            'create' => array(
-                                    'help' => t('Create transaction'),
-                                    'file' => array(
-                                            'type' => 'inc',
-                                            'module' => 'mybrary_service',
-                                            'name' => 'mybrary_service.transaction.api'
-                                    ),
-                                    'callback' => 'mybrary_service_transaction_create',
-                                    'access callback' => 'mybrary_service_transaction_resource_access',
-                                    'access arguments' => array('create'),
                                     'access arguments append' => TRUE,
                                     'args' => array(
                                             array(

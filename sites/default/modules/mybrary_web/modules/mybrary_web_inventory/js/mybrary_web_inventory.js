@@ -67,41 +67,64 @@ angular.module('app_inventory', ['ui.router', 'ImageCropper', 'app_log', 'app_he
 			$scope.formItem.errors['category'] = null;
 		}
 
-		if ($scope.formItem.errors['image'] != null) {
+		if ($scope.formItem.errors['image'] != null && $scope.formItem.data.image.step != 3) {
 			result = false;
 		}
 		
 		return result;
 	};
 	
-	$scope.imageCrop = {};
 	$scope.fileChanged = function(e) {			
 		var files = e.target.files;
 	
  		var fileReader = new FileReader();
- 		$scope.imageCrop.filename = files[0];
+ 		$scope.formItem.data.image.file = files[0];
 		fileReader.readAsDataURL(files[0]);		
 		
 		fileReader.onload = function(e) {
-			$scope.imageCrop.raw = this.result;
+			$scope.formItem.data.image.raw = this.result;
 			$scope.formItem.errors['image'] = null
 			$scope.$apply();
 		};
 		
 	};
 	
-	 var $imageFileElement = angular.element(document.getElementById('form-item-image'));
      $scope.clearImage = function() {
-		 $scope.imageCrop.step = 1;
-		 
-		 $imageFileElement.replaceWith($imageFileElement.clone());
-		 
-		 delete $scope.imageCrop.filename;
-		 delete $scope.imageCrop.raw;
-		 delete $scope.imageCrop.result;
-		 delete $scope.imageCrop.resultBlob;
+		 $scope.formItem.data.image.step = 1;
+		 delete $scope.formItem.data.image.file;
+		 delete $scope.formItem.data.image.raw;
+		 delete $scope.formItem.data.image.result;
+		 delete $scope.formItem.data.image.resultBlob;
 		 $scope.formItem.errors['image'] = "Please choose an image."; 
-	};	
+	};
+	
+	$scope.saveItem = function() {
+		if ($scope.validFormItem) {
+			AppHelper.showLoading();
+			
+			var data = {
+				title: $scope.formItem.data.title,
+				field_type: $scope.formItem.data.category,
+				field_model: $scope.formItem.data.model,
+				body:$scope.formItem.data.body
+			};
+			
+			// only update if image changed
+			if ($scope.formItem.data.image.file) {
+				data['field_image'] = {
+					name: $scope.formItem.data.image.file.name,
+					data: $scope.formItem.data.image.result
+				};
+			}
+			
+			AppApi.inventoryUpdate(data).then(function(response) {
+				AppHelper.hideLoading();
+
+				AppHelper.showAlert(response.message, response.status);
+				jQuery('#modalItem button[data-dismiss=modal]').click();
+			});
+		}
+	}
 	
 }]);
 

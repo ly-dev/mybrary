@@ -8,7 +8,6 @@ function mybrary_service_inventory_resource_access($op = 'view', $args = array()
     switch ($op) {
         case 'list':
         case 'view':
-        case 'create':
         case 'update':
         case 'delete':
         default:
@@ -56,7 +55,6 @@ function mybrary_service_inventory_list ($data)
                     'title'=>array('is_property'=>TRUE),
                     'body'=>array('values_convertor'=>'single_value'),
                     'field_type'=>array('values_convertor'=>'single_value'),
-                    'field_manufacturer'=>array('values_convertor'=>'single_value'),
                     'field_image'=>array('value_convertor'=>'image'),
             );
             
@@ -98,23 +96,6 @@ function mybrary_service_inventory_view ($data)
 
 /**
  * Callback for for inventory resource.
- * Create
- *
- * @return array
- */
-function mybrary_service_inventory_create ($data)
-{
-    global $user;
-
-    $response = array();
-
-    $response = services_error(t('Create action has not been implemented yet.'), 404);
-
-    return $response;
-}
-
-/**
- * Callback for for inventory resource.
  * Update
  *
  * @return array
@@ -123,9 +104,68 @@ function mybrary_service_inventory_update ($data)
 {
     global $user;
 
-    $response = array();
+    $response = array(
+            'status' => 'error',
+            'message' => t('Oops! Something goes wrong.')
+    );
+    
+    // check required fields
+    $errors = array();
+    if (empty($data['title'])) {
+        $errors[] = t('Name is missing');
+    }
+    
+    if (empty($data['field_type'])) {
+        $errors[] = t('Type is missing');
+    }
+    
+    if (empty($errors)) {
+        if (isset($data['nid'])) {
+            // load item to update
+            $node = node_load($data['nid']);
+        } else {
+            // create new item
+            $node = new stdClass();
+            $node->type = 'item';
+            node_object_prepare($node); // Sets some defaults. Invokes hook_prepare() and hook_node_prepare().
+            $node->language = LANGUAGE_NONE; // Or e.g. 'en' if locale is enabled
+            $node->uid = $user->uid;
+            $node->status = 1; //(1 or 0): published or not
 
-    $response = services_error(t('Update action has not been implemented yet.'), 404);
+            $node = node_submit($node); // Prepare node for saving
+        }
+        
+        if ($node) {
+            $node->title = $data['title'];
+            $node->field_type[$node->language][]['tid'] = $data['field_type'];
+            $node->field_model[$node->language][]['value'] = $data['field_model'];
+            $node->body[$node->language][]['value'] = $data['body'];
+            
+            try {
+                if (!empty($data['field_image']) && !empty($data['field_image']['name']) && !empty($data['field_image']['data'])) {
+                    $filename = $data['field_image']['name'];
+                    $fileParts = explode(',', $data['field_image']['data']);
+                    $fileContent = base64_decode($fileParts[1]);
+                    $fileObject = file_save_data($fileContent, 'public://'.$filename);
+                    $node->field_image[$node->language]= array((array) $fileObject);
+                }
+            
+                node_save($node);
+                
+                $response = array(
+                        'status' => 'success',
+                        'message' => t('Successfully saved inventory item: !name.', array('!name' => $node->title))
+                );
+            } catch (Exception $e) {
+                $response = services_error($e->getMessage(), 500);
+            }
+        } else {
+            $response['message'] = t('Inventory item: !id is missing.', array('!id' => $data['nid']));
+        }
+        
+    } else {
+        $response['message'] = implode("; ", $errors);
+    }
 
     return $response;
 }

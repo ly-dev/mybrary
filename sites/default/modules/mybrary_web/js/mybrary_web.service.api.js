@@ -74,6 +74,12 @@ angular.module('app_api', ['app_log', 'app_helper'])
         });
 	};
 
+	service.inventoryUpdate = function(data) {
+        return service.callRestApi('POST', '/inventory/update', data).then(function(response) {
+        	return response.data;
+        });
+	};
+
 	service.prepareTermOptionsByType = function(allTerms, type) {
 		return _.chain(allTerms).values().filter(function (o) {
 			return o.type == type;

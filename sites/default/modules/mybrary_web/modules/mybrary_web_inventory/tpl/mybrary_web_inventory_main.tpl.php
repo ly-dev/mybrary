@@ -40,41 +40,43 @@
 					<div class="form-group" ng-class="{'has-error has-feedback' : formItem.errors['image']}">
 						<span class="help-block" ng-show="formItem.errors['image']">{{formItem.errors['image']}}</span>
 						<span class="glyphicon glyphicon-warning-sign form-control-feedback" aria-hidden="true" ng-show="formItem.errors['image']"></span>
-
-						<div ng-show="imageCrop.step == 1">
-                        	<input type="file" id="form-item-image" name="form-item-image" placeholder="Tool name" onchange="angular.element(this).scope().fileChanged(event)">
-                        </div>
-                       <div ng-show="imageCrop.step == 2">
-                           <image-crop			 
-                             data-height="220"
-                             data-width="220"
-                             data-shape="square"
-                             data-step="imageCrop.step"
-                             src="imageCrop.raw"
-                             data-result="imageCrop.result"
-                             data-result-blob="imageCrop.resultBlob"
-                             crop="initCrop"
-                             padding="40"
-                             max-size="300"
-                           ></image-crop>		   
-                           <button ng-click="clearImage()">Cancel</button>
-                           <button ng-click="initCrop = true">Crop</button>		
-                       </div>		  
-                       
-                       <div ng-show="imageCrop.step == 3">
-                       
-                         <h2>Result</h2>
-                       
-                         <p>The data-result-blob property is a Blob object, which is necessary in some upload libraries like <a href="https://github.com/nervgh/angular-file-upload" target="_blank">Angular File Upload</a></p>
-                         <p>Image using the data uri:</p>
-                         <img ng-src="{{imageCrop.result}}"></img>
-                         <p>The Base64 String used in the image above:</p>         
-                         <textarea class="result-datauri">{{imageCrop.result }}</textarea>
-                         <button ng-click="clearImage()">Clear</button>	
-                       
-                      </div>                        
-                        
-					</div>				
+						<div ng-show="formItem.data.image.step == 1">
+                    		<input type="file" id="form-item-image" name="form-item-image" placeholder="Tool name" onchange="angular.element(this).scope().fileChanged(event)">
+                    	</div>
+                        <div class="panel panel-default" ng-show="formItem.data.image.step == 2">
+                            <div class="panel-body">
+		                         <div style="text-align: center;">	
+									 <div class="btn-group" role="group">
+                                        <button type="button" class="btn btn-primary" ng-click="initCrop = true">Crop</button>
+    	                            	<button type="button" class="btn btn-default" ng-click="clearImage()">Reset</button>
+        	                         </div>
+    	                         </div>
+                            	<div style="margin-left:-5px;">
+                                <image-crop			 
+                                  data-height="200"
+                                  data-width="200"
+                                  data-shape="square"
+                                  data-step="formItem.data.image.step"
+                                  src="formItem.data.image.raw"
+                                  data-result="formItem.data.image.result"
+                                  data-result-blob="formItem.data.image.resultBlob"
+                                  crop="initCrop"
+                                  padding="50"
+                                  max-size="300"></image-crop>
+                                  </div>
+                            </div>
+                        </div>		  
+                        <div class="panel panel-default" ng-show="formItem.data.image.step == 3">
+                            <div class="panel-body">
+		                         <div style="text-align: center;">	
+									 <div class="btn-group" role="group">
+    		                         	<button class="btn btn-default" ng-click="clearImage()">Choose a new image </button>
+    		                         </div>
+    		                         <img ng-src="{{formItem.data.image.result}}"></img>
+		                         </div>
+                            </div>
+                        </div>		  
+        			</div>				
 					<div class="form-group" ng-class="{'has-error has-feedback' : formItem.errors['title']}">
 						<span class="help-block" ng-show="formItem.errors['title']">{{formItem.errors['title']}}</span>
 						<span class="glyphicon glyphicon-warning-sign form-control-feedback" aria-hidden="true" ng-show="formItem.errors['title']"></span>
@@ -83,7 +85,8 @@
 					<div class="form-group" ng-class="{'has-error has-feedback' : formItem.errors['category']}">
 						<span class="help-block" ng-show="formItem.errors['category']">{{formItem.errors['category']}}</span>
 						<span class="glyphicon glyphicon-warning-sign form-control-feedback" aria-hidden="true" ng-show="formItem.errors['category']"></span>
-						<select class="form-control" id="form-item-category" name="form-item-category" ng-options="option.name for option in cateogories track by option.tid" ng-model="formItem.data['category']">
+						<select class="form-control" id="form-item-category" name="form-item-category" ng-model="formItem.data['category']">
+							<option ng-repeat="category in cateogories track by category.tid" value="{{category.tid}}" ng-selected="formItem.data['category'] == category.tid" >{{category.name}}</option>
 						</select>
 					</div>
 					<div class="form-group">

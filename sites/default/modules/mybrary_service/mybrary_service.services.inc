@@ -58,9 +58,6 @@ function mybrary_service_default_services_endpoint() {
         'view' => array(
           'enabled' => '1',
         ),
-        'create' => array(
-          'enabled' => '1',
-        ),
         'update' => array(
           'enabled' => '1',
         ),
@@ -82,9 +79,6 @@ function mybrary_service_default_services_endpoint() {
           'enabled' => '1',
         ),
         'view' => array(
-          'enabled' => '1',
-        ),
-        'create' => array(
           'enabled' => '1',
         ),
         'update' => array(

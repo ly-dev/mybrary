@@ -8,7 +8,6 @@ function mybrary_service_transaction_resource_access($op = 'view', $args = array
     switch ($op) {
         case 'list':
         case 'view':
-        case 'create':
         case 'update':
         case 'delete':
         default:
@@ -46,23 +45,6 @@ function mybrary_service_transaction_view ($data)
     $response = array();
 
     $response = services_error(t('View action has not been implemented yet.'), 404);
-
-    return $response;
-}
-
-/**
- * Callback for for transaction resource.
- * Create
- *
- * @return array
- */
-function mybrary_service_transaction_create ($data)
-{
-    global $user;
-
-    $response = array();
-
-    $response = services_error(t('Create action has not been implemented yet.'), 404);
 
     return $response;
 }
