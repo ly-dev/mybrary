@@ -11,6 +11,9 @@ function project_root_install()
     // enable visitor to register and no need admin approval, no need email verification
     variable_set('user_register', '1');
     variable_set('user_email_verification', '0');
+    
+    // set jquery update
+    variable_set('jquery_update_jquery_version', '2.1');
 }
 
 function project_root_set_theme($theme_name)
