@@ -2,7 +2,7 @@
 	<p></p>
 	<div class="row">
 		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-            <a class="btn btn-link" href="<?php print url('dashboard'); ?>" role="button"><i class="glyphicon glyphicon-chevron-left"></i> Dashboard</a>
+            <a class="btn btn-link" ui-sref="dashboard" role="button"><i class="glyphicon glyphicon-chevron-left"></i> Dashboard</a>
             <a class="btn btn-link" href="#" role="button" data-toggle="modal" data-target="#modalInviteFriend"><i class="glyphicon glyphicon-plus"></i> invite friends</a>
         </div>
     </div>

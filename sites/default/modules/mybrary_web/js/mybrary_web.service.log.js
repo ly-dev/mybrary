@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('app_log', [])
+angular.module('app_mybrary')
 
 .factory('AppLog', ['$log',
     function ($log) {
@@ -96,10 +96,4 @@ angular.module('app_log', [])
         };
 
         return service;
-}])
-
-.config(['$logProvider',
-    function ($logProvider) {
-        // disable debug log for production
-        $logProvider.debugEnabled(true);
 }]);

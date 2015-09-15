@@ -1,16 +1,12 @@
 'use strict';
 
-angular.module('app_dashboard', ['ui.router', 'app_log', 'app_helper',  'app_api'])
-
-.config(['$stateProvider', '$urlRouterProvider', function($stateProvider, $urlRouterProvider) {
-	// For any unmatched url, redirect to /
-	$urlRouterProvider.otherwise("/main");
-	
-	// Now set up the states
+angular.module('app_mybrary')
+				
+.config(['$stateProvider', function($stateProvider) {
 	$stateProvider
-    .state('main', {
-		url: "/main",
-		templateUrl: Drupal.settings.angularjsApp.basePath + '/dashboard/main',
+    .state('dashboard', {
+		url: "/dashboard",
+		templateUrl: Drupal.settings.angularjsApp.basePath + '/tpl/dashboard',
     	controller: 'DashboardController',
     	resolve:{
             termListPromise:  ['AppApi', function(AppApi) {

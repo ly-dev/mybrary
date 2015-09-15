@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('app_helper', [])
+angular.module('app_mybrary')
 
 .factory('AppHelper', [
     function () {

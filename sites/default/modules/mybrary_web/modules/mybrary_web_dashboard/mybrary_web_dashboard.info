@@ -1,5 +1,0 @@
-name = Mybrary Web - Dashboard
-description = Dashboard related stuffs for Mybrary
-package = Mybrary
-core = 7.x
-dependencies[] = mybrary_web

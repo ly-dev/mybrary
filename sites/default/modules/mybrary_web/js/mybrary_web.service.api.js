@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('app_api', ['app_log', 'app_helper'])
+angular.module('app_mybrary')
 
 .factory('AppApi', ['AppLog', 'AppHelper', '$q', '$http',
     function (AppLog, AppHelper, $q, $http) {
@@ -87,10 +87,4 @@ angular.module('app_api', ['app_log', 'app_helper'])
 	};
 	
 	return service;
-}])
-
-.config(["$httpProvider", function($httpProvider) {
-	$httpProvider.defaults.headers.common['Content-Type'] = 'application/json';
-	$httpProvider.defaults.headers.common['X-CSRF-Token'] = Drupal.settings.mybrary_web.csrf_token;
-	$httpProvider.defaults.headers.common['X-ANGULARJS'] = 1;
 }]);

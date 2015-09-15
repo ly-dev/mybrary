@@ -1,22 +1,24 @@
 <?php
 global $user;
 
-$apps = array (
-    'app_dashboard' => array(
+$activeApp = 'dashboard';
+
+$items = array (
+    'dashboard' => array(
             'label' => t('Dashboard'),
-            'link' => url('dashboard'),
+            'state' => 'dashboard',
     ),
-    'app_connection' => array(
+    'connection' => array(
             'label' => t('Connection'),
-            'link' => url('connection'),
+            'state' => 'connection',
     ),
-    'app_inventory' => array(
+    'inventory' => array(
             'label' => t('Inventory'),
-            'link' => url('inventory'),
+            'state' => 'inventory',
     ),
-    'app_transaction' => array(
+    'transaction' => array(
             'label' => t('Transaction'),
-            'link' => url('transaction'),
+            'state' => 'transaction',
     ),
 );
 ?>
@@ -33,11 +35,12 @@ $apps = array (
         </div>
         <div id="navbar" class="collapse navbar-collapse">
             <ul class="nav navbar-nav navbar-right">
-            	<?php foreach($apps as $key=>$app): ?>
-                <li<?php if ($key == $activeApp) print ' class="active"'; ?>><a href="<?php print $app['link']; ?>"><?php print $app['label']; ?></a></li>
+            	<?php foreach($items as $key=>$item): ?>
+                <li ui-sref-active="active"><a ui-sref="<?php print $item['state']; ?>"><?php print $item['label']; ?></a></li>
                 <?php endforeach;?>
                 <li><a href="<?php print url('user/logout'); ?>"><?php print t('Log out @username', array('@username' => $user->name)); ?></a></li>
             </ul>
         </div><!--/.nav-collapse -->
     </div>
 </nav>
+<div style="padding-top: 50px" ui-view></div>

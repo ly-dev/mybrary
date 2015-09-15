@@ -1,16 +1,12 @@
 'use strict';
 
-angular.module('app_connection', ['ui.router', 'app_log', 'app_helper',  'app_api'])
+angular.module('app_mybrary')
 
-.config(['$stateProvider', '$urlRouterProvider', function($stateProvider, $urlRouterProvider) {
-	// For any unmatched url, redirect to /
-	$urlRouterProvider.otherwise("/main");
-	
-	// Now set up the states
+.config(['$stateProvider', function($stateProvider) {
 	$stateProvider
-    .state('main', {
-		url: "/main",
-		templateUrl: Drupal.settings.angularjsApp.basePath + '/connection/main',
+    .state('connection', {
+		url: "/connection",
+		templateUrl: Drupal.settings.angularjsApp.basePath + '/tpl/connection',
     	controller: 'ConnectionController'
     });
 }])
