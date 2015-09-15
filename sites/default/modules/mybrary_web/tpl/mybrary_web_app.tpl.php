@@ -43,4 +43,16 @@ $items = array (
         </div><!--/.nav-collapse -->
     </div>
 </nav>
-<div style="padding-top: 50px" ui-view></div>
+<div class="container" style="padding-top: 50px" ng-controller="SearchBarController as searchBar">
+	<p></p>
+	<div class="row">
+		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+			<div class="input-group">
+				<input type="text" class="form-control" id="form-search-key" name="form-search-key" placeholder="Search for ..." ng-model="searchBar.searchParams.key">
+				<span class="input-group-btn"><button class="btn btn-primary" type="button" ng-click="searchBar.goSearch()"><i class="glyphicon glyphicon-search"></i> Search</button></span>
+			</div>
+		</div>
+	</div>
+	<p></p>
+</div>
+<div ui-view></div>

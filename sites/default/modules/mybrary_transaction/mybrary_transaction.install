@@ -98,3 +98,28 @@ function _mybrary_transaction_schema_definition ()
     
     return $schema;
 }
+
+/**
+ * Alter table mybrary_transaction_head to add borrow period.
+ */
+function mybrary_transaction_update_7100 ()
+{
+    db_add_field('mybrary_transaction_head', 'start', 
+            array(
+                    'description' => t('start of the borrow period'),
+                    'type' => 'int',
+                    'unsigned' => TRUE,
+                    'size' => 'normal',
+                    'not null' => TRUE
+            )
+    );
+    db_add_field('mybrary_transaction_head', 'end',
+            array(
+                    'description' => t('start of the borrow period'),
+                    'type' => 'int',
+                    'unsigned' => TRUE,
+                    'size' => 'normal',
+                    'not null' => TRUE
+            )
+    );
+}

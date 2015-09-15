@@ -7,7 +7,7 @@ angular.module('app_mybrary')
     .state('search', {
 		url: "/search/:key",
 		templateUrl: Drupal.settings.angularjsApp.basePath + '/tpl/search',
-    	controller: 'SearchController',
+    	controller: 'SearchResultController',
     	resolve:{
             termListPromise:  ['AppApi', function(AppApi) {
                return AppApi.termList();
@@ -16,27 +16,18 @@ angular.module('app_mybrary')
     });
 }])
 
-.controller('SearchController', ['AppLog', 'AppHelper', 'AppApi', '$stateParams', '$scope', '$q', 'termListPromise', 
+.controller('SearchResultController', ['AppLog', 'AppHelper', 'AppApi', '$stateParams', '$scope', '$q', 'termListPromise', 
     function(AppLog, AppHelper, AppApi, $stateParams, $scope, $q, termListPromise) {
-	    AppLog.debug("SearchController");
+	    AppLog.debug("SearchResultController");
 		
 		$scope.terms = termListPromise;
-
-		// search
-		$scope.searchParams = {
-			key: $stateParams.key	
-		};
-		
-		$scope.goSearch = function() {
-			refreshList();
-		}
 	
 		var refreshList = function() {
 			AppHelper.showLoading();
 
 			$q.all({
-				'frdItems': AppApi.inventoryList({owner: 'frd', key: $scope.searchParams.key}),
-				'fofItems': AppApi.inventoryList({owner: 'fof', key: $scope.searchParams.key})
+				'frdItems': AppApi.inventoryList({owner: 'frd', key: $stateParams.key}),
+				'fofItems': AppApi.inventoryList({owner: 'fof', key: $stateParams.key})
 			}).then(function (data) {
 				
 				$scope.frdItems = data['frdItems'];

@@ -15,4 +15,15 @@ angular.module('app_mybrary', ['ui.router', 'ImageCropper'])
     	$httpProvider.defaults.headers.common['Content-Type'] = 'application/json';
     	$httpProvider.defaults.headers.common['X-CSRF-Token'] = Drupal.settings.mybrary_web.csrf_token;
     	$httpProvider.defaults.headers.common['X-ANGULARJS'] = 1;
+}])
+
+.controller('SearchBarController', ['AppLog', 'AppHelper', 'AppApi', '$state', '$scope', 
+    function(AppLog, AppHelper, AppApi, $state, $scope) {
+	    AppLog.debug("SearchBarController");
+	    
+	    this.searchParams = AppApi.searchParams;
+		this.goSearch = function() {
+			AppLog.debug(AppApi.searchParams);
+			$state.go('search', AppApi.searchParams);
+		};	    
 }]);

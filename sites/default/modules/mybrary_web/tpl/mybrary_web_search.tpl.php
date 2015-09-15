@@ -1,14 +1,4 @@
 <div class="container">
-	<p></p>
-	<div class="row">
-		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-			<div class="input-group">
-				<input type="text" class="form-control" id="form-search-key" name="form-search-key" placeholder="Search for ..." ng-model="searchParams.key">
-				<span class="input-group-btn"><button class="btn btn-primary" type="button" ng-click="goSearch()"><i class="glyphicon glyphicon-search"></i> Search</button></span>
-			</div>
-		</div>
-	</div>
-	<p></p>
 	<div class="row">
 		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
 			<h3>From Friends</h3>

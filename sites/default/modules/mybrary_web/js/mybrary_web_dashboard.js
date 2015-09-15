@@ -16,8 +16,8 @@ angular.module('app_mybrary')
     });
 }])
 
-.controller('DashboardController', ['AppLog', 'AppHelper', 'AppApi', '$state', '$scope', '$q', 'termListPromise', 
-    function(AppLog, AppHelper, AppApi, $state, $scope, $q, termListPromise) {
+.controller('DashboardController', ['AppLog', 'AppHelper', 'AppApi', '$scope', '$q', 'termListPromise', 
+    function(AppLog, AppHelper, AppApi, $scope, $q, termListPromise) {
 	
 	    AppLog.debug("DashboardController");
 		AppHelper.showLoading();
@@ -48,14 +48,5 @@ angular.module('app_mybrary')
 			});
 		}
 		refreshList();
-		
-		// search
-		$scope.searchParams = {
-			key: ''	
-		};
-		
-		$scope.goSearch = function() {
-			$state.go('search', $scope.searchParams);
-		}
 }]);
 

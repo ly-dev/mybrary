@@ -86,5 +86,10 @@ angular.module('app_mybrary')
 		}).value();
 	};
 	
+	
+	service.searchParams = {
+	    key: ''
+	};
+	
 	return service;
 }]);
