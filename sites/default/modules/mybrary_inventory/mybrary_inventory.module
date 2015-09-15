@@ -5,3 +5,9 @@
  */
 
 include_once 'mybrary_inventory.features.inc';
+
+/**
+ * Inventory item shared status
+ */
+define("MYBRARY_ITEM_FIELD_SHARED_NO", 0);
+define("MYBRARY_ITEM_FIELD_SHARED_TO_FRIEND", 1);

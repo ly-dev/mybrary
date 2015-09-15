@@ -172,3 +172,53 @@ function mybrary_user_user_delete($account) {
 function mybrary_user_user_cancel($edit, $account, $method) {
     mybrary_user_user_delete($account);
 }
+
+/**
+ * Get friend ids
+ * 
+ * @param integer $uid
+ */
+function _mybrary_user_get_friends ($uid) {
+    
+    $result = array();
+    
+    if (!empty($uid)) {
+        $query = db_select('mybrary_user_net', 'n');
+        $query->addField('n', 'uid_to');
+        $query->condition('n.uid_from', $uid);
+        $dbResult = $query->execute();
+
+        while ($row = $dbResult->fetchAssoc()) {
+            $result[] = $row['uid_to'];
+        }
+    }
+    
+    return $result;
+}
+
+/**
+ * Get friend of friend ids
+ *
+ * @param integer $uid
+ */
+function _mybrary_user_get_friends_of_friends ($uid, $friendIncluded = FALSE) {
+
+    $result = array();
+
+    if (!empty($uid)) {
+        $friends = _mybrary_user_get_friends($uid);
+        $fofriends = _mybrary_user_get_friends($friends);
+
+        if ($friendIncluded) {
+            $result = array_merge($fofriends, $friends);
+        } else {
+            $result = array_diff($fofriends, $friends);
+        }
+        
+        // always exclude self
+        $result = array_diff($result, array($uid));
+    }
+
+    return $result;
+}
+

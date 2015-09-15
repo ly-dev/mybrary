@@ -45,5 +45,13 @@ function mybrary_web_menu ()
             'access callback' => 'user_is_logged_in'
     );
     
+    $items['tpl/search'] = array(
+            'title' => t('Connection'),
+            'page callback' => 'mybrary_web_share',
+            'file' => 'mybrary_web.page.inc',
+            'type' => MENU_NORMAL_ITEM,
+            'access callback' => 'user_is_logged_in'
+    );
+    
     return $items;
 }

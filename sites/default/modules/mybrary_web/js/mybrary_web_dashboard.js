@@ -16,35 +16,46 @@ angular.module('app_mybrary')
     });
 }])
 
-.controller('DashboardController', ['AppLog', 'AppHelper', 'AppApi', '$scope', '$q', 'termListPromise', function(AppLog, AppHelper, AppApi, $scope, $q, termListPromise) {
-    AppLog.debug("DashboardController");
-	AppHelper.showLoading();
-
-	$scope.terms = termListPromise;
-	var refreshList = function() {
-		$q.all({
-			'friends': AppApi.connectionList(),
-			'items': AppApi.inventoryList()
-		}).then(function (data) {
-			
-			$scope.friends = data['friends'];
-			$scope.friendsMeta = {
-				count: _.values($scope.friends).length
-			};
-
-			$scope.items = data['items'];
-			$scope.itemsMeta = {
-				count: _.values($scope.items).length
-			};
-			
-			$scope.transactions = {};
-			$scope.transactionsMeta = {
-				count: _.values($scope.transactions).length
-			};
-			
-			AppHelper.hideLoading();
-		});
-	}
-	refreshList();
+.controller('DashboardController', ['AppLog', 'AppHelper', 'AppApi', '$state', '$scope', '$q', 'termListPromise', 
+    function(AppLog, AppHelper, AppApi, $state, $scope, $q, termListPromise) {
+	
+	    AppLog.debug("DashboardController");
+		AppHelper.showLoading();
+	
+		$scope.terms = termListPromise;
+		var refreshList = function() {
+			$q.all({
+				'friends': AppApi.connectionList(),
+				'items': AppApi.inventoryList()
+			}).then(function (data) {
+				
+				$scope.friends = data['friends'];
+				$scope.friendsMeta = {
+					count: _.values($scope.friends).length
+				};
+	
+				$scope.items = data['items'];
+				$scope.itemsMeta = {
+					count: _.values($scope.items).length
+				};
+				
+				$scope.transactions = {};
+				$scope.transactionsMeta = {
+					count: _.values($scope.transactions).length
+				};
+				
+				AppHelper.hideLoading();
+			});
+		}
+		refreshList();
+		
+		// search
+		$scope.searchParams = {
+			key: ''	
+		};
+		
+		$scope.goSearch = function() {
+			$state.go('search', $scope.searchParams);
+		}
 }]);
 

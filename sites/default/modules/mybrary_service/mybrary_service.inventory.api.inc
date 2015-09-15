@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Access check callback for inventory resource.
  */
@@ -28,20 +29,45 @@ function mybrary_service_inventory_list ($data)
     $response = NULL;
     
     // list own inventory by default
-    $uid = $user->uid;
-    if ($data) {
-        //@TODO check access to friend or fof
-        if ($data['uid']) {
-            $uid = $data['uid'];
-        }
+    if (empty($data)) {
+        $data = array(
+                'owner' => 'me'
+        );
     }
     
     $query = new EntityFieldQuery();
     $query->entityCondition('entity_type', 'node')
     ->entityCondition('bundle', 'item')
-    ->propertyCondition('status', NODE_PUBLISHED)
-    ->propertyCondition('uid', $uid);
+    ->propertyCondition('status', NODE_PUBLISHED);
     
+    // adjust query according to data
+    
+    // owner
+    $temp = NULL;
+    switch ($data['owner']) {
+        case 'me':
+            $temp = $user->uid;
+            break;
+        case 'frd':
+            $temp = _mybrary_user_get_friends($user->uid);
+            $query->fieldCondition('field_shared', 'value', MYBRARY_ITEM_FIELD_SHARED_TO_FRIEND);
+            break;
+        case 'fof':
+            $temp = _mybrary_user_get_friends_of_friends($user->uid);
+            $query->fieldCondition('field_shared', 'value', MYBRARY_ITEM_FIELD_SHARED_TO_FRIEND);
+            break;
+    }
+    if (empty($temp)) {
+        $temp = "0"; // return nothing if wrong owner
+    }
+    $query->propertyCondition('uid', $temp);
+    
+    // search key
+    if (!empty($data['key'])) {
+        $query->propertyCondition('title', $data['key'], 'CONTAINS');
+    }
+    
+    // run query
     $result = $query->execute();
     
     $response = array();

@@ -3,10 +3,8 @@
 	<div class="row">
 		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
 			<div class="input-group">
-				<span class="input-group-addon"><i
-					class="glyphicon glyphicon-search"></i></span> <input type="text"
-					class="form-control" id="inputGroupSuccess4"
-					aria-describedby="inputGroupSuccess4Status">
+				<input type="text" class="form-control" id="form-search-key" name="form-search-key" placeholder="Search for ..." ng-model="searchParams.key">
+				<span class="input-group-btn"><button class="btn btn-primary" type="button" ng-click="goSearch()"><i class="glyphicon glyphicon-search"></i> Search</button></span>
 			</div>
 		</div>
 	</div>
@@ -14,7 +12,7 @@
 	<div class="row">
 		<div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
 			<div class="list-group">
-				<a class="list-group-item" ui-sref="connection"><span>My Connection ({{friendsMeta.count}})</span><div class="pull-right" style="font-size:75%"><i class="fa fa-user"></i> Not shared <i class="fa fa-cloud-upload"></i> Shared</div></a>
+				<a class="list-group-item" ui-sref="connection"><span>My Connection ({{friendsMeta.count}})</a>
 				<button type="button" class="list-group-item" ng-show="friendsMeta.count < 1">Oops! Nothing found.</button>
 				<button type="button" class="list-group-item" ng-repeat="(id, friend) in friends">
 					<img ng-src="{{friend.pictureUrl}}" alt="avatar" class="app-icon app-icon-avatar-small">
