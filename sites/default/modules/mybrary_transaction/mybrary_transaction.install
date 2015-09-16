@@ -46,6 +46,20 @@ function _mybrary_transaction_schema_definition ()
                             'size' => 'normal',
                             'not null' => FALSE
                     ),
+                    'start' => array(
+                            'description' => t('start of the borrow period'),
+                            'type' => 'int',
+                            'unsigned' => TRUE,
+                            'size' => 'normal',
+                            'not null' => TRUE
+                    ),
+                    'end' => array(
+                            'description' => t('start of the borrow period'),
+                            'type' => 'int',
+                            'unsigned' => TRUE,
+                            'size' => 'normal',
+                            'not null' => TRUE
+                    ),
             ),
             'primary key' => array(
                     'transaction_id'
