@@ -17,13 +17,22 @@ angular.module('app_mybrary', ['ui.router', 'ImageCropper'])
     	$httpProvider.defaults.headers.common['X-ANGULARJS'] = 1;
 }])
 
-.controller('SearchBarController', ['AppLog', 'AppHelper', 'AppApi', '$state', '$scope', 
-    function(AppLog, AppHelper, AppApi, $state, $scope) {
+.run(['AppLog', 'AppHelper', 'AppApi', '$rootScope', 
+    function(AppLog, AppHelper, AppApi, $rootScope) {
+	    AppLog.debug("App running");
+	    
+	    $rootScope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState, fromParams){
+	    	// collapse the dropdown menu
+	    	jQuery('#navbar.collapse.in').removeClass('in').attr('aria-expanded', false);
+		});
+}])
+
+.controller('SearchBarController', ['AppLog', 'AppHelper', 'AppApi', '$state', 
+    function(AppLog, AppHelper, AppApi, $state) {
 	    AppLog.debug("SearchBarController");
 	    
 	    this.searchParams = AppApi.searchParams;
 		this.goSearch = function() {
-			AppLog.debug(AppApi.searchParams);
 			$state.go('search', AppApi.searchParams);
 		};	    
 }]);
