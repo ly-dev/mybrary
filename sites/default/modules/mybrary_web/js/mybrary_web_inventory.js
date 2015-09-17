@@ -10,7 +10,7 @@ angular.module('app_mybrary')
     	controller: 'InventoryController',
     	resolve:{
             termListPromise:  ['AppApi', function(AppApi) {
-               return AppApi.termList();
+               return AppApi.getTerms();
             }]
         }
     });
@@ -18,7 +18,6 @@ angular.module('app_mybrary')
 
 .controller('InventoryController', ['AppLog', 'AppHelper', 'AppApi', '$scope', 'termListPromise', function(AppLog, AppHelper, AppApi, $scope, termListPromise) {
     AppLog.debug("InventoryController");
-    AppHelper.showLoading();
     
     $scope.terms = termListPromise;
     $scope.categories = AppApi.prepareTermOptionsByType(termListPromise, 'categories');
@@ -28,6 +27,8 @@ angular.module('app_mybrary')
     ];
 	
 	var refreshList = function() {
+		AppHelper.showLoading();
+
 		AppApi.inventoryList().then(function(data) {
 			$scope.items = data;
 			$scope.itemsMeta = {

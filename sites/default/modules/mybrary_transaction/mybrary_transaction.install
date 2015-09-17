@@ -20,10 +20,10 @@ function _mybrary_transaction_schema_definition ()
             'fields' => array(
                     'transaction_id' => array(
                             'description' => t('transaction id, primary key'),
-                            'type' => 'int',
+                            'type' => 'serial',
                             'unsigned' => TRUE,
                             'size' => 'normal',
-                            'not null' => FALSE
+                            'not null' => TRUE
                     ),
                     'entity_id' => array(
                             'description' => t('nid of entity bundle item'),
@@ -34,13 +34,6 @@ function _mybrary_transaction_schema_definition ()
                     ),
                     'uid_borrower' => array(
                             'description' => t(('from  transaction id, source of the relationship (item borrower)')),
-                            'type' => 'int',
-                            'unsigned' => TRUE,
-                            'size' => 'normal',
-                            'not null' => FALSE
-                    ),
-                    'uid_owner' => array(
-                            'description' => t(('to  transaction id, source of the relationship (item owner)')),
                             'type' => 'int',
                             'unsigned' => TRUE,
                             'size' => 'normal',
@@ -71,10 +64,10 @@ function _mybrary_transaction_schema_definition ()
             'fields' => array(
                     'instance_id' => array(
                             'description' => t('instance id, primary key'),
-                            'type' => 'int',
+                            'type' => 'serial',
                             'unsigned' => TRUE,
                             'size' => 'normal',
-                            'not null' => FALSE
+                            'not null' => TRUE
                     ),
                     'transaction_id' => array(
                             'description' => t('transaction id'),
@@ -136,4 +129,52 @@ function mybrary_transaction_update_7100 ()
                     'not null' => TRUE
             )
     );
+}
+
+/**
+ * Alter table mybrary_transaction_head and table mybrary_transaction_head
+ * to set primary key with proper type.
+ */
+function mybrary_transaction_update_7101 ()
+{
+    db_drop_primary_key('mybrary_transaction_head');
+    db_change_field('mybrary_transaction_head', 'transaction_id', 'transaction_id',
+            array(
+                    'description' => t('transaction id, primary key'),
+                    'type' => 'serial',
+                    'unsigned' => TRUE,
+                    'size' => 'normal',
+                    'not null' => TRUE
+            ),
+            array(
+                    'primary key' => array(
+                            'transaction_id'
+                    )
+            )
+    );
+    
+    db_drop_primary_key('mybrary_transaction_items');
+    db_change_field('mybrary_transaction_items', 'instance_id', 'instance_id',
+            array(
+                    'description' => t('transaction id, primary key'),
+                    'type' => 'serial',
+                    'unsigned' => TRUE,
+                    'size' => 'normal',
+                    'not null' => TRUE
+            ),
+            array(
+                    'primary key' => array(
+                            'instance_id'
+                    )
+            )
+    );
+}
+
+/**
+ * Alter table mybrary_transaction_head
+ * to drop uid_owner which is redundent
+ */
+function mybrary_transaction_update_7102 ()
+{
+    db_drop_field('mybrary_transaction_head', 'uid_owner');
 }

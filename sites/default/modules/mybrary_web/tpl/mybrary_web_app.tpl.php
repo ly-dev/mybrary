@@ -43,7 +43,14 @@ $items = array (
         </div><!--/.nav-collapse -->
     </div>
 </nav>
-<div class="container" style="padding-top: 50px" ng-controller="SearchBarController as searchBar">
+<div class="container" style="padding-top: 50px">
+	<div class="row">
+		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+			<div id="app-alert-container"></div>
+		</div>
+    </div>
+</div>
+<div class="container" ng-controller="SearchBarController as searchBar">
 	<p></p>
 	<div class="row">
 		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">

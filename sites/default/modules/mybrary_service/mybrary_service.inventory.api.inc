@@ -77,13 +77,14 @@ function mybrary_service_inventory_list ($data)
         if (!empty($entities)) {
             // required fields to return and related options, 'field name'=>option array
             $filterRequiredFields = array(
+                    'uid'=>array('is_property'=>TRUE),
                     'nid'=>array('is_property'=>TRUE),
                     'title'=>array('is_property'=>TRUE),
                     'body'=>array('values_convertor'=>'single_value'),
                     'field_type'=>array('values_convertor'=>'single_value'),
                     'field_model'=>array('values_convertor'=>'single_value'),
                     'field_image'=>array('value_convertor'=>'image'),
-                    'field_shared'=>array('value_convertor'=>'single_value'),
+                    'field_shared'=>array('values_convertor'=>'single_value'),
             );
             
             // all available fields
@@ -114,10 +115,38 @@ function mybrary_service_inventory_list ($data)
 function mybrary_service_inventory_view ($data)
 {
     global $user;
-
-    $response = array();
-
-    $response = services_error(t('View action has not been implemented yet.'), 404);
+    
+    $response = NULL;
+    
+    if (!empty($data['nid'])) {
+        $entity = node_load($data['nid']);
+        
+        if ($entity) {
+            // required fields to return and related options, 'field name'=>option array
+            $filterRequiredFields = array(
+                    'uid'=>array('is_property'=>TRUE),
+                    'nid'=>array('is_property'=>TRUE),
+                    'title'=>array('is_property'=>TRUE),
+                    'body'=>array('values_convertor'=>'single_value'),
+                    'field_type'=>array('values_convertor'=>'single_value'),
+                    'field_model'=>array('values_convertor'=>'single_value'),
+                    'field_image'=>array('value_convertor'=>'image'),
+                    'field_shared'=>array('values_convertor'=>'single_value'),
+            );
+            
+            // all available fields
+            $fieldInfo = field_info_instances('node', 'item');
+            $fieldKeys = array_keys($fieldInfo);
+            
+            $response = array();
+            foreach ($filterRequiredFields as $fik => $fio) {
+                
+                if (($fio && $fio['is_property']) || in_array($fik, $fieldKeys)) {
+                    $response[$fik] = _mybrary_service_get_entity_field_value($entity, $fik, $fio);
+                }
+            }
+        }
+    }
 
     return $response;
 }
@@ -186,6 +215,9 @@ function mybrary_service_inventory_update ($data)
                         'message' => t('Successfully saved item: !name.', array('!name' => $node->title))
                 );
             } catch (Exception $e) {
+                watchdog('mybrary_service_inventory',
+                        'Inventory update error  [' . $e->getCode() . '] ' .
+                        $e->getMessage(), NULL, WATCHDOG_ERROR);
                 $response = services_error($e->getMessage(), 500);
             }
         } else {

@@ -18,6 +18,7 @@ function mybrary_web_welcome_page ()
  * Page callback for app.
  */
 function mybrary_web_app() {
+    global $user;
     global $base_url;
     
     angularjs_init_application('app_mybrary');
@@ -26,18 +27,24 @@ function mybrary_web_app() {
     $js_settings = array(
             'mybrary_web' => array(
                     'csrf_token' => drupal_get_token('services'),
-                    'service_base_url' =>  $base_url
+                    'service_base_url' =>  $base_url,
+                    'user' => array(
+                        'uid' => $user->uid
+                    )
             )
     );
     drupal_add_js($js_settings, 'setting');
     
-    // css
-    drupal_add_css(drupal_get_path('module', 'mybrary_web') . '/lib/angular-image-crop/image-crop-styles.css');
+    // datepicker
+    drupal_add_css(drupal_get_path('module', 'mybrary_web') . '/lib/angularjs-datepicker/dist/angular-datepicker.min.css');
+    drupal_add_js(drupal_get_path('module', 'mybrary_web') . '/lib/angularjs-datepicker/dist/angular-datepicker.min.js');
     
-    // use ui-route
-    drupal_add_js(drupal_get_path('module', 'mybrary_web') . '/lib/angular-ui-router/release/angular-ui-router.min.js');
+    // image crop
+    drupal_add_css(drupal_get_path('module', 'mybrary_web') . '/lib/angular-image-crop/image-crop-styles.css');
     drupal_add_js(drupal_get_path('module', 'mybrary_web') . '/lib/angular-image-crop/image-crop.js');
-
+    
+    // ui-route
+    drupal_add_js(drupal_get_path('module', 'mybrary_web') . '/lib/angular-ui-router/release/angular-ui-router.min.js');
     
     // app
     drupal_add_js(drupal_get_path('module', 'mybrary_web') . '/js/mybrary_web_app.js');
@@ -52,6 +59,7 @@ function mybrary_web_app() {
     drupal_add_js(drupal_get_path('module', 'mybrary_web') . '/js/mybrary_web_connection.js');
     drupal_add_js(drupal_get_path('module', 'mybrary_web') . '/js/mybrary_web_inventory.js');
     drupal_add_js(drupal_get_path('module', 'mybrary_web') . '/js/mybrary_web_search.js');
+    drupal_add_js(drupal_get_path('module', 'mybrary_web') . '/js/mybrary_web_transaction.js');
     
 
     return theme_render_template(drupal_get_path('module', 'mybrary_web') . '/tpl/mybrary_web_app.tpl.php', array());
@@ -81,8 +89,13 @@ function mybrary_web_inventory() {
 /**
  * Page callback for search.
  */
-function mybrary_web_share() {
+function mybrary_web_search() {
     return theme_render_template(drupal_get_path('module', 'mybrary_web') . '/tpl/mybrary_web_search.tpl.php', array());
 }
 
-
+/**
+ * Page callback for transaction.
+ */
+function mybrary_web_transaction() {
+    return theme_render_template(drupal_get_path('module', 'mybrary_web') . '/tpl/mybrary_web_transaction.tpl.php', array());
+}

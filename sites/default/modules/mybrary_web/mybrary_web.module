@@ -38,7 +38,7 @@ function mybrary_web_menu ()
     );
     
     $items['tpl/inventory'] = array(
-            'title' => t('Connection'),
+            'title' => t('Inventory'),
             'page callback' => 'mybrary_web_inventory',
             'file' => 'mybrary_web.page.inc',
             'type' => MENU_NORMAL_ITEM,
@@ -46,8 +46,16 @@ function mybrary_web_menu ()
     );
     
     $items['tpl/search'] = array(
-            'title' => t('Connection'),
-            'page callback' => 'mybrary_web_share',
+            'title' => t('Search'),
+            'page callback' => 'mybrary_web_search',
+            'file' => 'mybrary_web.page.inc',
+            'type' => MENU_NORMAL_ITEM,
+            'access callback' => 'user_is_logged_in'
+    );
+    
+    $items['tpl/transaction'] = array(
+            'title' => t('Transaction'),
+            'page callback' => 'mybrary_web_transaction',
             'file' => 'mybrary_web.page.inc',
             'type' => MENU_NORMAL_ITEM,
             'access callback' => 'user_is_logged_in'

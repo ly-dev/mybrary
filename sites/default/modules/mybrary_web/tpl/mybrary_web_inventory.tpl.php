@@ -6,11 +6,6 @@
             <button type="button" class="btn btn-link" ng-click="newItem(event)"><i class="glyphicon glyphicon-plus"></i> new item</button>
         </div>
     </div>
-	<p></p>
-	<div class="row">
-		<div id="app-alert-container" class="col-xs-12 col-sm-12 col-md-12 col-lg-12"/>
-    </div>
-	<p></p>
 	<div class="row">
 		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
 			<div class="list-group">
@@ -21,8 +16,9 @@
 						<img ng-src="{{item.field_image[0].url}}" alt="picture" class="app-icon app-icon-avatar-small">
 					</div>
 					<div class="pull-left" style="padding-left: 1em;">
-    					<span>{{item.title}}</span><br/>
-    					<span>{{terms[item.field_type].name}}</span>
+    					<span>{{item.title}}</span><br />
+						<span>{{terms[item.field_type].name}}</span><br />
+						<span>{{item.model}}</span>
 					</div>
 					<div class="pull-right"><i class="fa" ng-class="{'fa-user': (item.field_shared == 0), 'fa-cloud-upload': (item.field_shared == 1)}" ></i></div>
 				</button>

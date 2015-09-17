@@ -10,7 +10,7 @@ angular.module('app_mybrary')
     	controller: 'SearchResultController',
     	resolve:{
             termListPromise:  ['AppApi', function(AppApi) {
-               return AppApi.termList();
+               return AppApi.getTerms();
             }]
         }
     });
@@ -45,6 +45,8 @@ angular.module('app_mybrary')
 		}
 		refreshList();
 		
-		
+		$scope.fofMessage = function() {
+			AppHelper.showAlert('You can\'t borrow from friends of friends at current stage.', 'warning');
+		}
 }]);
 

@@ -118,6 +118,9 @@ function mybrary_service_connection_list ($data)
                 $response[$row['uid']] = $row;
             }
         } catch (Exception $e) {
+            watchdog('mybrary_service_connection',
+                    'Connection list error  [' . $e->getCode() . '] ' .
+                    $e->getMessage(), NULL, WATCHDOG_ERROR);
             $response = services_error($e->getMessage(), 500);
         }
         
@@ -134,13 +137,34 @@ function mybrary_service_connection_list ($data)
  *
  * @return array
  */
-function mybrary_service_connection_view ($id, $data)
+function mybrary_service_connection_view ($data)
 {
-    global $user;
-
-    $response = array();
-
-    $response = services_error(t('View action has not been implemented yet.'), 404);
-
+    global $base_path;
+    
+    $response = NULL;
+    
+    if (!empty($data['uid'])) {
+        try {
+            $query = db_select('users', 'u');
+            $query->leftJoin('file_managed', 'f', 'u.picture = f.fid');
+            $query->fields('u', array('uid', 'name'));
+            $query->addField('f', 'uri', 'pictureUri');
+            $query->condition('u.uid', $data['uid']);
+            $dbResult = $query->execute();
+            
+            while ($row = $dbResult->fetchAssoc()) {
+                $row['pictureUrl'] = ($row['pictureUri'] ? file_create_url($row['pictureUri'])
+                            : $base_path . drupal_get_path('theme', 'mybrary') . '/images/unknown-user.png');
+                $response = $row; // should only return single result
+            }
+        } catch (Exception $e) {
+            watchdog('mybrary_service_connection',
+                    'Connection view error  [' . $e->getCode() . '] ' .
+                    $e->getMessage(), NULL, WATCHDOG_ERROR);
+            $response = services_error($e->getMessage(), 500);
+        }
+        
+    }
+    
     return $response;
 }

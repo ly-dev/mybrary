@@ -6,6 +6,8 @@ angular.module('app_mybrary')
     function (AppLog, AppHelper, $q, $http) {
 	
 	var serviceUrlBase = Drupal.settings.mybrary_web.service_base_url + '/api/v1',
+		cachedTerms = null,
+		cachedUser = Drupal.settings.mybrary_web.user,
 		cancelRestApiQs = {},
 		service = {};
 	
@@ -62,6 +64,12 @@ angular.module('app_mybrary')
         });
 	};
 
+	service.connectionView = function(data) {
+        return service.callRestApi('POST', '/connection/view', data).then(function(response) {
+        	return response.data;
+        });
+	};
+	
 	service.termList = function(data) {
         return service.callRestApi('POST', '/term/list', data).then(function(response) {
         	return response.data;
@@ -74,21 +82,57 @@ angular.module('app_mybrary')
         });
 	};
 
+	service.inventoryView = function(data) {
+        return service.callRestApi('POST', '/inventory/view', data).then(function(response) {
+        	return response.data;
+        });
+	};
+
 	service.inventoryUpdate = function(data) {
         return service.callRestApi('POST', '/inventory/update', data).then(function(response) {
         	return response.data;
         });
 	};
 
+	service.transactionList = function(data) {
+        return service.callRestApi('POST', '/transaction/list', data).then(function(response) {
+        	return response.data;
+        });
+	};
+
+	service.transactionView = function(data) {
+        return service.callRestApi('POST', '/transaction/view', data).then(function(response) {
+        	return response.data;
+        });
+	};
+
+	service.searchParams = {
+	    key: ''
+	};
+	
+	service.getTerms = function() {
+		var q =$q.defer();
+		
+		if (cachedTerms == null) {
+			service.termList().then(function(result) {
+				cachedTerms = result;
+				q.resolve(cachedTerms);
+			});
+		} else {
+			q.resolve(cachedTerms);			
+		};
+		
+		return q.promise;
+	};
+	
 	service.prepareTermOptionsByType = function(allTerms, type) {
 		return _.chain(allTerms).values().filter(function (o) {
 			return o.type == type;
 		}).value();
 	};
-	
-	
-	service.searchParams = {
-	    key: ''
+
+	service.getUser = function() {
+		return cachedUser;
 	};
 	
 	return service;

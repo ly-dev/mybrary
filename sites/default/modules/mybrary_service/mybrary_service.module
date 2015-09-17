@@ -270,15 +270,6 @@ function mybrary_service_services_resources ()
                                     'access arguments append' => TRUE,
                                     'args' => array(
                                             array(
-                                                    'name' => 'id',
-                                                    'type' => 'string',
-                                                    'description' => t('friend user id'),
-                                                    'source' => array(
-                                                            'path' => 1
-                                                    ),
-                                                    'optional' => FALSE
-                                            ),
-                                            array(
                                                     'name' => 'data',
                                                     'type' => 'array',
                                                     'description' => t('Parameters of the action'),

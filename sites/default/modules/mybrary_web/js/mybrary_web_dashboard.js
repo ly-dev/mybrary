@@ -10,7 +10,7 @@ angular.module('app_mybrary')
     	controller: 'DashboardController',
     	resolve:{
             termListPromise:  ['AppApi', function(AppApi) {
-               return AppApi.termList();
+               return AppApi.getTerms();
             }]
         }
     });
@@ -20,10 +20,11 @@ angular.module('app_mybrary')
     function(AppLog, AppHelper, AppApi, $scope, $q, termListPromise) {
 	
 	    AppLog.debug("DashboardController");
-		AppHelper.showLoading();
 	
 		$scope.terms = termListPromise;
 		var refreshList = function() {
+			AppHelper.showLoading();
+			
 			$q.all({
 				'friends': AppApi.connectionList(),
 				'items': AppApi.inventoryList()

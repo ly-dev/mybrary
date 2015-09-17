@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('app_mybrary', ['ui.router', 'ImageCropper'])
+angular.module('app_mybrary', ['ui.router', 'ImageCropper', '720kb.datepicker'])
 
 .config(['$logProvider', '$urlRouterProvider', '$httpProvider', 
     function ($logProvider, $urlRouterProvider, $httpProvider) {
@@ -20,6 +20,10 @@ angular.module('app_mybrary', ['ui.router', 'ImageCropper'])
 .run(['AppLog', 'AppHelper', 'AppApi', '$rootScope', 
     function(AppLog, AppHelper, AppApi, $rootScope) {
 	    AppLog.debug("App running");
+	    
+	    $rootScope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams){
+	    	AppHelper.dismissAlert();
+		});
 	    
 	    $rootScope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState, fromParams){
 	    	// collapse the dropdown menu

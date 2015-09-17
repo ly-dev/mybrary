@@ -13,10 +13,11 @@ angular.module('app_mybrary')
 
 .controller('ConnectionController', ['AppLog', 'AppHelper', 'AppApi', '$scope', function(AppLog, AppHelper, AppApi, $scope) {
     AppLog.debug("ConnectionController");
-    AppHelper.showLoading();
     
 	var refreshList = function() {
-		AppApi.connectionList().then(function(data) {
+	    AppHelper.showLoading();
+
+	    AppApi.connectionList().then(function(data) {
 			$scope.friends = data;
 			$scope.friendsMeta = {
 				count: _.values($scope.friends).length

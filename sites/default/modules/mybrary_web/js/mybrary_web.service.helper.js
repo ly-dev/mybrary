@@ -90,7 +90,7 @@ angular.module('app_mybrary')
         	var element = document.getElementById(domId);
         	
         	if (element) {
-        		$element.empty();
+        		angular.element(element).empty();
         	}
         };
         
