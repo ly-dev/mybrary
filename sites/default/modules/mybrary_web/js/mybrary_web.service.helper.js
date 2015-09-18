@@ -39,7 +39,9 @@ angular.module('app_mybrary')
             var message = '';
 
             angular.forEach(errors, function (value, key) {
-                message += service.htmlToPlaintext(value);
+            	if (value) {
+            		message += service.htmlToPlaintext(value);
+            	}
             });
 
             return message;

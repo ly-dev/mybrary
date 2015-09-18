@@ -83,6 +83,16 @@ body {
   height: 64px;
 }
 .app-icon.app-icon-avatar-small {
-  width: 48px;
-  height: 48x;
+  width: 32px;
+  height: 32px;
+}
+.app-icon.app-icon-avatar-tiny {
+  width: 16px;
+  height: 16px;
+}
+.app-text.app-text-small {
+  font-size: 80%;
+}
+.app-text.app-text-tiny {
+  font-size: 60%;
 }

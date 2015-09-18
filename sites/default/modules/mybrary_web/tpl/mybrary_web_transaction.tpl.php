@@ -1,13 +1,14 @@
 <div class="container">
 	<div class="row">
 		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-			<img ng-src="{{owner.pictureUrl}}" alt="avatar" class="app-icon app-icon-avatar-small">
-			<span>{{owner.name}}</span>
 			<div class="panel panel-default">
 				<div class="panel-body">
+					<div class="pull-right">
+            			<img ng-src="{{owner.pictureUrl}}" alt="avatar" class="app-icon app-icon-avatar-tiny">
+            			<span class="app-text app-text-tiny">{{owner.name}}</span>
+					</div>
 					<div class="pull-left">
-						<img ng-src="{{item.field_image[0].url}}" alt="picture"
-							class="app-icon app-icon-avatar-small">
+						<img ng-src="{{item.field_image[0].url}}" alt="picture" class="app-icon app-icon-avatar">
 					</div>
 					<div class="pull-left" style="padding-left: 1em;">
 						<span>{{item.title}}</span><br />
@@ -17,11 +18,11 @@
 					<p>{{item.body}}</p>
 				</div>
 			</div>
-			<div class="panel panel-default" ng-if="transaction.status == <?php print MYBRARY_TRANSACTION_STATUS_UNKNOWN; ?>">
+			
+			<div class="panel panel-default">
 				<div class="panel-body">
-				
     				<form>
-    					<div class="form-group ">
+    					<div class="form-group " ng-if="showFormElement('form-transactio-start')">
                     		<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3">
                     			<label for="form-transactio-start">Borrow date:</label>
                             	<datepicker date-format="fullDate" date-set="{{formTransactionData['start']}}">
@@ -29,7 +30,7 @@
                                 </datepicker>
                     		</div>
                 		</div>
-    					<div class="form-group">
+    					<div class="form-group"  ng-if="showFormElement('form-transactio-end')">
                     		<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3">
                     			<label for="form-transactio-end">Return date:</label>
                             	<datepicker date-format="fullDate" date-set="{{formTransactionData['end']}}">
@@ -37,15 +38,17 @@
                                 </datepicker>
                     		</div>
                 		</div>
-    					<div class="form-group">
+    					<div class="form-group" ng-class="{'has-error has-feedback' : formTransactionErrors['text']}" ng-if="showFormElement('form-transaction-text')">
 	        				<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="margin-top: 15px;">
+        						<span class="help-block" ng-show="formTransactionErrors['text']">{{formTransactionErrors['text']}}</span>
+        						<span class="glyphicon glyphicon-warning-sign form-control-feedback" aria-hidden="true" ng-show="formTransactionErrors['text']"></span>
         						<textarea rows="10" class="form-control" id="form-transaction-text" name="form-transaction-text" placeholder="Give a decent reason, e.g. why need it? how to use? etc." ng-model="formTransactionData['text']"></textarea>
         					</div>
         				</div>
     				</form>
     				<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="margin-top: 15px;">
         				<div class="btn-group" role="group" aria-label="">
-                            <button type="button" class="btn btn-primary">Request to borrow</button>
+                            <button type="button" class="btn btn-primary" ng-disabled="!validFormTransaction()" ng-click="submitForm()">Request to borrow</button>
                         </div>
                     </div>
     			</div>

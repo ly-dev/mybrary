@@ -106,6 +106,12 @@ angular.module('app_mybrary')
         });
 	};
 
+	service.transactionUpdate = function(data) {
+        return service.callRestApi('POST', '/transaction/update', data).then(function(response) {
+        	return response.data;
+        });
+	};
+
 	service.searchParams = {
 	    key: ''
 	};

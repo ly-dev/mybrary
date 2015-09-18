@@ -36,18 +36,29 @@ angular.module('app_mybrary')
 				$scope.transaction = result.transaction;
 				$scope.userRole = (user.uid == result.owner.uid ? 'owner' : 'borrower');
 				
+				// prepare form
 				$scope.formTransactionData['start'] = $filter('date')(parseInt(result.transaction.start) * 1000, 'fullDate');
 				$scope.formTransactionData['end'] = $filter('date')(parseInt(result.transaction.end) * 1000, 'fullDate');
-
-				switch (result.transaction.status) {
-					case 0:
-						$scope.formTransactionData['text'] = '';
-						break;
-				}
 				
-				// show alert for existing transaction found
-				if (result.transaction.transaction_id > 0 && $stateParams.transaction_id == 0) {
-					AppHelper.showAlert('Open transaction found on current item', 'success');					
+				// role and status based process
+				if ($scope.userRole == 'owner') { // owner role
+					switch (parseInt($scope.transaction.status)) {
+						case 0: // status unknown
+							break;
+						case 1: // requested
+							break;
+					}
+				} else { // borrower role
+					switch (parseInt($scope.transaction.status)) {
+						case 0: // status unknown
+							break;
+						case 1: // requested
+							// show alert for existing transaction found
+							if ($scope.transaction.transaction_id > 0) {
+								AppHelper.showAlert('You have an open request on current item', 'success', false);
+							}
+							break;
+					}
 				}
 
 				AppHelper.hideLoading();
@@ -67,9 +78,112 @@ angular.module('app_mybrary')
 			}
 		};
 		
-		refreshTransaction();
+		// Form
+		$scope.formTransactionData = {};
+		$scope.formTransactionErrors = {};
 		
-		$scope.requestToBorrow = function () {
+		$scope.showFormElement = function(elementId) {
+			var visibleElements = [];
+			
+			// role and status based process
+			if ($scope.userRole == 'owner') { // owner role
+				switch (parseInt($scope.transaction.status)) {
+					case 0: // status unknown
+						break;
+				}
+			} else { // borrower role
+				switch (parseInt($scope.transaction.status)) {
+					case 0: // status unknown
+						visibleElements = ['form-transactio-start', 'form-transactio-end', 'form-transaction-text'];
+						break;
+					case 1: // status unknown
+						visibleElements = ['form-transactio-start', 'form-transactio-end', 'form-transaction-text'];
+						break;
+				}
+			}
+
+			return (visibleElements.indexOf(elementId) >= 0);
 		}
+		
+		$scope.validFormTransaction = function() {
+			var result = true;
+			
+			if (_.isEmpty($scope.formTransactionData['start'] )) {
+				$scope.formTransactionErrors['start'] = "Please select start date.";
+				result = false;
+			} else {
+				$scope.formTransactionErrors['start'] = null;
+			}
+			
+			if (_.isEmpty($scope.formTransactionData['end'] )) {
+				$scope.formTransactionErrors['end'] = "Please select end date.";
+				result = false;
+			} else {
+				$scope.formTransactionErrors['end'] = null;
+			}
+
+			if (_.isEmpty($scope.formTransactionData['text'] )) {
+				$scope.formTransactionErrors['text'] = "Please enter a reason.";
+				result = false;
+			} else {
+				$scope.formTransactionErrors['text'] = null;
+			}
+
+			// role and status based check
+			if ($scope.userRole == 'owner') { // owner role
+				switch (parseInt($scope.transaction.status)) {
+					case 0: // status unknown
+						break;
+				}
+			} else { // borrower role
+				switch (parseInt($scope.transaction.status)) {
+					case 0: // status unknown
+						break;
+				}
+			}
+			
+			return result;
+		};
+		
+		$scope.submitForm = function (newStatus) {
+			if ($scope.validFormTransaction()) {
+				var data = angular.copy($scope.transaction);
+				
+				// fill form data
+				var temp = new Date($scope.formTransactionData['start']);
+				data['start'] = Math.round(temp.getTime() / 1000);
+				
+				temp = new Date($scope.formTransactionData['end']);
+				data['end'] = Math.round(temp.getTime() / 1000);
+				
+				// role and status based process
+				if ($scope.userRole == 'owner') { // owner role
+					switch (parseInt($scope.transaction.status)) {
+						case 0: // status unknown
+							break;
+					}
+				} else { // borrower role
+					switch (parseInt($scope.transaction.status)) {
+						case 0: // status unknown
+							data['new_status'] = 1; // requested
+							break;
+						case 1: // status unknown
+							data['new_status'] = 1; // requested
+							break;
+					}
+				}
+				
+				AppHelper.showLoading();
+				AppApi.transactionUpdate(data).then(function(response) {
+					AppHelper.showAlert(response.message, response.statue);
+					
+					refreshTransaction();
+				});
+			} else {
+				AppHelper.showAlert(AppHelper.prepareErrorMessage($scope.formTransactionErrors));
+			}
+		};
+		
+		refreshTransaction();
 }]);
 

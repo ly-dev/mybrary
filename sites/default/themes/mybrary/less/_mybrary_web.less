@@ -44,14 +44,32 @@
     }
 }
 
+@app-icon-width:       64px;
+@app-icon-height:       64px;
+
 .app-icon {
     &.app-icon-avatar {
-        width: 64px;
-        height: 64px;
+        width: @app-icon-width;
+        height: @app-icon-height;
     }
     
     &.app-icon-avatar-small {
-        width: 48px;
-        height: 48x;
+        width: (@app-icon-width * 0.5);
+        height: (@app-icon-height * 0.5);
+    }
+    
+    &.app-icon-avatar-tiny {
+        width: (@app-icon-width * 0.25);
+        height: (@app-icon-height * 0.25);
+    }
+}
+
+.app-text {
+    &.app-text-small {
+        font-size: 80%;
+    }
+
+    &.app-text-tiny {
+        font-size: 60%;
     }
 }
