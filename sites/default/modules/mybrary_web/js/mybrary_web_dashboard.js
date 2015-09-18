@@ -27,7 +27,8 @@ angular.module('app_mybrary')
 			
 			$q.all({
 				'friends': AppApi.connectionList(),
-				'items': AppApi.inventoryList()
+				'items': AppApi.inventoryList(),
+				'transactionCollection': AppApi.transactionList()
 			}).then(function (data) {
 				
 				$scope.friends = data['friends'];
@@ -40,10 +41,32 @@ angular.module('app_mybrary')
 					count: _.values($scope.items).length
 				};
 				
-				$scope.transactions = {};
-				$scope.transactionsMeta = {
-					count: _.values($scope.transactions).length
+				
+				var user = AppApi.getUser();
+				$scope.transactions = {
+						'owner': {},
+						'borrower': {}
 				};
+				
+				// expand transaction with full data
+				angular.forEach(data['transactionCollection']['transactions'], function(v, k) {
+					v['item'] = data['transactionCollection']['items'][v['entity_id']];
+					v['owner'] = data['transactionCollection']['users'][v['item']['uid']];
+					v['borrower'] = data['transactionCollection']['users'][v['uid_borrower']];
+
+					if (user.uid == v['uid_borrower']) {
+						$scope.transactions['borrower'][k] = v;
+					} else {
+						$scope.transactions['owner'][k] = v;
+					}
+				});
+			
+				$scope.transactionsMeta = {
+					countAsOwner: _.values($scope.transactions['owner']).length,
+					countAsBorrower: _.values($scope.transactions['borrower']).length 
+				};
+				
+				$scope.transactionsMeta['count'] = $scope.transactionsMeta['countAsOwner'] + $scope.transactionsMeta['countAsBorrower'];
 				
 				AppHelper.hideLoading();
 			});

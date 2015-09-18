@@ -25,9 +25,57 @@ function mybrary_service_transaction_list ($data)
 {
     global $user;
     
-    $response = array();
+    $response = NULL;
     
-    $response = services_error(t('List action has not been implemented yet.'), 404);
+    if (empty($data['uid'])) {
+        $data['uid'] = $user->uid;
+    }
+    
+    try {
+        // tricky to get transaction with latest status
+        $queryStatement = 'select th.transaction_id, th.entity_id, th.uid_borrower, th.start, th.end,'
+            . ' ti.instance_id, ti.status, ti.update_timestamp, ti.text from' 
+        	. ' (select * from mybrary_transaction_items'
+            . ' where transaction_id in' 
+        	. ' (select th.transaction_id from mybrary_transaction_head th'
+        	. ' join node nd on nd.nid = th.entity_id'
+	        . ' where th.uid_borrower = :uid or nd.uid = :uid)'
+            . ' order by transaction_id, update_timestamp desc) ti'
+            . ' join mybrary_transaction_head th on th.transaction_id = ti.transaction_id'
+            . ' group by ti.transaction_id';
+        
+        $dbResult = db_query($queryStatement, array(
+                ':uid' => $data['uid']
+        ));
+        
+        $response = array();
+        $relatedItems = array();
+        $relatedUsers = array();
+        while ($row = $dbResult->fetchAssoc()) {
+            $response['transactions'][$row['transaction_id']] = $row;
+            $response['transactions'][$row['transaction_id']]['status_label'] = _mybrary_transaction_get_status_label($row['status']);
+            $relatedItems[$row['entity_id']] = $row['entity_id'];
+            
+            // collect borrower ids
+            $relatedUsers[$row['uid_borrower']] = $row['uid_borrower'];
+        }
+        
+        module_load_include('inc', 'mybrary_service', 'mybrary_service.inventory.api');
+        $response['items'] =  mybrary_service_inventory_list(array('nid' => array_keys($relatedItems)));
+        
+        // collect owner ids
+        foreach ($response['items'] as $nid=>$item) {
+            $relatedUsers[$item['uid']] = $item['uid'];
+        }
+        
+        module_load_include('inc', 'mybrary_service', 'mybrary_service.connection.api');
+        $response['users'] =  mybrary_service_connection_list(array('uid' => array_keys($relatedUsers)));
+    } catch (Exception $e) {
+        watchdog('mybrary_service_connection',
+                'Connection list error  [' . $e->getCode() . '] ' .
+                $e->getMessage(), NULL, WATCHDOG_ERROR);
+        $response = services_error($e->getMessage(), 500);
+    }
     
     return $response;
 }
@@ -108,15 +156,17 @@ function mybrary_service_transaction_view ($data)
                                 'start' => $row['start'],
                                 'end' => $row['end'],
                                 'status' => $row['status'],
+                                'status_label' => _mybrary_transaction_get_status_label($row['status']),
                                 'items' => array()
                         );
                     }
                         
-                    $response['transaction']['items'][] = array(
+                    $response['transaction']['items'][$row['instance_id']] = array(
                             'instance_id' => $row['instance_id'],
                             'status' => $row['status'],
+                            'status_label' => _mybrary_transaction_get_status_label($row['status']),
                             'update_timestamp' => $row['update_timestamp'],
-                            'text' => $row['text']
+                            'text' => json_decode($row['text'])
                     );
                 }
             } else {
@@ -132,6 +182,7 @@ function mybrary_service_transaction_view ($data)
                         'start' => $start->getTimestamp(),
                         'end' => $end->getTimestamp(),
                         'status' => MYBRARY_TRANSACTION_STATUS_UNKNOWN,
+                        'status_label' => _mybrary_transaction_get_status_label(MYBRARY_TRANSACTION_STATUS_UNKNOWN),
                         'items' => array()
                 );
             }
@@ -141,8 +192,7 @@ function mybrary_service_transaction_view ($data)
                 $response['item'] =  mybrary_service_inventory_view(array('nid' => $response['transaction']['entity_id']));
                 
                 module_load_include('inc', 'mybrary_service', 'mybrary_service.connection.api');
-                $response['owner'] =  mybrary_service_connection_view(array('uid' => $response['item']['uid']));
-                $response['borrower'] =  mybrary_service_connection_view(array('uid' => $response['transaction']['uid_borrower']));
+                $response['users'] =  mybrary_service_connection_list(array('uid' => array($response['item']['uid'], $response['transaction']['uid_borrower'])));
             }
             
         } catch (Exception $e) {
@@ -243,7 +293,11 @@ function mybrary_service_transaction_update ($data)
                 $item = array(
                         'transaction_id' => $data['transaction_id'],
                         'status' => $data['new_status'],
-                        'text' => $data['text'],
+                        'text' => json_encode(array(
+                            'text' => $data['text'],
+                            'start'=> $data['start'],
+                            'end'=> $data['end']
+                        )),
                         'update_timestamp' => $timestamp,
                 );
                 

@@ -9,7 +9,7 @@
 		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
 			<div class="list-group">
 				<div class="list-group-item"><span>My Connection ({{friendsMeta.count}})</span></div>
-				<button type="button" class="list-group-item" ng-show="friendsMeta.count < 1">Oops! Nothing found.</button>
+				<div class="list-group-item" ng-show="friendsMeta.count < 1">Oops! Nothing found.</div>
 				<button type="button" class="list-group-item" ng-repeat="(id, friend) in friends">
 					<img ng-src="{{friend.pictureUrl}}" alt="avatar" class="app-icon app-icon-avatar-small">
 					<span>{{friend.name}}</span>

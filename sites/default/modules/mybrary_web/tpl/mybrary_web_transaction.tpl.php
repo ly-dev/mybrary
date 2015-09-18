@@ -19,6 +19,19 @@
 				</div>
 			</div>
 			
+			<div class="list-group">
+				<div class="list-group-item" ng-repeat="(id, transactionItem) in transaction['items'] | orderBy :'update_timestamp' : true" style="height: 64px;">
+					<div class="pull-right">
+            			<img ng-src="{{transaction.owner.pictureUrl}}" alt="avatar" class="app-icon app-icon-avatar-tiny">
+            			<span class="app-text app-text-tiny">{{transaction.owner.name}}</span>
+					</div>
+					<div class="pull-left">
+    					<span>{{transactionItem.status_label}}</span>, <span>{{transactionItem.update_timestamp * 1000 | date : 'short'}}</span><br/>
+    					<span>{{transactionItem.text}}</span>
+					</div>
+				</div>
+			</div>
+
 			<div class="panel panel-default">
 				<div class="panel-body">
     				<form>
@@ -48,7 +61,7 @@
     				</form>
     				<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="margin-top: 15px;">
         				<div class="btn-group" role="group" aria-label="">
-                            <button type="button" class="btn btn-primary" ng-disabled="!validFormTransaction()" ng-click="submitForm()">Request to borrow</button>
+                            <button type="button" class="btn btn-primary" ng-disabled="!validFormTransaction()" ng-click="submitForm('requested')" ng-if="showFormElement('form-transaction-submit-requested')">Request to borrow</button>
                         </div>
                     </div>
     			</div>

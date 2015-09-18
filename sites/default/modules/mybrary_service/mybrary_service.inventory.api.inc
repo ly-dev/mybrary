@@ -57,10 +57,14 @@ function mybrary_service_inventory_list ($data)
             $query->fieldCondition('field_shared', 'value', MYBRARY_ITEM_FIELD_SHARED_TO_FRIEND);
             break;
     }
-    if (empty($temp)) {
-        $temp = "0"; // return nothing if wrong owner
+    if (!empty($temp)) {
+        $query->propertyCondition('uid', $temp);
     }
-    $query->propertyCondition('uid', $temp);
+    
+    // list of nid
+    if (!empty($data['nid'])) {
+        $query->propertyCondition('nid', $data['nid']);
+    }
     
     // search key
     if (!empty($data['key'])) {

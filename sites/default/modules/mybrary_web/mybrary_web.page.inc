@@ -99,3 +99,11 @@ function mybrary_web_search() {
 function mybrary_web_transaction() {
     return theme_render_template(drupal_get_path('module', 'mybrary_web') . '/tpl/mybrary_web_transaction.tpl.php', array());
 }
+
+/**
+ * Page callback for transaction list.
+ */
+function mybrary_web_transaction_list() {
+    return theme_render_template(drupal_get_path('module', 'mybrary_web') . '/tpl/mybrary_web_transaction-list.tpl.php', array());
+}
+

@@ -97,35 +97,34 @@ function mybrary_service_connection_list ($data)
     
     $response = NULL;
     
-    if ($user->uid) {
-        try {
-            $query = db_select('mybrary_user_net', 'n');
-            $query->join('users', 'u', 'n.uid_to = u.uid');
-            $query->join('mybrary_user_ext', 'e', 'e.uid = u.uid');
-            $query->leftJoin('file_managed', 'f', 'u.picture = f.fid');
-            $query->fields('u', array('uid', 'name'));
-            $query->addField('e', 'ext_id', 'externalId');
-            $query->addField('e', 'ext_name', 'externalName');
-            $query->addField('e', 'type', 'externalType');
-            $query->addField('f', 'uri', 'pictureUri');
-            $query->condition('n.uid_from', $user->uid);
-            $dbResult = $query->execute();
-            
-            $response = array();
-            while ($row = $dbResult->fetchAssoc()) {
-                $row['pictureUrl'] = ($row['pictureUri'] ? file_create_url($row['pictureUri'])
-                            : $base_path . drupal_get_path('theme', 'mybrary') . '/images/unknown-user.png');
-                $response[$row['uid']] = $row;
-            }
-        } catch (Exception $e) {
-            watchdog('mybrary_service_connection',
-                    'Connection list error  [' . $e->getCode() . '] ' .
-                    $e->getMessage(), NULL, WATCHDOG_ERROR);
-            $response = services_error($e->getMessage(), 500);
-        }
+    if (empty($data['uid'])) {
+        $data['uid'] = $user->uid; 
+    }
         
-    } else {
-        $response = services_error(t('Access denied to anonymous user.'), 401);
+    try {
+        $query = db_select('mybrary_user_net', 'n');
+        $query->join('users', 'u', 'n.uid_to = u.uid');
+        $query->join('mybrary_user_ext', 'e', 'e.uid = u.uid');
+        $query->leftJoin('file_managed', 'f', 'u.picture = f.fid');
+        $query->fields('u', array('uid', 'name'));
+        $query->addField('e', 'ext_id', 'externalId');
+        $query->addField('e', 'ext_name', 'externalName');
+        $query->addField('e', 'type', 'externalType');
+        $query->addField('f', 'uri', 'pictureUri');
+        $query->condition('n.uid_from', $data['uid']);
+        $dbResult = $query->execute();
+        
+        $response = array();
+        while ($row = $dbResult->fetchAssoc()) {
+            $row['pictureUrl'] = ($row['pictureUri'] ? file_create_url($row['pictureUri'])
+                        : $base_path . drupal_get_path('theme', 'mybrary') . '/images/unknown-user.png');
+            $response[$row['uid']] = $row;
+        }
+    } catch (Exception $e) {
+        watchdog('mybrary_service_connection',
+                'Connection list error  [' . $e->getCode() . '] ' .
+                $e->getMessage(), NULL, WATCHDOG_ERROR);
+        $response = services_error($e->getMessage(), 500);
     }
     
     return $response;

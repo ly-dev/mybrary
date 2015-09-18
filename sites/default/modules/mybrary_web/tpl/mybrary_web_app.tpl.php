@@ -16,9 +16,9 @@ $items = array (
             'label' => t('Inventory'),
             'state' => 'inventory',
     ),
-    'transaction' => array(
+    'transaction-list' => array(
             'label' => t('Transaction'),
-            'state' => 'transaction',
+            'state' => 'transaction-list',
     ),
 );
 ?>

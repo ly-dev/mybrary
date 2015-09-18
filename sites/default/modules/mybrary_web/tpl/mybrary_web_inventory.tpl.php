@@ -9,7 +9,7 @@
 		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
 			<div class="list-group">
 				<div class="list-group-item"><span>My Inventory ({{itemsMeta.count}})</span><div class="pull-right" style="font-size:75%"><i class="fa fa-user"></i> Not shared <i class="fa fa-cloud-upload"></i> Shared</div></div>
-				<button type="button" class="list-group-item" ng-show="itemsMeta.count < 1">Oops! Nothing found.</button>
+				<div class="list-group-item" ng-show="itemsMeta.count < 1">Oops! Nothing found.</div>
 				<button type="button" class="list-group-item" ng-repeat="(id, item) in items track by id" ng-click="editItem(item)">
 					<div class="pull-left">
 						<img ng-src="{{item.field_image[0].url}}" alt="picture" class="app-icon app-icon-avatar-small">

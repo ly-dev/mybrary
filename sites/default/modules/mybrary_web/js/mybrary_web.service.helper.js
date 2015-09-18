@@ -6,6 +6,15 @@ angular.module('app_mybrary')
     function () {
 
         var service = {};
+        
+        service.CONST = {
+    		'MYBRARY_TRANSACTION_STATUS_UNKNOWN': 0,
+    		'MYBRARY_TRANSACTION_STATUS_REQUESTED': 1,
+    		'MYBRARY_TRANSACTION_STATUS_CONFIRMED': 2,
+    		'MYBRARY_TRANSACTION_STATUS_DECLINED': 3,
+    		'MYBRARY_TRANSACTION_STATUS_RECEIVED': 4,
+    		'MYBRARY_TRANSACTION_STATUS_RETURNED': 5
+        };
 
         service.getTimestamp = function () {
             if (!Date.now) {

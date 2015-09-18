@@ -61,5 +61,13 @@ function mybrary_web_menu ()
             'access callback' => 'user_is_logged_in'
     );
     
+    $items['tpl/transaction-list'] = array(
+            'title' => t('Transaction'),
+            'page callback' => 'mybrary_web_transaction_list',
+            'file' => 'mybrary_web.page.inc',
+            'type' => MENU_NORMAL_ITEM,
+            'access callback' => 'user_is_logged_in'
+    );
+    
     return $items;
 }
