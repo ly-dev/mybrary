@@ -139,6 +139,8 @@ function mybrary_service_transaction_view ($data)
                 $query->addField('th', 'uid_borrower');
                 $query->addField('th', 'start');
                 $query->addField('th', 'end');
+                $query->addField('th', 'feedback_owner');
+                $query->addField('th', 'feedback_borrower');
                 $query->addField('ti', 'instance_id');
                 $query->addField('ti', 'status');
                 $query->addField('ti', 'update_timestamp');
@@ -155,12 +157,16 @@ function mybrary_service_transaction_view ($data)
                                 'uid_borrower' => $row['uid_borrower'],
                                 'start' => $row['start'],
                                 'end' => $row['end'],
+                                'feedback_owner'=> $row['feedback_owner'],
+                                'feedback_borrower'=> $row['feedback_borrower'],
                                 'status' => $row['status'],
                                 'status_label' => _mybrary_transaction_get_status_label($row['status']),
+                                'feedback_owner_label'=> _mybrary_transaction_get_feedback_label($row['feedback_owner']),
+                                'feedback_borrower_label'=> _mybrary_transaction_get_feedback_label($row['feedback_borrower']),
                                 'items' => array()
                         );
                     }
-                        
+
                     $response['transaction']['items'][$row['instance_id']] = array(
                             'instance_id' => $row['instance_id'],
                             'status' => $row['status'],
@@ -168,6 +174,10 @@ function mybrary_service_transaction_view ($data)
                             'update_timestamp' => $row['update_timestamp'],
                             'text' => json_decode($row['text'])
                     );
+                    
+                    if (isset($response['transaction']['items'][$row['instance_id']]['text']->feedback)) {
+                        $response['transaction']['items'][$row['instance_id']]['text']->feedback_label = _mybrary_transaction_get_feedback_label($response['transaction']['items'][$row['instance_id']]['text']->feedback);
+                    }
                 }
             } else {
                 // new transaction
@@ -181,8 +191,12 @@ function mybrary_service_transaction_view ($data)
                         'uid_borrower' => $data['uid_borrower'],
                         'start' => $start->getTimestamp(),
                         'end' => $end->getTimestamp(),
+                        'feedback_owner'=> MYBRARY_TRANSACTION_FEEDBACK_UNKNOWN,
+                        'feedback_borrower'=> MYBRARY_TRANSACTION_FEEDBACK_UNKNOWN,
                         'status' => MYBRARY_TRANSACTION_STATUS_UNKNOWN,
                         'status_label' => _mybrary_transaction_get_status_label(MYBRARY_TRANSACTION_STATUS_UNKNOWN),
+                        'feedback_owner_label'=> _mybrary_transaction_get_feedback_label(MYBRARY_TRANSACTION_FEEDBACK_UNKNOWN),
+                        'feedback_borrower_label'=> _mybrary_transaction_get_feedback_label(MYBRARY_TRANSACTION_FEEDBACK_UNKNOWN),
                         'items' => array()
                 );
             }
@@ -249,29 +263,49 @@ function mybrary_service_transaction_update ($data)
     
     if (!isset($data['new_status'])) {
         $errors[] = t('New status is missing');
+    } elseif ($data['new_status'] == MYBRARY_TRANSACTION_STATUS_OWNER_FEEDBACKED && !isset($data['feedback_owner'])) {
+        $errors[] = t('Owner feedback is missing');
+    } elseif ($data['new_status'] == MYBRARY_TRANSACTION_STATUS_BORROWER_FEEDBACKED && !isset($data['feedback_borrower'])) {
+        $errors[] = t('Borrower feedback is missing');
     }
     
     if (empty($errors)) {
         try {
             if ($data['transaction_id'] > 0) {
+                // tricky to get open transaction against the entity_id, uid_borrower
                 // double check transaction existing
-                $result = db_select('mybrary_transaction_head', 't')
-                ->fields('t', array('transaction_id'))
-                ->condition('t.transaction_id', $data['transaction_id'])
-                ->condition('t.entity_id', $data['entity_id'])
-                ->condition('t.uid_borrower', $data['uid_borrower'])
-                ->range(0, 1)
-                ->execute()
-                ->rowCount();
+                $queryStatement = 'select transaction_id, status from' 
+                	. ' (select * from mybrary_transaction_items'
+                    . ' where transaction_id in' 
+                	. ' (select transaction_id from mybrary_transaction_head'
+                	. ' where transaction_id = :transaction_id and entity_id = :entity_id and uid_borrower = :uid_borrower)'
+                    . ' order by transaction_id, update_timestamp desc) ti'
+                    . ' group by transaction_id';
+                        
+                $dbResult = db_query($queryStatement, array(
+                        ':transaction_id' => $data['transaction_id'],
+                        ':entity_id' => $data['entity_id'],
+                        ':uid_borrower' => $data['uid_borrower']
+                ));
                 
-                if (!$result) {
-                    $errors[] = t('Matched transaction could not be found');
-                } else {
+                $errors[] = t('Matched transaction could not be found');
+                while ($row = $dbResult->fetchAssoc()) {
+                    // should only existing one matched transaction
+                    $errors = array(); // clear error
+                    
+                    if ($row['status'] != $data['status']) {
+                        $errors[] = t('Operation cancelled due to status changed by others.');
+                    }
+                }
+                
+                if (empty($errors)) {
                     // updte start and end
                     $result = db_update('mybrary_transaction_head')->fields(
                             array(
                                 'start'=> $data['start'],
                                 'end'=> $data['end'],
+                                'feedback_owner'=> $data['feedback_owner'],
+                                'feedback_borrower'=> $data['feedback_borrower'],
                             ))
                             ->condition('transaction_id', $data['transaction_id'])
                             ->execute();                    
@@ -284,6 +318,8 @@ function mybrary_service_transaction_update ($data)
                             'uid_borrower' => $data['uid_borrower'],
                             'start'=> $data['start'],
                             'end'=> $data['end'],
+                            'feedback_owner'=> MYBRARY_TRANSACTION_FEEDBACK_UNKNOWN,
+                            'feedback_borrower'=> MYBRARY_TRANSACTION_FEEDBACK_UNKNOWN,
                         ))->execute();
             }
         
@@ -295,12 +331,32 @@ function mybrary_service_transaction_update ($data)
                         'status' => $data['new_status'],
                         'text' => json_encode(array(
                             'text' => $data['text'],
-                            'start'=> $data['start'],
-                            'end'=> $data['end']
                         )),
                         'update_timestamp' => $timestamp,
                 );
                 
+                switch ($data['new_status']) {
+                    case MYBRARY_TRANSACTION_STATUS_REQUESTED:
+                    case MYBRARY_TRANSACTION_STATUS_CONFIRMED:
+                        $item['text'] = json_encode(array(
+                                'text' => $data['text'],
+                                'start'=> $data['start'],
+                                'end'=> $data['end'],
+                        ));
+                        break;
+                    case MYBRARY_TRANSACTION_STATUS_OWNER_FEEDBACKED:
+                        $item['text'] = json_encode(array(
+                                'text' => $data['text'],
+                                'feedback'=> $data['feedback_owner'],
+                        ));
+                        break;
+                    case MYBRARY_TRANSACTION_STATUS_BORROWER_FEEDBACKED:
+                        $item['text'] = json_encode(array(
+                            'text' => $data['text'],
+                            'feedback'=> $data['feedback_borrower'],
+                        ));                     
+                        break;
+                }
                 
                 $item[] = db_insert('mybrary_transaction_items')->fields($item)->execute();
                 

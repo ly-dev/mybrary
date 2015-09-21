@@ -8,20 +8,47 @@ define("MYBRARY_TRANSACTION_STATUS_CONFIRMED", 2);
 define("MYBRARY_TRANSACTION_STATUS_DECLINED", 3);
 define("MYBRARY_TRANSACTION_STATUS_RECEIVED", 4);
 define("MYBRARY_TRANSACTION_STATUS_RETURNED", 5);
+define("MYBRARY_TRANSACTION_STATUS_CANCELLED", 6);
+define("MYBRARY_TRANSACTION_STATUS_OWNER_FEEDBACKED", 7);
+define("MYBRARY_TRANSACTION_STATUS_BORROWER_FEEDBACKED", 8);
+
+define("MYBRARY_TRANSACTION_FEEDBACK_UNKNOWN", 0);
+define("MYBRARY_TRANSACTION_FEEDBACK_NEGATIVE", 1);
+define("MYBRARY_TRANSACTION_FEEDBACK_NEUTRAL", 2);
+define("MYBRARY_TRANSACTION_FEEDBACK_POSITIVE", 3);
 
 function _mybrary_transaction_get_status_label ($key) {
     $labels = array(
             MYBRARY_TRANSACTION_STATUS_UNKNOWN => t('unknown'),
             MYBRARY_TRANSACTION_STATUS_REQUESTED => t('requested'),
             MYBRARY_TRANSACTION_STATUS_CONFIRMED => t('confirmed'),
-            MYBRARY_TRANSACTION_STATUS_DECLINED => t(' declined'),
-            MYBRARY_TRANSACTION_STATUS_RECEIVED => t(' received'),
-            MYBRARY_TRANSACTION_STATUS_RETURNED => t(' returned'),
+            MYBRARY_TRANSACTION_STATUS_DECLINED => t('declined'),
+            MYBRARY_TRANSACTION_STATUS_RECEIVED => t('received'),
+            MYBRARY_TRANSACTION_STATUS_RETURNED => t('returned'),
+            MYBRARY_TRANSACTION_STATUS_CANCELLED => t('cancelled'),
+            MYBRARY_TRANSACTION_STATUS_OWNER_FEEDBACKED => t('feedbacked'),
+            MYBRARY_TRANSACTION_STATUS_BORROWER_FEEDBACKED => t('feedbacked'),
     );
     
     if (array_key_exists($key, $labels)) {
         return $labels[$key];
     } else {
-        return t('Unknown label for key: !key', array('!key' => $key));
+        return t('Unknown status label for key: !key', array('!key' => $key));
     }
 }
+
+function _mybrary_transaction_get_feedback_label ($key) {
+    $labels = array(
+            MYBRARY_TRANSACTION_FEEDBACK_UNKNOWN => t('unknown'),
+            MYBRARY_TRANSACTION_FEEDBACK_NEGATIVE => t('negative'),
+            MYBRARY_TRANSACTION_FEEDBACK_NEUTRAL => t('neutral'),
+            MYBRARY_TRANSACTION_FEEDBACK_POSITIVE => t('positive'),
+    );
+
+    if (array_key_exists($key, $labels)) {
+        return $labels[$key];
+    } else {
+        return t('Unknown feedback label for key: !key', array('!key' => $key));
+    }
+}
+

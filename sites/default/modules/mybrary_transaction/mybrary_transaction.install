@@ -53,6 +53,20 @@ function _mybrary_transaction_schema_definition ()
                             'size' => 'normal',
                             'not null' => TRUE
                     ),
+                    'feedback_owner' => array(
+                            'description' => t('feedback from owner'),
+                            'type' => 'int',
+                            'unsigned' => TRUE,
+                            'size' => 'normal',
+                            'not null' => FALSE
+                    ),
+                    'feedback_borrower' => array(
+                            'description' => t('feedback from borrower'),
+                            'type' => 'int',
+                            'unsigned' => TRUE,
+                            'size' => 'normal',
+                            'not null' => FALSE
+                    ),
             ),
             'primary key' => array(
                     'transaction_id'
@@ -177,4 +191,29 @@ function mybrary_transaction_update_7101 ()
 function mybrary_transaction_update_7102 ()
 {
     db_drop_field('mybrary_transaction_head', 'uid_owner');
+}
+
+/**
+ * Alter table mybrary_transaction_head to add feedback fields.
+ */
+function mybrary_transaction_update_7103 ()
+{
+    db_add_field('mybrary_transaction_head', 'feedback_owner',
+            array(
+                    'description' => t('feedback from owner'),
+                    'type' => 'int',
+                    'unsigned' => TRUE,
+                    'size' => 'normal',
+                    'not null' => FALSE
+            )
+    );
+    db_add_field('mybrary_transaction_head', 'feedback_borrower',
+            array(
+                    'description' => t('feedback from borrower'),
+                    'type' => 'int',
+                    'unsigned' => TRUE,
+                    'size' => 'normal',
+                    'not null' => FALSE
+            )
+    );
 }

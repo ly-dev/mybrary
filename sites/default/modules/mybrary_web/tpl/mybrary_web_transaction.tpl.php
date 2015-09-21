@@ -1,6 +1,11 @@
 <div class="container">
 	<div class="row">
 		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <button type="button" class="btn btn-link" ui-sref="transaction-list"><i class="glyphicon glyphicon-menu-left"></i> My Transations</button>
+        </div>
+    </div>
+	<div class="row">
+		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
 			<div class="panel panel-default">
 				<div class="panel-body">
 					<div class="pull-right">
@@ -20,13 +25,15 @@
 			</div>
 			
 			<div class="list-group">
-				<div class="list-group-item" ng-repeat="(id, transactionItem) in transaction['items'] | orderBy :'update_timestamp' : true" style="height: 64px;">
-					<div class="pull-right">
-            			<img ng-src="{{transaction.owner.pictureUrl}}" alt="avatar" class="app-icon app-icon-avatar-tiny">
-            			<span class="app-text app-text-tiny">{{transaction.owner.name}}</span>
+				<div class="list-group-item" ng-repeat="(id, transactionItem) in transaction['items'] | orderBy :'update_timestamp' : true">
+					<div>
+            			<img ng-src="{{transactionItem.user.pictureUrl}}" alt="avatar" class="app-icon app-icon-avatar-tiny">
+            			<span class="app-text app-text-tiny">{{transactionItem.user.name}}</span>
+            			<span class="app-text app-text-tiny">{{transactionItem.update_timestamp * 1000 | date : 'short'}}</span>
+            			<span class="app-text app-text-tiny">{{transactionItem.status_label}}</span>
+            			
 					</div>
-					<div class="pull-left">
-    					<span>{{transactionItem.status_label}}</span>, <span>{{transactionItem.update_timestamp * 1000 | date : 'short'}}</span><br/>
+					<div>
     					<span>{{transactionItem.text}}</span>
 					</div>
 				</div>
@@ -34,6 +41,10 @@
 
 			<div class="panel panel-default">
 				<div class="panel-body">
+					<div class="pull-right">
+            			<img ng-src="{{currentUser.pictureUrl}}" alt="avatar" class="app-icon app-icon-avatar-tiny">
+            			<span class="app-text app-text-tiny">{{currentUser.name}}</span>
+					</div>
     				<form>
     					<div class="form-group " ng-if="showFormElement('form-transactio-start')">
                     		<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3">
@@ -51,6 +62,21 @@
                                 </datepicker>
                     		</div>
                 		</div>
+    					<div class="form-group" ng-class="{'has-error has-feedback' : formTransactionErrors['feedback']}" ng-if="showFormElement('form-transaction-feedback')">
+	        				<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="margin-top: 15px;">
+        						<span class="help-block" ng-show="formTransactionErrors['feedback']">{{formTransactionErrors['feedback']}}</span>
+        						<span class="glyphicon glyphicon-warning-sign form-control-feedback" aria-hidden="true" ng-show="formTransactionErrors['feedback']"></span>
+	    	    				<div class="col-xs-4 col-sm-4 col-md-2 col-lg-2">
+        							<label for="form-transaction-feedback-3"><input type="radio" value="3" class="form-control" id="form-transaction-feedback-3" name="form-transaction-feedback-3" ng-model="formTransactionData['feedback']">Positive</label>
+        						</div>
+	    	    				<div class="col-xs-4 col-sm-4 col-md-2 col-lg-2">
+        							<label for="form-transaction-feedback-2"><input type="radio" value="2" class="form-control" id="form-transaction-feedback-2" name="form-transaction-feedback-2" ng-model="formTransactionData['feedback']">Neutral</label>
+        						</div>
+	    	    				<div class="col-xs-4 col-sm-4 col-md-2 col-lg-2">
+        							<label for="form-transaction-feedback-1"><input type="radio" value="1" class="form-control" id="form-transaction-feedback-1" name="form-transaction-feedback-1" ng-model="formTransactionData['feedback']">Negative</label>
+        						</div>
+        					</div>
+        				</div>
     					<div class="form-group" ng-class="{'has-error has-feedback' : formTransactionErrors['text']}" ng-if="showFormElement('form-transaction-text')">
 	        				<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="margin-top: 15px;">
         						<span class="help-block" ng-show="formTransactionErrors['text']">{{formTransactionErrors['text']}}</span>
@@ -62,6 +88,12 @@
     				<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="margin-top: 15px;">
         				<div class="btn-group" role="group" aria-label="">
                             <button type="button" class="btn btn-primary" ng-disabled="!validFormTransaction()" ng-click="submitForm('requested')" ng-if="showFormElement('form-transaction-submit-requested')">Request to borrow</button>
+                            <button type="button" class="btn btn-default" ng-disabled="!validFormTransaction()" ng-click="submitForm('cancelled')" ng-if="showFormElement('form-transaction-submit-cancelled')">Cancel the request</button>
+                            <button type="button" class="btn btn-primary" ng-disabled="!validFormTransaction()" ng-click="submitForm('confirmed')" ng-if="showFormElement('form-transaction-submit-confirmed')">Confirm to borrow</button>
+                            <button type="button" class="btn btn-default" ng-disabled="!validFormTransaction()" ng-click="submitForm('declined')" ng-if="showFormElement('form-transaction-submit-declined')">Decline to borrow</button>
+                            <button type="button" class="btn btn-primary" ng-disabled="!validFormTransaction()" ng-click="submitForm('received')" ng-if="showFormElement('form-transaction-submit-received')">Received</button>
+                            <button type="button" class="btn btn-primary" ng-disabled="!validFormTransaction()" ng-click="submitForm('returned')" ng-if="showFormElement('form-transaction-submit-returned')">Returned</button>
+                            <button type="button" class="btn btn-primary" ng-disabled="!validFormTransaction()" ng-click="submitForm('feedback')" ng-if="showFormElement('form-transaction-submit-feedback')">Submit feedback</button>
                         </div>
                     </div>
     			</div>

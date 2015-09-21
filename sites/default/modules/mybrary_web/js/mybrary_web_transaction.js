@@ -78,8 +78,8 @@ angular.module('app_mybrary')
 }])
 
 
-.controller('TransactionResultController', ['AppLog', 'AppHelper', 'AppApi', '$stateParams', '$scope', '$filter', 'termListPromise',
-    function(AppLog, AppHelper, AppApi, $stateParams, $scope, $filter, termListPromise) {
+.controller('TransactionResultController', ['AppLog', 'AppHelper', 'AppApi', '$state', '$stateParams', '$scope', '$filter', 'termListPromise',
+    function(AppLog, AppHelper, AppApi, $state, $stateParams, $scope, $filter, termListPromise) {
 	    AppLog.debug("TransactionResultController");
 		
 		$scope.terms = termListPromise;
@@ -92,44 +92,99 @@ angular.module('app_mybrary')
 		    (function() {
 		    	return AppApi.transactionView({transaction_id: $stateParams.transaction_id, entity_id: $stateParams.nid, uid_borrower: user.uid});
 			})().then(function(result) {
+				
+				// redirectory if open transaction found
+				if ($stateParams.transaction_id == 0 && result.transaction.transaction_id > 0) {
+					$state.go('transaction', {transaction_id: result.transaction.transaction_id, nid: null});
+					return;
+				}
+				
+				
 				$scope.item = result.item;
 				$scope.transaction = result.transaction;
 				if (user.uid == $scope.transaction.uid_borrower) {
 					$scope.userRole = 'borrower';
 					$scope.owner = result.users[$scope.item.uid];
 					$scope.borrower = result.users[user.uid];
+					$scope.currentUser = $scope.borrower;
 				} else {
 					$scope.userRole = 'owner';
 					$scope.owner = result.users[user.uid];
 					$scope.borrower = result.users[$scope.transaction.uid_borrower];
+					$scope.currentUser = $scope.owner;
 				}
+				
+				// prepare items
+				angular.forEach($scope.transaction.items, function(v, k) {
+					var t = v.text;
+					
+					switch (parseInt(v.status)) {
+						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_REQUESTED']:
+							v.text = t.text + ' (From ' + $filter('date')(t.start * 1000, 'shortDate') + ' to ' + $filter('date')(t.end * 1000, 'shortDate') + ')';
+							v['user'] = $scope.borrower;
+							break;
+						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_CONFIRMED']:
+							v.text = t.text + ' (From ' + $filter('date')(t.start * 1000, 'shortDate') + ' to ' + $filter('date')(t.end * 1000, 'shortDate') + ')';
+							v['user'] = $scope.owner;
+							break;
+						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_DECLINED']:
+							v.text = t.text;
+							v['user'] = $scope.owner;
+							break;
+						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_RECEIVED']:
+							v.text = t.text;
+							v['user'] = $scope.borrower;
+							break;
+						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_RETURNED']:
+							v.text = t.text;
+							v['user'] = $scope.owner;
+							break;
+						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_CANCELLED']:
+							v.text = t.text;
+							v['user'] = $scope.owner;
+							break;
+						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_OWNER_FEEDBACKED']:
+							v.text = t.feedback_label;
+							v['user'] = $scope.owner;
+							break;
+						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_BORROWER_FEEDBACKED']:
+							v.text = t.feedback_label;
+							v['user'] = $scope.borrower;
+							break;
+					}
+				});
 				
 				// prepare form
 				$scope.formTransactionData['start'] = $filter('date')(parseInt(result.transaction.start) * 1000, 'fullDate');
 				$scope.formTransactionData['end'] = $filter('date')(parseInt(result.transaction.end) * 1000, 'fullDate');
+				$scope.formTransactionData['text'] = '';
+				$scope.formTransactionData['feedback'] =  AppHelper.CONST['MYBRARY_TRANSACTION_FEEDBACK_UNKNOWN'];
 				
 				// role and status based process
 				if ($scope.userRole == 'owner') { // owner role
 					switch (parseInt($scope.transaction.status)) {
-						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_REQUESTED']:
-							break;
-						default:
-							AppLog.error([$scope.userRole, "should not be here", $scope.transaction.status]);
+						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_DECLINED']:
+						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_CANCELLED']:
+						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_RETURNED']:
+						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_OWNER_FEEDBACKED']:
+						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_BORROWER_FEEDBACKED']:
+							// show alert for completed transaction
+							AppHelper.showAlert('The transaction has been completed. Please give or revise your feedback.', 'success', false);
 							break;
 					}
 				} else { // borrower role
 					switch (parseInt($scope.transaction.status)) {
-						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_UNKNOWN']:
-							$scope.formTransactionData['text'] = ''
-							break;
 						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_REQUESTED']:
 							// show alert for existing open request found
-							if ($scope.transaction.transaction_id > 0) {
-								AppHelper.showAlert('You have an open request on current item. You may revise it.', 'success', false);
-							}
+							AppHelper.showAlert('You have an open request on current item. You may revise it.', 'success', false);
 							break;
-						default:
-							AppLog.error([$scope.userRole, "should not be here", $scope.transaction.status]);
+						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_DECLINED']:
+						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_CANCELLED']:
+						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_RETURNED']:
+						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_OWNER_FEEDBACKED']:
+						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_BORROWER_FEEDBACKED']:
+							// show alert for completed transaction
+							AppHelper.showAlert('The transaction has been completed. Please give or revise your feedback.', 'success', false);
 							break;
 					}
 				}
@@ -163,19 +218,41 @@ angular.module('app_mybrary')
 				if ($scope.userRole == 'owner') { // owner role
 					switch (parseInt($scope.transaction.status)) {
 						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_REQUESTED']:
+							visibleElements = ['form-transactio-start', 'form-transactio-end', 'form-transaction-text', 'form-transaction-submit-confirmed', 'form-transaction-submit-declined'];
 							break;
-						default:
-							AppLog.error([$scope.userRole, "should not be here", $scope.transaction.status]);
+						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_CONFIRMED']:
+							visibleElements = ['form-transaction-text', 'form-transaction-submit-declined', 'form-transaction-submit-returned'];
 							break;
+						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_RECEIVED']:
+							visibleElements = ['form-transaction-text', 'form-transaction-submit-returned'];
+							break;
+						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_DECLINED']:
+						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_CANCELLED']:
+						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_RETURNED']:
+						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_OWNER_FEEDBACKED']:
+						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_BORROWER_FEEDBACKED']:
+							visibleElements = ['form-transaction-feedback', 'form-transaction-submit-feedback'];
+							break;
+							
 					}
 				} else { // borrower role
 					switch (parseInt($scope.transaction.status)) {
 						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_UNKNOWN']:
-						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_REQUESTED']:
 							visibleElements = ['form-transactio-start', 'form-transactio-end', 'form-transaction-text', 'form-transaction-submit-requested'];
 							break;
-						default:
-							AppLog.error([$scope.userRole, "should not be here", $scope.transaction.status]);
+						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_REQUESTED']:
+							visibleElements = ['form-transactio-start', 'form-transactio-end', 'form-transaction-text', 'form-transaction-submit-requested', 'form-transaction-submit-cancelled'];
+							break;
+						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_CONFIRMED']:
+							visibleElements = ['form-transaction-text', 'form-transaction-submit-received'];
+							break;
+						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_RECEIVED']:
+						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_DECLINED']:
+						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_CANCELLED']:
+						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_RETURNED']:
+						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_OWNER_FEEDBACKED']:
+						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_BORROWER_FEEDBACKED']:
+							visibleElements = ['form-transaction-feedback', 'form-transaction-submit-feedback'];
 							break;
 					}
 				}
@@ -187,47 +264,34 @@ angular.module('app_mybrary')
 		$scope.validFormTransaction = function() {
 			var result = true;
 			
-			if (_.isEmpty($scope.formTransactionData['start'] )) {
+			if ($scope.showFormElement('form-transaction-start') && _.isEmpty($scope.formTransactionData['start'] )) {
 				$scope.formTransactionErrors['start'] = "Please select start date.";
 				result = false;
 			} else {
 				$scope.formTransactionErrors['start'] = null;
 			}
 			
-			if (_.isEmpty($scope.formTransactionData['end'] )) {
+			if ($scope.showFormElement('form-transaction-end') && _.isEmpty($scope.formTransactionData['end'] )) {
 				$scope.formTransactionErrors['end'] = "Please select end date.";
 				result = false;
 			} else {
 				$scope.formTransactionErrors['end'] = null;
 			}
 
-			if (_.isEmpty($scope.formTransactionData['text'] )) {
+			if ($scope.showFormElement('form-transaction-text') && _.isEmpty($scope.formTransactionData['text'] )) {
 				$scope.formTransactionErrors['text'] = "Please enter a reason.";
 				result = false;
 			} else {
 				$scope.formTransactionErrors['text'] = null;
 			}
 
-			// role and status based check
-			if ($scope.userRole == 'owner') { // owner role
-				switch (parseInt($scope.transaction.status)) {
-					case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_REQUESTED']:
-						break;
-					default:
-						AppLog.error([$scope.userRole, "should not be here", $scope.transaction.status]);
-						break;
-				}
-			} else { // borrower role
-				switch (parseInt($scope.transaction.status)) {
-					case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_UNKNOWN']:
-					case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_REQUESTED']:
-						break;
-					default:
-						AppLog.error([$scope.userRole, "should not be here", $scope.transaction.status]);
-						break;
-				}
+			if ($scope.showFormElement('form-transaction-feedback') && _.isEmpty($scope.formTransactionData['feedback'] )) {
+				$scope.formTransactionErrors['feedback'] = "Please select a feedback.";
+				result = false;
+			} else {
+				$scope.formTransactionErrors['feedback'] = null;
 			}
-			
+
 			return result;
 		};
 		
@@ -248,19 +312,63 @@ angular.module('app_mybrary')
 				if ($scope.userRole == 'owner') { // owner role
 					switch (parseInt($scope.transaction.status)) {
 						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_REQUESTED']:
+							if (submitType == 'confirmed') {
+								data['new_status'] = AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_CONFIRMED'];
+							} else if (submitType == 'declined') {
+								data['new_status'] = AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_DECLINED'];
+							}
 							break;
-						default:
-							AppLog.error([$scope.userRole, "should not be here", $scope.transaction.status]);
+						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_CONFIRMED']:
+							if (submitType == 'declined') {
+								data['new_status'] = AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_DECLINED'];
+							} else if (submitType == 'returned') {
+								data['new_status'] = AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_RETURNED'];
+							}
+							break;
+						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_RECEIVED']:
+							if (submitType == 'returned') {
+								data['new_status'] = AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_RETURNED'];
+							}
+							break;
+						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_DECLINED']:
+						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_CANCELLED']:
+						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_RETURNED']:
+						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_OWNER_FEEDBACKED']:
+						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_BORROWER_FEEDBACKED']:
+							if (submitType == 'feedback') {
+								data['new_status'] = AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_OWNER_FEEDBACKED'];
+								data['feedback_owner'] = parseInt($scope.formTransactionData['feedback']);
+							}
 							break;
 					}
 				} else { // borrower role
 					switch (parseInt($scope.transaction.status)) {
 						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_UNKNOWN']:
-						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_REQUESTED']:
-							data['new_status'] = 1; // requested
+							if (submitType == 'requested') {
+								data['new_status'] = AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_REQUESTED'];
+							}
 							break;
-						default:
-							AppLog.error([$scope.userRole, "should not be here", $scope.transaction.status]);
+						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_REQUESTED']:
+							if (submitType == 'requested') {
+								data['new_status'] = AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_REQUESTED'];
+							} else if (submitType == 'cancelled') {
+								data['new_status'] = AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_CANCELLED'];
+							}
+							break;
+						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_CONFIRMED']:
+							if (submitType == 'received') {
+								data['new_status'] = AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_RECEIVED'];
+							}
+							break;
+						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_DECLINED']:
+						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_CANCELLED']:
+						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_RETURNED']:
+						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_OWNER_FEEDBACKED']:
+						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_BORROWER_FEEDBACKED']:
+							if (submitType == 'feedback') {
+								data['new_status'] = AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_BORROWER_FEEDBACKED'];
+								data['feedback_borrower'] = parseInt($scope.formTransactionData['feedback']);
+							}
 							break;
 					}
 				}

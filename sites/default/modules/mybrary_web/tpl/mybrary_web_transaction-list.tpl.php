@@ -2,8 +2,13 @@
 	<p></p>
 	<div class="row">
 		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <a class="btn btn-link" role="button" ui-sref="dashboard"><i class="glyphicon glyphicon-menu-left"></i> Dashboard</a>
+        </div>
+    </div>
+	<div class="row">
+		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
 			<div class="list-group">
-				<a class="list-group-item" ui-sref="transaction-list"><span>My Transaction ({{transactionsMeta.count}})</span></a>
+				<a class="list-group-item" ui-sref="transaction-list"><span>My Transactions ({{transactionsMeta.count}})</span></a>
 
 				<div class="list-group-item list-group-item-info">As Owner ({{transactionsMeta.countAsOwner}})</div>
 				<div class="list-group-item" ng-show="transactionsMeta.countAsOwner < 1">Oops! Nothing found.</div>

@@ -2,6 +2,7 @@
 	<p></p>
 	<div class="row">
 		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <a class="btn btn-link" role="button" ui-sref="dashboard"><i class="glyphicon glyphicon-menu-left"></i> Dashboard</a>
             <button type="button" class="btn btn-link" ng-click="newItem(event)"><i class="glyphicon glyphicon-plus"></i> new item</button>
         </div>
     </div>
