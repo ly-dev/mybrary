@@ -44,8 +44,8 @@ angular.module('app_mybrary')
 				
 				var user = AppApi.getUser();
 				$scope.transactions = {
-						'owner': {},
-						'borrower': {}
+						'owner': [],
+						'borrower': []
 				};
 				
 				// expand transaction with full data
@@ -55,15 +55,15 @@ angular.module('app_mybrary')
 					v['borrower'] = data['transactionCollection']['users'][v['uid_borrower']];
 
 					if (user.uid == v['uid_borrower']) {
-						$scope.transactions['borrower'][k] = v;
+						$scope.transactions['borrower'].push(v);
 					} else {
-						$scope.transactions['owner'][k] = v;
+						$scope.transactions['owner'].push(v);
 					}
 				});
 			
 				$scope.transactionsMeta = {
-					countAsOwner: _.values($scope.transactions['owner']).length,
-					countAsBorrower: _.values($scope.transactions['borrower']).length 
+					countAsOwner: $scope.transactions['owner'].length,
+					countAsBorrower: $scope.transactions['borrower'].length 
 				};
 				
 				$scope.transactionsMeta['count'] = $scope.transactionsMeta['countAsOwner'] + $scope.transactionsMeta['countAsBorrower'];
