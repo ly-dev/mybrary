@@ -4,7 +4,7 @@
 			<div class="list-group">
 				<a class="list-group-item" ui-sref="connection"><span>My Connections ({{friendsMeta.count}})</span></a>
 				<div class="list-group-item" ng-show="friendsMeta.count < 1">Oops! Nothing found.</div>
-				<div class="list-group-item" ng-repeat="(id, friend) in friends">
+				<div class="list-group-item" ng-repeat="friend in friends | orderBy:'name' | limitTo : 3">
 					<img ng-src="{{friend.pictureUrl}}" alt="avatar" class="app-icon app-icon-avatar-small">
 					<span>{{friend.name}}</span>
 				</div>
@@ -12,9 +12,9 @@
 		</div>
 		<div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
 			<div class="list-group">
-				<a class="list-group-item" ui-sref="inventory"><span>My Inventory ({{itemsMeta.count}})</span><div class="pull-right" style="font-size:75%"><i class="fa fa-user"></i> Not shared <i class="fa fa-cloud-upload"></i> Shared</div></a>
+				<a class="list-group-item" ui-sref="inventory-list"><span>My Inventory ({{itemsMeta.count}})</span><div class="pull-right" style="font-size:75%"><i class="fa fa-user"></i> Not shared <i class="fa fa-cloud-upload"></i> Shared</div></a>
 				<div class="list-group-item" ng-show="itemsMeta.count < 1">Oops! Nothing found.</div>
-				<div class="list-group-item" ng-repeat="(id, item) in items"  style="height: 64px;">
+				<div class="list-group-item" ng-repeat="item in items | orderBy:'-changed' | limitTo : 3"  style="height: 64px;">
 					<div class="pull-left">
 						<img ng-src="{{item.field_image[0].url}}" alt="picture" class="app-icon app-icon-avatar-small">
 					</div>

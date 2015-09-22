@@ -2,43 +2,12 @@
 	<p></p>
 	<div class="row">
 		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-            <a class="btn btn-link" role="button" ui-sref="dashboard"><i class="glyphicon glyphicon-menu-left"></i> Dashboard</a>
-            <button type="button" class="btn btn-link" ng-click="newItem(event)"><i class="glyphicon glyphicon-plus"></i> new item</button>
+            <a class="btn btn-link" role="button" ui-sref="inventory-list"><i class="glyphicon glyphicon-menu-left"></i> My Inventory</a>
         </div>
     </div>
 	<div class="row">
 		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-			<div class="list-group">
-				<div class="list-group-item"><span>My Inventory ({{itemsMeta.count}})</span><div class="pull-right" style="font-size:75%"><i class="fa fa-user"></i> Not shared <i class="fa fa-cloud-upload"></i> Shared</div></div>
-				<div class="list-group-item" ng-show="itemsMeta.count < 1">Oops! Nothing found.</div>
-				<button type="button" class="list-group-item" ng-repeat="(id, item) in items track by id" ng-click="editItem(item)">
-					<div class="pull-left">
-						<img ng-src="{{item.field_image[0].url}}" alt="picture" class="app-icon app-icon-avatar-small">
-					</div>
-					<div class="pull-left" style="padding-left: 1em;">
-    					<span>{{item.title}}</span><br />
-						<span>{{terms[item.field_type].name}}</span><br />
-						<span>{{item.model}}</span>
-					</div>
-					<div class="pull-right"><i class="fa" ng-class="{'fa-user': (item.field_shared == 0), 'fa-cloud-upload': (item.field_shared == 1)}" ></i></div>
-				</button>
-			</div>
-		</div>
-	</div>
-</div>
 
-<!-- Modal Item -->
-<div class="modal fade" id="modalItem" tabindex="-1"
-	role="dialog" aria-labelledby="Inventory Item">
-	<div class="modal-dialog" role="document">
-		<div class="modal-content">
-			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-					<span aria-hidden="true">&times;</span>
-				</button>
-				<h4 class="modal-title">{{modalItem.title}}</h4>
-			</div>
-			<div class="modal-body">
 				<form>
 					<div class="form-group" ng-class="{'has-error has-feedback' : formItemErrors['field_image']}">
 						<span class="help-block" ng-show="formItemErrors['field_image']">{{formItemErrors['field_image']}}</span>
@@ -108,11 +77,11 @@
 						<textarea class="form-control" id="form-item-body" name="form-item-body" placeholder="Tool description (optional)" ng-model="formItemData['body']"></textarea>
 					</div>									
 				</form>
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-				<button type="button" class="btn btn-primary" ng-click="saveItem()" ng-disabled="!validFormItem()">Save</button>
-			</div>
+				
+    			<div class="btn-group" role="group" aria-label="">
+    				<button type="button" class="btn btn-primary" ng-click="saveItem()" ng-disabled="!validFormItem()">Save</button>
+    				<a class="btn btn-default" role="button" ui-sref="inventory-list">Cancel</a>
+    			</div>
 		</div>
 	</div>
 </div>

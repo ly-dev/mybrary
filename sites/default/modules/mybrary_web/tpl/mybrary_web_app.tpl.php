@@ -12,9 +12,9 @@ $items = array (
             'label' => t('Connection'),
             'state' => 'connection',
     ),
-    'inventory' => array(
+    'inventory-list' => array(
             'label' => t('Inventory'),
-            'state' => 'inventory',
+            'state' => 'inventory-list',
     ),
     'transaction-list' => array(
             'label' => t('Transaction'),

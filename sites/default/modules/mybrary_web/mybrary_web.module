@@ -37,9 +37,17 @@ function mybrary_web_menu ()
             'access callback' => 'user_is_logged_in'
     );
     
-    $items['tpl/inventory'] = array(
+    $items['tpl/inventory-list'] = array(
             'title' => t('Inventory'),
-            'page callback' => 'mybrary_web_inventory',
+            'page callback' => 'mybrary_web_inventory_list',
+            'file' => 'mybrary_web.page.inc',
+            'type' => MENU_NORMAL_ITEM,
+            'access callback' => 'user_is_logged_in'
+    );
+    
+    $items['tpl/inventory-edit'] = array(
+            'title' => t('Inventory'),
+            'page callback' => 'mybrary_web_inventory_edit',
             'file' => 'mybrary_web.page.inc',
             'type' => MENU_NORMAL_ITEM,
             'access callback' => 'user_is_logged_in'

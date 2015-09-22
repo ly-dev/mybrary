@@ -31,14 +31,14 @@ angular.module('app_mybrary')
 				'transactionCollection': AppApi.transactionList()
 			}).then(function (data) {
 				
-				$scope.friends = data['friends'];
+				$scope.friends = _.values(data['friends']);
 				$scope.friendsMeta = {
-					count: _.values($scope.friends).length
+					count: $scope.friends.length
 				};
 	
-				$scope.items = data['items'];
+				$scope.items = _.values(data['items']);
 				$scope.itemsMeta = {
-					count: _.values($scope.items).length
+					count: $scope.items.length
 				};
 				
 				

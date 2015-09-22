@@ -80,10 +80,17 @@ function mybrary_web_connection() {
 }
 
 /**
- * Page callback for inventory.
+ * Page callback for inventory edit.
  */
-function mybrary_web_inventory() {
-    return theme_render_template(drupal_get_path('module', 'mybrary_web') . '/tpl/mybrary_web_inventory.tpl.php', array());
+function mybrary_web_inventory_edit() {
+    return theme_render_template(drupal_get_path('module', 'mybrary_web') . '/tpl/mybrary_web_inventory-edit.tpl.php', array());
+}
+
+/**
+ * Page callback for inventory list.
+ */
+function mybrary_web_inventory_list() {
+    return theme_render_template(drupal_get_path('module', 'mybrary_web') . '/tpl/mybrary_web_inventory-list.tpl.php', array());
 }
 
 /**

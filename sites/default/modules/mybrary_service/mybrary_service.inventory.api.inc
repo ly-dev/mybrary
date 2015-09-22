@@ -31,7 +31,7 @@ function mybrary_service_inventory_list ($data)
     // list own inventory by default
     if (empty($data)) {
         $data = array(
-                'owner' => 'me'
+            'owner' => 'me'
         );
     }
     
@@ -84,6 +84,7 @@ function mybrary_service_inventory_list ($data)
                     'uid'=>array('is_property'=>TRUE),
                     'nid'=>array('is_property'=>TRUE),
                     'title'=>array('is_property'=>TRUE),
+                    'changed'=>array('is_property'=>TRUE),
                     'body'=>array('values_convertor'=>'single_value'),
                     'field_type'=>array('values_convertor'=>'single_value'),
                     'field_model'=>array('values_convertor'=>'single_value'),
@@ -150,6 +151,16 @@ function mybrary_service_inventory_view ($data)
                 }
             }
         }
+    } elseif ($data['nid'] == 0) { // return empty item with default values
+        $response = array(
+                'nid'=>0,
+                'title'=>'new item from '. $user->name,
+                'body'=> '',
+                'field_type'=>'',
+                'field_model'=>'',
+                'field_image'=> NULL,
+                'field_shared'=> ''. MYBRARY_ITEM_FIELD_SHARED_NO, // force to string
+        );
     }
 
     return $response;
@@ -181,7 +192,7 @@ function mybrary_service_inventory_update ($data)
     }
     
     if (empty($errors)) {
-        if (isset($data['nid'])) {
+        if (!empty($data['nid'])) {
             // load item to update
             $node = node_load($data['nid']);
         } else {

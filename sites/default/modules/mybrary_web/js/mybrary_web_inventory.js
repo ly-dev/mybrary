@@ -4,10 +4,20 @@ angular.module('app_mybrary')
 
 .config(['$stateProvider', function($stateProvider) {
 	$stateProvider
-    .state('inventory', {
-		url: "/inventory",
-		templateUrl: Drupal.settings.angularjsApp.basePath + '/tpl/inventory',
-    	controller: 'InventoryController',
+    .state('inventory-list', {
+		url: "/inventory-list",
+		templateUrl: Drupal.settings.angularjsApp.basePath + '/tpl/inventory-list',
+    	controller: 'InventoryListController',
+    	resolve:{
+            termListPromise:  ['AppApi', function(AppApi) {
+               return AppApi.getTerms();
+            }]
+        }
+    })
+    .state('inventory-edit', {
+		url: "/inventory-edit/:nid",
+		templateUrl: Drupal.settings.angularjsApp.basePath + '/tpl/inventory-edit',
+    	controller: 'InventoryEditController',
     	resolve:{
             termListPromise:  ['AppApi', function(AppApi) {
                return AppApi.getTerms();
@@ -16,8 +26,9 @@ angular.module('app_mybrary')
     });
 }])
 
-.controller('InventoryController', ['AppLog', 'AppHelper', 'AppApi', '$scope', 'termListPromise', function(AppLog, AppHelper, AppApi, $scope, termListPromise) {
-    AppLog.debug("InventoryController");
+.controller('InventoryListController', ['AppLog', 'AppHelper', 'AppApi', '$state', '$scope', 'termListPromise', 
+    function(AppLog, AppHelper, AppApi, $state, $scope, termListPromise) {
+    AppLog.debug("InventoryListController");
     
     $scope.terms = termListPromise;
     $scope.categories = AppApi.prepareTermOptionsByType(termListPromise, 'categories');
@@ -30,9 +41,9 @@ angular.module('app_mybrary')
 		AppHelper.showLoading();
 
 		AppApi.inventoryList().then(function(data) {
-			$scope.items = data;
+			$scope.items = _.values(data);
 			$scope.itemsMeta = {
-				count: _.values($scope.items).length
+				count: $scope.items.length
 			};
 			
 			AppHelper.hideLoading();
@@ -40,14 +51,23 @@ angular.module('app_mybrary')
 	}
 	refreshList();
 	
-	$scope.modalItem = {
-			title: "my modal",
-	}
+	$scope.editInventory = function (nid) {
+		$state.go('inventory-edit', {nid: nid});
+	};
+}])
 
-	$scope.formItemData = {};
-	$scope.formItemErrors = {};
+.controller('InventoryEditController', ['AppLog', 'AppHelper', 'AppApi', '$state', '$stateParams', '$scope', 'termListPromise',
+    function(AppLog, AppHelper, AppApi, $state, $stateParams, $scope, termListPromise) {
+    AppLog.debug("InventoryEditController");
+    
+    $scope.terms = termListPromise;
+    $scope.categories = AppApi.prepareTermOptionsByType(termListPromise, 'categories');
+    $scope.sharedOptions = [
+        {id: 0, label: "not shared"},
+        {id: 1, label: "shared"}
+    ];
 	
-	// image related functions
+	// image crop related functions
 	$scope.imageCrop = {};
 	$scope.fileChanged = function(e) {			
 		var files = e.target.files;
@@ -79,7 +99,33 @@ angular.module('app_mybrary')
 		 $scope.imageCrop.step = 3;
 		 $scope.imageCrop.result = item.field_image[0].url;
 	};	
+
+	// prepare form
+	$scope.formItemData = {};
+	var refreshInventory = function() {
+	    AppHelper.showLoading();
+
+	    (function() {
+	    	return AppApi.inventoryView({nid: $stateParams.nid});
+		})().then(function(item) {
+			AppLog.debug(item);
+			
+			$scope.item = item;
+			$scope.formItemData = angular.copy($scope.item);
+			
+			if (item.nid > 0) {
+				$scope.resetImage(item);
+			}
+			
+			// reset image
+			// $scope.resetImage(item);
+			
+			AppHelper.hideLoading();
+		});
+	};
+	refreshInventory();
 	
+	$scope.formItemErrors = {};
 	$scope.validFormItem = function() {
 		var result = true;
 		
@@ -129,37 +175,11 @@ angular.module('app_mybrary')
 			}
 			
 			AppApi.inventoryUpdate(data).then(function(response) {
-				refreshList();
+				$state.go('inventory-list');
 				AppHelper.showAlert(response.message, response.status);
-				jQuery('#modalItem button[data-dismiss=modal]').click();
 			});
 		}
 	}
-	
-	$scope.newItem = function (event) {
-		$scope.formItemData = {
-			'title': "New tool",
-			'field_type': null,
-			'field_shared': "0",
-			'field_model': "",
-			'body': ""
-		};
-		
-		$scope.clearImage();
-		
-		jQuery("#modalItem").modal('show');
-	}
-	
-	$scope.editItem = function (item) {
-		$scope.formItemData = angular.copy(item);
-		
-		$scope.resetImage(item);
-		
-		jQuery("#modalItem").modal('show');
-	}
-	
-	// initialize modal
-	jQuery("#modalItem").modal({show:false});
 	
 }]);
 

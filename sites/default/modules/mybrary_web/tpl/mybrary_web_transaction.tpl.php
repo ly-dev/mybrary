@@ -1,7 +1,7 @@
 <div class="container">
 	<div class="row">
 		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-            <button type="button" class="btn btn-link" ui-sref="transaction-list"><i class="glyphicon glyphicon-menu-left"></i> My Transations</button>
+            <a class="btn btn-link" role="button" ui-sref="transaction-list"><i class="glyphicon glyphicon-menu-left"></i> My Transations</a>
         </div>
     </div>
 	<div class="row">
