@@ -70,8 +70,8 @@ angular.module('app_mybrary')
 			});
 		}
 		
-		$scope.openTransaction = function (id) {
-			$state.go('transaction', {transaction_id: id});
+		$scope.openTransaction = function (transaction) {
+			$state.go('transaction', {transaction_id: transaction.transaction_id});
 		};
 		
 		refreshList();
@@ -144,11 +144,11 @@ angular.module('app_mybrary')
 							v['user'] = $scope.owner;
 							break;
 						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_OWNER_FEEDBACKED']:
-							v.text = t.feedback_label;
+							v.text = t.text + ' (' + t.feedback_label + ')';
 							v['user'] = $scope.owner;
 							break;
 						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_BORROWER_FEEDBACKED']:
-							v.text = t.feedback_label;
+							v.text = t.text + ' (' + t.feedback_label + ')';
 							v['user'] = $scope.borrower;
 							break;
 					}
@@ -231,7 +231,7 @@ angular.module('app_mybrary')
 						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_RETURNED']:
 						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_OWNER_FEEDBACKED']:
 						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_BORROWER_FEEDBACKED']:
-							visibleElements = ['form-transaction-feedback', 'form-transaction-submit-feedback'];
+							visibleElements = ['form-transaction-feedback', 'form-transaction-text', 'form-transaction-submit-feedback'];
 							break;
 							
 					}
@@ -252,7 +252,7 @@ angular.module('app_mybrary')
 						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_RETURNED']:
 						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_OWNER_FEEDBACKED']:
 						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_BORROWER_FEEDBACKED']:
-							visibleElements = ['form-transaction-feedback', 'form-transaction-submit-feedback'];
+							visibleElements = ['form-transaction-feedback', 'form-transaction-text', 'form-transaction-submit-feedback'];
 							break;
 					}
 				}
