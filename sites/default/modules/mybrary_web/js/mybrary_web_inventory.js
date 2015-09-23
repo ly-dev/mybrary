@@ -159,7 +159,11 @@ angular.module('app_mybrary')
 			// only update image when changed
 			AppLog.debug($scope.cropper);
 			if ($scope.cropper.confirmedCroppedImage != $scope.cropper.originalCroppedImage) {
-				data['field_image'] = $scope.cropper.confirmedCroppedImage;
+				data['field_image'] = {
+						'data': $scope.cropper.confirmedCroppedImage
+				};
+			} else {
+				data['field_image'] = null;
 			}
 			
 			AppApi.inventoryUpdate(data).then(function(response) {
