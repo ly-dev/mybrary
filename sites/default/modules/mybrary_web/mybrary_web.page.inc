@@ -114,3 +114,56 @@ function mybrary_web_transaction_list() {
     return theme_render_template(drupal_get_path('module', 'mybrary_web') . '/tpl/mybrary_web_transaction-list.tpl.php', array());
 }
 
+
+/**
+ * Implement ajax delivery call back
+ */
+function mybrary_web_ajax_delivery_callback ($page_callback_result)
+{
+
+    // Emit a Content-Type HTTP header if none has been added by the page
+    // callback or by a wrapping delivery callback.
+    if (is_null(drupal_get_http_header('Content-Type'))) {
+        drupal_add_http_header('Content-Type',
+                'application/json; charset=utf-8');
+    }
+
+    // just export the page callback result
+    print $page_callback_result;
+}
+
+/**
+ * Page callback for transaction list.
+ */
+function mybrary_web_ajax_image_upload() {
+    $response = array(
+        'status' => 'error',
+        'message' => t('Oops! Something goes wrong')
+    );
+    
+    if (!empty($_FILES) && !empty($_FILES['image-upload-form-file'])) {
+        $fileMeta = $_FILES['image-upload-form-file'];
+        if (empty($fileMeta['error'])) {
+            if (in_array($fileMeta['type'], array('image/jpeg', 'image/png'))) {
+                try {
+                    $response = array(
+                            'status' => 'success',
+                            'message' => t('success'),
+                            'data' => 'data:'. $fileMeta['type'] . ';base64,'. base64_encode(file_get_contents($fileMeta['tmp_name']))
+                    );
+                } catch (Exception $e) {
+                    $response['message'] = $e->getMessage();
+                }
+            } else {
+                $response['message'] = t('Invalid tmage data type: !type.', array('!type' => $fileMeta['type']));
+            }
+        } else {
+            $response['message'] = t('Image data uploaded with error: !error.', array('!error' => $fileMeta['error']));
+        }
+    } else {
+        $response['message'] = t('No image data uploaded.');
+    }
+    
+    return json_encode($response);
+}
+

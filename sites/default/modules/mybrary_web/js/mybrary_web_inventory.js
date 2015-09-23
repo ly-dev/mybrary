@@ -67,21 +67,63 @@ angular.module('app_mybrary')
         {id: 1, label: "shared"}
     ];
 	
+    
 	// image crop related functions
 	$scope.imageCrop = {};
-	$scope.fileChanged = function(e) {			
-		var files = e.target.files;
-	
- 		var fileReader = new FileReader();
- 		$scope.imageCrop.file = files[0];
-		fileReader.readAsDataURL(files[0]);		
-		
-		fileReader.onload = function(e) {
-			$scope.imageCrop.raw = this.result;
-			$scope.$apply();
-		};
-		
-	};
+	$scope.fileUpload = function(e) {	
+    	AppLog.debug('fileUpload');
+    	
+    	var formId = '#image-upload-form',
+    		files = e.target.files;
+    	
+    	$scope.imageCrop.file = files[0];
+    	
+    	//callback handler for form submit
+    	jQuery(formId).submit(function(e){
+    	    var myTarget = '#image-upload-form-file-status',
+    	    	formURL = jQuery(this).attr("action"),
+    	    	postData = new FormData(document.getElementById('image-upload-form'));
+    	    
+    	    jQuery.ajax({
+    	        url : formURL,
+    	        type: "POST",
+    	        xhr: function() {  // Custom XMLHttpRequest
+    	            var myXhr = jQuery.ajaxSettings.xhr();
+    	            if(myXhr.upload){ // Check if upload property exists
+    	                myXhr.upload.addEventListener('progress',function(e) {
+    	                	jQuery(myTarget).text(Math.round(e.loaded / e.total * 100) + '% loaded');
+    	                }, false); // For handling the progress of the upload
+    	            }
+    	            return myXhr;
+    	        },
+    	        data : postData,
+    	        beforeSend: function( jqXHR, settings ) {
+    	        	jQuery(myTarget).text('Loading...');
+                },
+    	        success: function(response, textStatus, jqXHR) {
+    	        	jQuery(myTarget).text(response.message);
+    	        	
+    	        	if (response.status == 'success') {
+	    	            $scope.imageCrop.raw = response.data;
+	    				$scope.$apply();
+    	        	} else {
+    	        		
+    	        	}
+    	        },
+    	        error: function(jqXHR, textStatus, errorThrown){
+    	        	jQuery(myTarget).text(textStatus);
+    	        },
+    	        //Options to tell jQuery not to process data or worry about content-type.
+    	        cache: false,
+    	        contentType: false,
+    	        processData: false
+    	    });
+    	    
+    	    e.preventDefault(); // STOP default action
+    	});
+    	 
+    	jQuery(formId).submit(); //Submit the FORM    	
+    };
 	
      $scope.clearImage = function() {
 		 $scope.imageCrop.step = 1;

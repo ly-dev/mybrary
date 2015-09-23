@@ -8,13 +8,17 @@
 	<div class="row">
 		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
 
+                <div ng-show="imageCrop.step == 1">
+                    <form enctype="multipart/form-data" id="image-upload-form" action="<?php print url('ajax/image-upload'); ?>" method="post">
+                		<input type="file" name="image-upload-form-file" id="image-upload-form-file" onchange="angular.element(this).scope().fileUpload(event)">
+                		<div id="image-upload-form-file-status"></div>
+                    </form>
+                </div>
+                
 				<form>
 					<div class="form-group" ng-class="{'has-error has-feedback' : formItemErrors['field_image']}">
 						<span class="help-block" ng-show="formItemErrors['field_image']">{{formItemErrors['field_image']}}</span>
 						<span class="glyphicon glyphicon-warning-sign form-control-feedback" aria-hidden="true" ng-show="formItemErrors['field_image']"></span>
-						<div ng-show="imageCrop.step == 1">
-                    		<input type="file" id="form-item-field_image" name="form-item-field_image" placeholder="Tool name" onchange="angular.element(this).scope().fileChanged(event)">
-                    	</div>
                         <div class="panel panel-default" ng-show="imageCrop.step == 2">
                             <div class="panel-body">
 		                         <div style="text-align: center;">	
