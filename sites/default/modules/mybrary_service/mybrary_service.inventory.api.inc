@@ -215,11 +215,10 @@ function mybrary_service_inventory_update ($data)
             $node->body[$node->language] = array(array('value' => $data['body']));
             
             try {
-                if (!empty($data['field_image']) && !empty($data['field_image']['name']) && !empty($data['field_image']['data'])) {
-                    $filename = $data['field_image']['name'];
-                    $fileParts = explode(',', $data['field_image']['data']);
+                if (!empty($data['field_image'])) {
+                    $fileParts = explode(',', $data['field_image']);
                     $fileContent = base64_decode($fileParts[1]);
-                    $fileObject = file_save_data($fileContent, 'public://'.$filename);
+                    $fileObject = file_save_data($fileContent);
                     $node->field_image[$node->language]= array((array) $fileObject);
                 }
             

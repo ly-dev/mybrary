@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('app_mybrary', ['ui.router', 'ImageCropper', '720kb.datepicker'])
+angular.module('app_mybrary', ['ui.router', 'angular-img-cropper', '720kb.datepicker'])
 
 .config(['$logProvider', '$urlRouterProvider', '$httpProvider', 
     function ($logProvider, $urlRouterProvider, $httpProvider) {

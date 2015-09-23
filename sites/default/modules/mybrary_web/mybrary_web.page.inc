@@ -40,8 +40,7 @@ function mybrary_web_app() {
     drupal_add_js(drupal_get_path('module', 'mybrary_web') . '/lib/angularjs-datepicker/dist/angular-datepicker.min.js');
     
     // image crop
-    drupal_add_css(drupal_get_path('module', 'mybrary_web') . '/lib/angular-image-crop/image-crop-styles.css');
-    drupal_add_js(drupal_get_path('module', 'mybrary_web') . '/lib/angular-image-crop/image-crop.js');
+    drupal_add_js(drupal_get_path('module', 'mybrary_web') . '/lib/angular-img-cropper/dist/angular-img-cropper.min.js');
     
     // ui-route
     drupal_add_js(drupal_get_path('module', 'mybrary_web') . '/lib/angular-ui-router/release/angular-ui-router.min.js');

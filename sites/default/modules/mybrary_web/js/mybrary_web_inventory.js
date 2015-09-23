@@ -67,81 +67,31 @@ angular.module('app_mybrary')
         {id: 1, label: "shared"}
     ];
 	
-    
-	// image crop related functions
-	$scope.imageCrop = {};
-	$scope.fileUpload = function(e) {	
-    	AppLog.debug('fileUpload');
-    	
-    	var formId = '#image-upload-form',
-    		files = e.target.files;
-    	
-    	$scope.imageCrop.file = files[0];
-    	
-    	//callback handler for form submit
-    	jQuery(formId).submit(function(e){
-    	    var myTarget = '#image-upload-form-file-status',
-    	    	formURL = jQuery(this).attr("action"),
-    	    	postData = new FormData(document.getElementById('image-upload-form'));
-    	    
-    	    jQuery.ajax({
-    	        url : formURL,
-    	        type: "POST",
-    	        xhr: function() {  // Custom XMLHttpRequest
-    	            var myXhr = jQuery.ajaxSettings.xhr();
-    	            if(myXhr.upload){ // Check if upload property exists
-    	                myXhr.upload.addEventListener('progress',function(e) {
-    	                	jQuery(myTarget).text(Math.round(e.loaded / e.total * 100) + '% loaded');
-    	                }, false); // For handling the progress of the upload
-    	            }
-    	            return myXhr;
-    	        },
-    	        data : postData,
-    	        beforeSend: function( jqXHR, settings ) {
-    	        	jQuery(myTarget).text('Loading...');
-                },
-    	        success: function(response, textStatus, jqXHR) {
-    	        	jQuery(myTarget).text(response.message);
-    	        	
-    	        	if (response.status == 'success') {
-	    	            $scope.imageCrop.raw = response.data;
-	    				$scope.$apply();
-    	        	} else {
-    	        		
-    	        	}
-    	        },
-    	        error: function(jqXHR, textStatus, errorThrown){
-    	        	jQuery(myTarget).text(textStatus);
-    	        },
-    	        //Options to tell jQuery not to process data or worry about content-type.
-    	        cache: false,
-    	        contentType: false,
-    	        processData: false
-    	    });
-    	    
-    	    e.preventDefault(); // STOP default action
-    	});
-    	 
-    	jQuery(formId).submit(); //Submit the FORM    	
-    };
-	
-     $scope.clearImage = function() {
-		 $scope.imageCrop.step = 1;
-		 delete $scope.imageCrop.file;
-		 delete $scope.imageCrop.raw;
-		 delete $scope.imageCrop.result;
-		 delete $scope.imageCrop.resultBlob;
+	// prepare image crop 
+	$scope.cropper = {
+		sourceImage: null,
+		croppedImage: null,
+		originalCroppedImage: null,
+		confirmedCroppedImage: null,
+		bounds: {
+			left: 0,
+			right: 0,
+			top: 0,
+			bottom: 0
+		}
 	};
-	
-    $scope.resetImage = function(item) {
-		 delete $scope.imageCrop.file;
-		 delete $scope.imageCrop.raw;
-		 delete $scope.imageCrop.resultBlob;
-		 
-		 $scope.imageCrop.step = 3;
-		 $scope.imageCrop.result = item.field_image[0].url;
-	};	
-
+	$scope.clearImage = function() {
+		$scope.cropper.sourceImage = null;
+		$scope.cropper.croppedImage = null;
+		$scope.cropper.confirmedCroppedImage = null;
+	};
+	$scope.resetImage = function() {
+		$scope.cropper.confirmedCroppedImage = $scope.cropper.originalCroppedImage;
+	};
+	$scope.cropImage = function() {
+		$scope.cropper.confirmedCroppedImage = $scope.cropper.croppedImage;
+	};
+    
 	// prepare form
 	$scope.formItemData = {};
 	var refreshInventory = function() {
@@ -155,12 +105,10 @@ angular.module('app_mybrary')
 			$scope.item = item;
 			$scope.formItemData = angular.copy($scope.item);
 			
-			if (item.nid > 0) {
-				$scope.resetImage(item);
+			if (item.nid > 0 && item.field_image && item.field_image[0] && item.field_image[0].url) {
+				$scope.cropper.originalCroppedImage = item.field_image[0].url;
+				$scope.resetImage();
 			}
-			
-			// reset image
-			// $scope.resetImage(item);
 			
 			AppHelper.hideLoading();
 		});
@@ -192,7 +140,7 @@ angular.module('app_mybrary')
 			$scope.formItemErrors['field_shared'] = null;
 		}
 
-		if ($scope.imageCrop.step != 3) {
+		if (_.isEmpty($scope.cropper.confirmedCroppedImage)) {
 			$scope.formItemErrors['field_image'] = "Please select image.";
 			result = false;
 		} else {
@@ -208,12 +156,10 @@ angular.module('app_mybrary')
 			
 			var data = angular.copy($scope.formItemData);
 			
-			// only update if image changed
-			if ($scope.imageCrop.file && $scope.imageCrop.step == 3) {
-				data['field_image'] = {
-					name: $scope.imageCrop.file.name,
-					data: $scope.imageCrop.result
-				};
+			// only update image when changed
+			AppLog.debug($scope.cropper);
+			if ($scope.cropper.confirmedCroppedImage != $scope.cropper.originalCroppedImage) {
+				data['field_image'] = $scope.cropper.confirmedCroppedImage;
 			}
 			
 			AppApi.inventoryUpdate(data).then(function(response) {
@@ -222,6 +168,5 @@ angular.module('app_mybrary')
 			});
 		}
 	}
-	
 }]);
 

@@ -7,53 +7,28 @@
     </div>
 	<div class="row">
 		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-
-                <div ng-show="imageCrop.step == 1">
-                    <form enctype="multipart/form-data" id="image-upload-form" action="<?php print url('ajax/image-upload'); ?>" method="post">
-                		<input type="file" name="image-upload-form-file" id="image-upload-form-file" onchange="angular.element(this).scope().fileUpload(event)">
-                		<div id="image-upload-form-file-status"></div>
-                    </form>
-                </div>
-                
 				<form>
 					<div class="form-group" ng-class="{'has-error has-feedback' : formItemErrors['field_image']}">
 						<span class="help-block" ng-show="formItemErrors['field_image']">{{formItemErrors['field_image']}}</span>
 						<span class="glyphicon glyphicon-warning-sign form-control-feedback" aria-hidden="true" ng-show="formItemErrors['field_image']"></span>
-                        <div class="panel panel-default" ng-show="imageCrop.step == 2">
-                            <div class="panel-body">
-		                         <div style="text-align: center;">	
-									 <div class="btn-group" role="group">
-                                        <button type="button" class="btn btn-primary" ng-click="initCrop = true">Crop</button>
-    	                            	<button type="button" class="btn btn-default" ng-click="clearImage()">Clear</button>
-        	                         </div>
-    	                         </div>
-                            	<div style="margin-left:-5px;">
-                                <image-crop			 
-                                  data-height="200"
-                                  data-width="200"
-                                  data-shape="square"
-                                  data-step="imageCrop.step"
-                                  src="imageCrop.raw"
-                                  data-result="imageCrop.result"
-                                  data-result-blob="imageCrop.resultBlob"
-                                  crop="initCrop"
-                                  padding="50"
-                                  max-size="300"></image-crop>
-                                  </div>
+                		<div ng-show="cropper.confirmedCroppedImage==null">
+                			<div>				
+                    			<input type="file" id="form-item-image-file" name="form-item-image-file" img-cropper-fileread image="cropper.sourceImage" />
+                			</div>
+                            <div>
+                                 <canvas width="250" height="250" id="canvas" image-cropper image="cropper.sourceImage" cropped-image="cropper.croppedImage" crop-width="200" crop-height="200" keep-aspect="true" touch-radius="30" crop-area-bounds="cropper.bounds"></canvas>
                             </div>
-                        </div>		  
-                        <div class="panel panel-default" ng-show="imageCrop.step == 3">
-                            <div class="panel-body">
-		                         <div style="text-align: center;">	
-									 <div class="btn-group" role="group">
-    		                         	  <button class="btn btn-default" ng-click="clearImage()">Choose new image </button>
-    		                         </div>
-    		                         <div>
-    		                         	  <img ng-src="{{imageCrop.result}}"></img>
-    		                         </div>
-		                         </div>
+                            <div>
+                            	<button type="button" class="btn btn-primary" ng-click="cropImage()">Crop</button>
+                            	<button type="button" class="btn btn-default" ng-click="resetImage()">Reset</button>
                             </div>
-                        </div>		  
+                        </div>
+                        <div ng-show="cropper.confirmedCroppedImage!=null">
+                            <img ng-src="{{cropper.confirmedCroppedImage}}" />
+                            <div>
+                            	<button type="button" class="btn btn-default" ng-click="clearImage()">Change</button>
+                            </div>
+                        </div>
         			</div>				
 					<div class="form-group" ng-class="{'has-error has-feedback' : formItemErrors['title']}">
 						<span class="help-block" ng-show="formItemErrors['title']">{{formItemErrors['title']}}</span>
