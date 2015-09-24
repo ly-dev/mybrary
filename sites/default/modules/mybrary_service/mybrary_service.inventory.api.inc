@@ -169,10 +169,15 @@ function mybrary_service_inventory_view ($data)
                 'field_type'=>'',
                 'field_model'=>'',
                 'field_image'=> NULL,
-                'field_shared'=> ''. MYBRARY_ITEM_FIELD_SHARED_NO, // force to string
+                'field_shared'=> ''. MYBRARY_ITEM_FIELD_SHARED_NO, // force to string,
         );
     }
 
+    // add availability information, calculate from today
+    if ($response['nid'] > 0) {
+        $response['not_available'] = _mybrary_transaction_get_not_available_periods($response['nid']);
+    }
+    
     return $response;
 }
 

@@ -8,19 +8,24 @@
 		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
 			<div class="panel panel-default">
 				<div class="panel-body">
-					<div class="pull-right">
-            			<img ng-src="{{owner.pictureUrl}}" alt="avatar" class="app-icon app-icon-avatar-tiny">
-            			<span class="app-text app-text-tiny">{{owner.name}}</span>
+					<div class="clearfix">
+    					<div class="pull-right">
+                			<img ng-src="{{owner.pictureUrl}}" alt="avatar" class="app-icon app-icon-avatar-tiny">
+                			<span class="app-text app-text-tiny">{{owner.name}}</span>
+    					</div>
+    					<div class="pull-left">
+    						<img ng-src="{{item.field_image[0].url}}" alt="picture" class="app-icon app-icon-avatar">
+    					</div>
+    					<div class="pull-left" style="padding-left: 1em;">
+    						<span>{{item.title}}</span><br />
+    						<span>{{terms[item.field_type].name}}</span><br />
+    						<span>{{item.model}}</span>
+    					</div>
 					</div>
-					<div class="pull-left">
-						<img ng-src="{{item.field_image[0].url}}" alt="picture" class="app-icon app-icon-avatar">
+					<div class="clearfix">
+    					<p>{{item.body}}</p>
+    					<p>{{item.notAvailableMessage}}</p>
 					</div>
-					<div class="pull-left" style="padding-left: 1em;">
-						<span>{{item.title}}</span><br />
-						<span>{{terms[item.field_type].name}}</span><br />
-						<span>{{item.model}}</span>
-					</div>
-					<p>{{item.body}}</p>
 				</div>
 			</div>
 			
@@ -29,7 +34,7 @@
 					<div>
             			<img ng-src="{{transactionItem.user.pictureUrl}}" alt="avatar" class="app-icon app-icon-avatar-tiny">
             			<span class="app-text app-text-tiny">{{transactionItem.user.name}}</span>
-            			<span class="app-text app-text-tiny">{{transactionItem.update_timestamp * 1000 | date : 'short'}}</span>
+            			<span class="app-text app-text-tiny">{{transactionItem.update_timestamp * 1000 | date : 'dd/MM/yyyy HH:mm:ss'}}</span>
             			<span class="app-text app-text-tiny">{{transactionItem.status_label}}</span>
             			
 					</div>
@@ -52,7 +57,8 @@
             			<span class="app-text app-text-tiny">{{currentUser.name}}</span>
 					</div>
     				<form>
-    					<div class="form-group " ng-if="showFormElement('form-transactio-start')">
+    					<div class="form-group " ng-class="{'has-error has-feedback' : formTransactionErrors['start']}" ng-if="showFormElement('form-transactio-start')">
+    						<span class="help-block" ng-show="formTransactionErrors['start']">{{formTransactionErrors['start']}}</span>
                     		<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3">
                     			<label for="form-transactio-start">Borrow date:</label>
                             	<datepicker date-format="fullDate" date-set="{{formTransactionData['start']}}">
@@ -60,7 +66,8 @@
                                 </datepicker>
                     		</div>
                 		</div>
-    					<div class="form-group"  ng-if="showFormElement('form-transactio-end')">
+    					<div class="form-group"  ng-class="{'has-error has-feedback' : formTransactionErrors['end']}" ng-if="showFormElement('form-transactio-end')">
+    						<span class="help-block" ng-show="formTransactionErrors['end']">{{formTransactionErrors['end']}}</span>
                     		<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3">
                     			<label for="form-transactio-end">Return date:</label>
                             	<datepicker date-format="fullDate" date-set="{{formTransactionData['end']}}">
@@ -83,7 +90,7 @@
         						</div>
         					</div>
         				</div>
-        				<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="margin-top: 15px;">
+        				<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
             				<div class="btn-group" role="group" aria-label="">
                                 <button type="button" class="btn btn-default" ng-disabled="!validFormTransaction('cancelled')" ng-click="submitForm('cancelled')" ng-if="showFormElement('form-transaction-submit-cancelled')">Cancel</button>
                                 <button type="button" class="btn btn-primary" ng-disabled="!validFormTransaction('confirmed')" ng-click="submitForm('confirmed')" ng-if="showFormElement('form-transaction-submit-confirmed')">Confirm</button>
@@ -94,7 +101,7 @@
 	        				<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="margin-top: 15px;">
         						<span class="help-block" ng-show="formTransactionErrors['text']">{{formTransactionErrors['text']}}</span>
         						<span class="glyphicon glyphicon-warning-sign form-control-feedback" aria-hidden="true" ng-show="formTransactionErrors['text']"></span>
-        						<textarea rows="10" class="form-control" id="form-transaction-text" name="form-transaction-text" placeholder="Give a decent explanation." ng-model="formTransactionData['text']"></textarea>
+        						<textarea rows="5" class="form-control" id="form-transaction-text" name="form-transaction-text" placeholder="Give a decent explanation." ng-model="formTransactionData['text']"></textarea>
         					</div>
         				</div>
     				</form>

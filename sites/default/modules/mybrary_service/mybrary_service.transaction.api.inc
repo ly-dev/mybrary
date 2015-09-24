@@ -298,6 +298,12 @@ function mybrary_service_transaction_update ($data)
                     }
                 }
                 
+                // double check item availability for request
+                if (($data['new_status'] == MYBRARY_TRANSACTION_STATUS_REQUESTED || $data['new_status'] == MYBRARY_TRANSACTION_STATUS_REQUEST_CHANGED)
+                        && !_mybrary_transaction_is_available ($data['entity_id'], $data['start'], $data['end'])) {
+                    $errors[] = t('Not available during the requested period.');
+                }
+                
                 if (empty($errors)) {
                     // updte start and end
                     $result = db_update('mybrary_transaction_head')->fields(

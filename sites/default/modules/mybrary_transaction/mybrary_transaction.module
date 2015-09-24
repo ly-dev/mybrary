@@ -56,3 +56,58 @@ function _mybrary_transaction_get_feedback_label ($key) {
     }
 }
 
+function _mybrary_transaction_get_not_available_periods ($nid) {
+    $result = array();
+    
+    // tricky to get transaction with latest status
+    //@TODO filter with TODAY
+    $queryStatement = 'select th.transaction_id, th.start, th.end, ti.status'
+     . ' from (select * from mybrary_transaction_items'
+     . ' where transaction_id in (select transaction_id from mybrary_transaction_head where entity_id = :nid)'
+     . ' order by transaction_id, update_timestamp desc) ti'
+     . ' join mybrary_transaction_head th on th.transaction_id = ti.transaction_id'
+     . ' group by ti.transaction_id'
+     . ' having status = :status';
+    
+    $dbResult = db_query($queryStatement, array(
+            ':nid' => $nid,
+            ':status' => MYBRARY_TRANSACTION_STATUS_CONFIRMED
+    ));
+    
+    while ($row = $dbResult->fetchAssoc()) {
+        $result[] = array(
+            'transaction_id' => $row['transaction_id'],
+            'start' => $row['start'],
+            'end' => $row['end']   
+        );
+    }
+    
+    return $result;
+}
+
+function _mybrary_transaction_is_available ($nid, $start, $end) {
+    $result = TRUE;
+
+    // tricky to get transaction with latest status
+    $queryStatement = 'select th.transaction_id, th.start, th.end, ti.status'
+            . ' from (select * from mybrary_transaction_items'
+            . ' where transaction_id in (select transaction_id from mybrary_transaction_head where entity_id = :nid)'
+            . ' order by transaction_id, update_timestamp desc) ti'
+            . ' join mybrary_transaction_head th on th.transaction_id = ti.transaction_id'
+            . ' group by ti.transaction_id'
+            . ' having status = :status and end >= :start and start <= :end';
+
+    $dbResult = db_query($queryStatement, array(
+            ':nid' => $nid,
+            ':status' => MYBRARY_TRANSACTION_STATUS_CONFIRMED,
+            ':start' => $start,
+            ':end' => $end
+    ));
+
+    // should only max one found
+    while ($row = $dbResult->fetchAssoc()) {
+        $result = FALSE;
+    }
+
+    return $result;
+}

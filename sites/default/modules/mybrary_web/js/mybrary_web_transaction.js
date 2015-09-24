@@ -100,8 +100,17 @@ angular.module('app_mybrary')
 					return;
 				}
 				
-				
+				// prepare item
 				$scope.item = result.item;
+				angular.forEach($scope.item.not_available, function (v, k) {
+					if ($scope.item.notAvailableMessage == null) {
+						$scope.item.notAvailableMessage = 'Not available: ';
+					}
+					
+					$scope.item.notAvailableMessage += $filter('date')(v.start * 1000, 'dd/MM/yyyy') + ' - ' + $filter('date')(v.end * 1000, 'dd/MM/yyyy') + ' ';
+				});
+				
+				// prepare transaction
 				$scope.transaction = result.transaction;
 				if (user.uid == $scope.transaction.uid_borrower) {
 					$scope.userRole = 'borrower';
@@ -126,7 +135,7 @@ angular.module('app_mybrary')
 					switch (parseInt(v.status)) {
 						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_REQUESTED']:
 						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_REQUEST_CHANGED']:							
-							v.text = '(From ' + $filter('date')(t.start * 1000, 'shortDate') + ' to ' + $filter('date')(t.end * 1000, 'shortDate') + ') ' + t.text;
+							v.text = '(' + $filter('date')(t.start * 1000, 'dd/MM/yyyy') + ' - ' + $filter('date')(t.end * 1000, 'dd/MM/yyyy') + ') ' + t.text;
 							v['user'] = $scope.borrower;
 							break;
 						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_CONFIRMED']:
@@ -280,20 +289,40 @@ angular.module('app_mybrary')
 				$scope.formTransactionErrors['end'] = null;
 			}
 
+			// check availability before request or confirm
+			if ($scope.transaction && ( $scope.transaction.status == AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_UNKNOWN']
+					|| $scope.transaction.status == AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_REQUESTED']
+					|| $scope.transaction.status == AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_REQUEST_CHANGED'])
+				&& (submitType == 'requested' || submitType == 'request_changed' || submitType == 'confirmed')) {
+				
+				var tempStart = new Date($scope.formTransactionData['start']);
+				tempStart = Math.round(tempStart.getTime() / 1000) ;
+				
+				var tempEnd = new Date($scope.formTransactionData['end']);
+				tempEnd = Math.round(tempEnd.getTime() / 1000);
+				
+				angular.forEach($scope.item.not_available, function (v, k) {
+					if ((tempStart <= v.end) && (tempEnd >= v.start)) {
+						$scope.formTransactionErrors['start'] = "Not availabe in " + $filter('date')(v.start * 1000, 'dd/MM/yyyy') + ' - ' + $filter('date')(v.end * 1000, 'dd/MM/yyyy');
+						result = false;
+					}
+				});			
+			}
+
 			if ($scope.showFormElement('form-transaction-text') && _.isEmpty($scope.formTransactionData['text'] )) {
 				switch (submitType) {
-					case 'cancelled':
-					case 'confirmed':
-					case 'returned':
-						result = true;
-						break;
 					case 'declined':
 						$scope.formTransactionErrors['text'] = "Please explain the reason to decline.";
 						result = false;
 						break;
-					default:
+					case 'requested':
+					case 'request_changed':
+					case 'feedback':
 						$scope.formTransactionErrors['text'] = "Please make a decent explanation.";
 						result = false;
+						break;
+					default:
+						// not check for other instance
 						break;
 				}
 			} else {
@@ -306,7 +335,7 @@ angular.module('app_mybrary')
 			} else {
 				$scope.formTransactionErrors['feedback'] = null;
 			}
-
+			
 			return result;
 		};
 		
