@@ -39,7 +39,13 @@
 				</div>
 			</div>
 
-			<div class="panel panel-default">
+			<div class="panel panel-default" ng-show="noActionMessage">
+				<div class="panel-body">
+                	<span>{{noActionMessage}}</span>
+            	</div>
+        	</div>
+
+			<div class="panel panel-default" ng-hide="noActionMessage">
 				<div class="panel-body">
 					<div class="pull-right">
             			<img ng-src="{{currentUser.pictureUrl}}" alt="avatar" class="app-icon app-icon-avatar-tiny">
@@ -77,23 +83,27 @@
         						</div>
         					</div>
         				</div>
+        				<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="margin-top: 15px;">
+            				<div class="btn-group" role="group" aria-label="">
+                                <button type="button" class="btn btn-default" ng-disabled="!validFormTransaction('cancelled')" ng-click="submitForm('cancelled')" ng-if="showFormElement('form-transaction-submit-cancelled')">Cancel</button>
+                                <button type="button" class="btn btn-primary" ng-disabled="!validFormTransaction('confirmed')" ng-click="submitForm('confirmed')" ng-if="showFormElement('form-transaction-submit-confirmed')">Confirm</button>
+                                <button type="button" class="btn btn-primary" ng-disabled="!validFormTransaction('returned')" ng-click="submitForm('returned')" ng-if="showFormElement('form-transaction-submit-returned')">Returned</button>
+                            </div>
+                        </div>
     					<div class="form-group" ng-class="{'has-error has-feedback' : formTransactionErrors['text']}" ng-if="showFormElement('form-transaction-text')">
 	        				<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="margin-top: 15px;">
         						<span class="help-block" ng-show="formTransactionErrors['text']">{{formTransactionErrors['text']}}</span>
         						<span class="glyphicon glyphicon-warning-sign form-control-feedback" aria-hidden="true" ng-show="formTransactionErrors['text']"></span>
-        						<textarea rows="10" class="form-control" id="form-transaction-text" name="form-transaction-text" placeholder="Give a decent reason, e.g. why need it? how to use? etc." ng-model="formTransactionData['text']"></textarea>
+        						<textarea rows="10" class="form-control" id="form-transaction-text" name="form-transaction-text" placeholder="Give a decent explanation." ng-model="formTransactionData['text']"></textarea>
         					</div>
         				</div>
     				</form>
     				<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="margin-top: 15px;">
         				<div class="btn-group" role="group" aria-label="">
-                            <button type="button" class="btn btn-primary" ng-disabled="!validFormTransaction()" ng-click="submitForm('requested')" ng-if="showFormElement('form-transaction-submit-requested')">Request to borrow</button>
-                            <button type="button" class="btn btn-default" ng-disabled="!validFormTransaction()" ng-click="submitForm('cancelled')" ng-if="showFormElement('form-transaction-submit-cancelled')">Cancel the request</button>
-                            <button type="button" class="btn btn-primary" ng-disabled="!validFormTransaction()" ng-click="submitForm('confirmed')" ng-if="showFormElement('form-transaction-submit-confirmed')">Confirm to borrow</button>
-                            <button type="button" class="btn btn-default" ng-disabled="!validFormTransaction()" ng-click="submitForm('declined')" ng-if="showFormElement('form-transaction-submit-declined')">Decline to borrow</button>
-                            <button type="button" class="btn btn-primary" ng-disabled="!validFormTransaction()" ng-click="submitForm('received')" ng-if="showFormElement('form-transaction-submit-received')">Received</button>
-                            <button type="button" class="btn btn-primary" ng-disabled="!validFormTransaction()" ng-click="submitForm('returned')" ng-if="showFormElement('form-transaction-submit-returned')">Returned</button>
-                            <button type="button" class="btn btn-primary" ng-disabled="!validFormTransaction()" ng-click="submitForm('feedback')" ng-if="showFormElement('form-transaction-submit-feedback')">Submit feedback</button>
+                            <button type="button" class="btn btn-primary" ng-disabled="!validFormTransaction('requested')" ng-click="submitForm('requested')" ng-if="showFormElement('form-transaction-submit-requested')">Request</button>
+                            <button type="button" class="btn btn-primary" ng-disabled="!validFormTransaction('request_changed')" ng-click="submitForm('request_changed')" ng-if="showFormElement('form-transaction-submit-request-changed')">Change</button>
+                            <button type="button" class="btn btn-default" ng-disabled="!validFormTransaction('declined')" ng-click="submitForm('declined')" ng-if="showFormElement('form-transaction-submit-declined')">Decline</button>
+                            <button type="button" class="btn btn-primary" ng-disabled="!validFormTransaction('feedback')" ng-click="submitForm('feedback')" ng-if="showFormElement('form-transaction-submit-feedback')">Feedback</button>
                         </div>
                     </div>
     			</div>

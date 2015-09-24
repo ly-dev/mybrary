@@ -11,7 +11,7 @@
 			<div class="list-group">
 				<div class="list-group-item"><span>My Inventory ({{itemsMeta.count}})</span><div class="pull-right" style="font-size:75%"><i class="fa fa-user"></i> Not shared <i class="fa fa-cloud-upload"></i> Shared</div></div>
 				<div class="list-group-item" ng-show="itemsMeta.count < 1">Oops! Nothing found.</div>
-				<button type="button" class="list-group-item" ng-repeat="item in items | orderBy:'-changed'" ng-click="editInventory(item.nid)">
+				<button type="button" class="list-group-item" ng-repeat="item in items | orderBy:'-changed'" ng-click="editInventory(item)">
 					<div class="pull-left">
 						<img ng-src="{{item.field_image[0].url}}" alt="picture" class="app-icon app-icon-avatar-small">
 					</div>

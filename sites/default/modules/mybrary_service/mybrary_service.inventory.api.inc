@@ -30,9 +30,11 @@ function mybrary_service_inventory_list ($data)
     
     // list own inventory by default
     if (empty($data)) {
-        $data = array(
-            'owner' => 'me'
-        );
+        $data = array();
+    }
+    
+    if (empty($data['owner'])) {
+        $data['owner'] = 'me';
     }
     
     $query = new EntityFieldQuery();
@@ -56,52 +58,60 @@ function mybrary_service_inventory_list ($data)
             $temp = _mybrary_user_get_friends_of_friends($user->uid);
             $query->fieldCondition('field_shared', 'value', MYBRARY_ITEM_FIELD_SHARED_TO_FRIEND);
             break;
-    }
-    if (!empty($temp)) {
-        $query->propertyCondition('uid', $temp);
-    }
-    
-    // list of nid
-    if (!empty($data['nid'])) {
-        $query->propertyCondition('nid', $data['nid']);
+        case '*':
+            $temp = '*';
+            break;
     }
     
-    // search key
-    if (!empty($data['key'])) {
-        $query->propertyCondition('title', $data['key'], 'CONTAINS');
-    }
-    
-    // run query
-    $result = $query->execute();
     
     $response = array();
-    if (isset($result['node'])) {
-        $entities = entity_load('node', array_keys($result['node']));
+    // must set the uid criteria
+    if (!empty($temp)) {
+        if ($temp !== '*') {
+            $query->propertyCondition('uid', $temp);
+        }
         
-        if (!empty($entities)) {
-            // required fields to return and related options, 'field name'=>option array
-            $filterRequiredFields = array(
-                    'uid'=>array('is_property'=>TRUE),
-                    'nid'=>array('is_property'=>TRUE),
-                    'title'=>array('is_property'=>TRUE),
-                    'changed'=>array('is_property'=>TRUE),
-                    'body'=>array('values_convertor'=>'single_value'),
-                    'field_type'=>array('values_convertor'=>'single_value'),
-                    'field_model'=>array('values_convertor'=>'single_value'),
-                    'field_image'=>array('value_convertor'=>'image'),
-                    'field_shared'=>array('values_convertor'=>'single_value'),
-            );
+        // list of nid
+        if (!empty($data['nid'])) {
+            $query->propertyCondition('nid', $data['nid']);
+        }
+        
+        // search key
+        if (!empty($data['key'])) {
+            $query->propertyCondition('title', $data['key'], 'CONTAINS');
+        }
+        
+        // run query
+        $result = $query->execute();
+        
+        if (isset($result['node'])) {
+            $entities = entity_load('node', array_keys($result['node']));
             
-            // all available fields
-            $fieldInfo = field_info_instances('node', 'item');
-            $fieldKeys = array_keys($fieldInfo);
-            
-            foreach($entities as $nid=>$entity)
-            {
-                foreach ($filterRequiredFields as $fik => $fio) {
-                    
-                    if (($fio && $fio['is_property']) || in_array($fik, $fieldKeys)) {
-                        $response[$entity->nid][$fik] = _mybrary_service_get_entity_field_value($entity, $fik, $fio);
+            if (!empty($entities)) {
+                // required fields to return and related options, 'field name'=>option array
+                $filterRequiredFields = array(
+                        'uid'=>array('is_property'=>TRUE),
+                        'nid'=>array('is_property'=>TRUE),
+                        'title'=>array('is_property'=>TRUE),
+                        'changed'=>array('is_property'=>TRUE),
+                        'body'=>array('values_convertor'=>'single_value'),
+                        'field_type'=>array('values_convertor'=>'single_value'),
+                        'field_model'=>array('values_convertor'=>'single_value'),
+                        'field_image'=>array('value_convertor'=>'image'),
+                        'field_shared'=>array('values_convertor'=>'single_value'),
+                );
+                
+                // all available fields
+                $fieldInfo = field_info_instances('node', 'item');
+                $fieldKeys = array_keys($fieldInfo);
+                
+                foreach($entities as $nid=>$entity)
+                {
+                    foreach ($filterRequiredFields as $fik => $fio) {
+                        
+                        if (($fio && $fio['is_property']) || in_array($fik, $fieldKeys)) {
+                            $response[$entity->nid][$fik] = _mybrary_service_get_entity_field_value($entity, $fik, $fio);
+                        }
                     }
                 }
             }

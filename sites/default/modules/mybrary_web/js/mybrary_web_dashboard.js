@@ -16,8 +16,8 @@ angular.module('app_mybrary')
     });
 }])
 
-.controller('DashboardController', ['AppLog', 'AppHelper', 'AppApi', '$scope', '$q', 'termListPromise', 
-    function(AppLog, AppHelper, AppApi, $scope, $q, termListPromise) {
+.controller('DashboardController', ['AppLog', 'AppHelper', 'AppApi', '$state', '$scope', '$q', 'termListPromise', 
+    function(AppLog, AppHelper, AppApi, $state, $scope, $q, termListPromise) {
 	
 	    AppLog.debug("DashboardController");
 	
@@ -70,7 +70,15 @@ angular.module('app_mybrary')
 				
 				AppHelper.hideLoading();
 			});
-		}
+		};
 		refreshList();
+		
+		$scope.editInventory = function (item) {
+			$state.go('inventory-edit', {nid: item.nid});
+		};
+		
+		$scope.openTransaction = function (transaction) {
+			$state.go('transaction', {transaction_id: transaction.transaction_id});
+		};
 }]);
 

@@ -61,7 +61,7 @@ function mybrary_service_transaction_list ($data)
         }
         
         module_load_include('inc', 'mybrary_service', 'mybrary_service.inventory.api');
-        $response['items'] =  mybrary_service_inventory_list(array('nid' => array_keys($relatedItems)));
+        $response['items'] =  mybrary_service_inventory_list(array('owner'=>'*', 'nid'=>array_keys($relatedItems)));
         
         // collect owner ids
         foreach ($response['items'] as $nid=>$item) {

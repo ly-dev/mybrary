@@ -11,6 +11,8 @@ define("MYBRARY_TRANSACTION_STATUS_RETURNED", 5);
 define("MYBRARY_TRANSACTION_STATUS_CANCELLED", 6);
 define("MYBRARY_TRANSACTION_STATUS_OWNER_FEEDBACKED", 7);
 define("MYBRARY_TRANSACTION_STATUS_BORROWER_FEEDBACKED", 8);
+define("MYBRARY_TRANSACTION_STATUS_REQUEST_CHANGED", 9);
+define("MYBRARY_TRANSACTION_STATUS_CLOSED", 10);
 
 define("MYBRARY_TRANSACTION_FEEDBACK_UNKNOWN", 0);
 define("MYBRARY_TRANSACTION_FEEDBACK_NEGATIVE", 1);
@@ -26,8 +28,10 @@ function _mybrary_transaction_get_status_label ($key) {
             MYBRARY_TRANSACTION_STATUS_RECEIVED => t('received'),
             MYBRARY_TRANSACTION_STATUS_RETURNED => t('returned'),
             MYBRARY_TRANSACTION_STATUS_CANCELLED => t('cancelled'),
-            MYBRARY_TRANSACTION_STATUS_OWNER_FEEDBACKED => t('feedbacked'),
-            MYBRARY_TRANSACTION_STATUS_BORROWER_FEEDBACKED => t('feedbacked'),
+            MYBRARY_TRANSACTION_STATUS_OWNER_FEEDBACKED => t('owner feedbacked'),
+            MYBRARY_TRANSACTION_STATUS_BORROWER_FEEDBACKED => t('borrower feedbacked'),
+            MYBRARY_TRANSACTION_STATUS_REQUEST_CHANGED => t('request changed'),
+            MYBRARY_TRANSACTION_STATUS_CLOSED => t('closed'),
     );
     
     if (array_key_exists($key, $labels)) {

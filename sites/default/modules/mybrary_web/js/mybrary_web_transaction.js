@@ -83,6 +83,7 @@ angular.module('app_mybrary')
 	    AppLog.debug("TransactionResultController");
 		
 		$scope.terms = termListPromise;
+		$scope.noActionMessage = null;
 		$scope.formTransactionData = {};
 		
 		var user = AppApi.getUser(),
@@ -115,44 +116,63 @@ angular.module('app_mybrary')
 				}
 				
 				// prepare items
+				var detectClosedStatus = {
+						owner: false,
+						borrower: false
+				};
 				angular.forEach($scope.transaction.items, function(v, k) {
 					var t = v.text;
 					
 					switch (parseInt(v.status)) {
 						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_REQUESTED']:
-							v.text = t.text + ' (From ' + $filter('date')(t.start * 1000, 'shortDate') + ' to ' + $filter('date')(t.end * 1000, 'shortDate') + ')';
+						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_REQUEST_CHANGED']:							
+							v.text = '(From ' + $filter('date')(t.start * 1000, 'shortDate') + ' to ' + $filter('date')(t.end * 1000, 'shortDate') + ') ' + t.text;
 							v['user'] = $scope.borrower;
 							break;
 						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_CONFIRMED']:
-							v.text = t.text + ' (From ' + $filter('date')(t.start * 1000, 'shortDate') + ' to ' + $filter('date')(t.end * 1000, 'shortDate') + ')';
+							v.text = null;
 							v['user'] = $scope.owner;
 							break;
 						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_DECLINED']:
 							v.text = t.text;
 							v['user'] = $scope.owner;
-							break;
-						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_RECEIVED']:
-							v.text = t.text;
-							v['user'] = $scope.borrower;
+							detectClosedStatus['owner'] = true;
+							detectClosedStatus['borrower'] = true;
 							break;
 						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_RETURNED']:
-							v.text = t.text;
+							v.text = null;
 							v['user'] = $scope.owner;
 							break;
 						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_CANCELLED']:
-							v.text = t.text;
+							v.text = null;
 							v['user'] = $scope.owner;
+							detectClosedStatus['owner'] = true;
+							detectClosedStatus['borrower'] = true;
 							break;
 						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_OWNER_FEEDBACKED']:
-							v.text = t.text + ' (' + t.feedback_label + ')';
+							v.text = '[' + t.feedback_label + ']: ' + t.text;
 							v['user'] = $scope.owner;
+							detectClosedStatus['owner'] = true;
 							break;
 						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_BORROWER_FEEDBACKED']:
-							v.text = t.text + ' (' + t.feedback_label + ')';
+							v.text = '[' + t.feedback_label + ']: ' + t.text;
 							v['user'] = $scope.borrower;
+							detectClosedStatus['borrower'] = true;
+							break;
+						default:
+							// remove the invalid status for legacy
+							delete $scope.transaction.items[k];
 							break;
 					}
 				});
+				
+				// marked the transaction as closed
+				if (detectClosedStatus['owner'] &&  detectClosedStatus['borrower']) {
+					$scope.transaction.status = AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_CLOSED'];
+					$scope.noActionMessage = 'The transaction is closed.';
+				} else {
+					$scope.noActionMessage = null;
+				}
 				
 				// prepare form
 				$scope.formTransactionData['start'] = $filter('date')(parseInt(result.transaction.start) * 1000, 'fullDate');
@@ -163,28 +183,22 @@ angular.module('app_mybrary')
 				// role and status based process
 				if ($scope.userRole == 'owner') { // owner role
 					switch (parseInt($scope.transaction.status)) {
-						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_DECLINED']:
-						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_CANCELLED']:
-						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_RETURNED']:
 						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_OWNER_FEEDBACKED']:
-						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_BORROWER_FEEDBACKED']:
-							// show alert for completed transaction
-							AppHelper.showAlert('The transaction has been completed. Please give or revise your feedback.', 'success', false);
+							$scope.noActionMessage = 'Wait for the feedback from borrower.';
 							break;
 					}
 				} else { // borrower role
 					switch (parseInt($scope.transaction.status)) {
 						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_REQUESTED']:
+						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_REQUEST_CHANGED']:							
 							// show alert for existing open request found
 							AppHelper.showAlert('You have an open request on current item. You may revise it.', 'success', false);
 							break;
-						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_DECLINED']:
-						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_CANCELLED']:
-						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_RETURNED']:
-						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_OWNER_FEEDBACKED']:
+						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_CONFIRMED']:
+							$scope.noActionMessage = 'Owner has confirmed. Please get and return the item on time.';
+							break;
 						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_BORROWER_FEEDBACKED']:
-							// show alert for completed transaction
-							AppHelper.showAlert('The transaction has been completed. Please give or revise your feedback.', 'success', false);
+							$scope.noActionMessage = 'Wait for the feedback from owner.';
 							break;
 					}
 				}
@@ -218,18 +232,13 @@ angular.module('app_mybrary')
 				if ($scope.userRole == 'owner') { // owner role
 					switch (parseInt($scope.transaction.status)) {
 						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_REQUESTED']:
+						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_REQUEST_CHANGED']:
 							visibleElements = ['form-transactio-start', 'form-transactio-end', 'form-transaction-text', 'form-transaction-submit-confirmed', 'form-transaction-submit-declined'];
 							break;
 						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_CONFIRMED']:
 							visibleElements = ['form-transaction-text', 'form-transaction-submit-declined', 'form-transaction-submit-returned'];
 							break;
-						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_RECEIVED']:
-							visibleElements = ['form-transaction-text', 'form-transaction-submit-returned'];
-							break;
-						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_DECLINED']:
-						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_CANCELLED']:
 						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_RETURNED']:
-						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_OWNER_FEEDBACKED']:
 						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_BORROWER_FEEDBACKED']:
 							visibleElements = ['form-transaction-feedback', 'form-transaction-text', 'form-transaction-submit-feedback'];
 							break;
@@ -241,17 +250,10 @@ angular.module('app_mybrary')
 							visibleElements = ['form-transactio-start', 'form-transactio-end', 'form-transaction-text', 'form-transaction-submit-requested'];
 							break;
 						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_REQUESTED']:
-							visibleElements = ['form-transactio-start', 'form-transactio-end', 'form-transaction-text', 'form-transaction-submit-requested', 'form-transaction-submit-cancelled'];
+							visibleElements = ['form-transactio-start', 'form-transactio-end', 'form-transaction-text', 'form-transaction-submit-request-changed', 'form-transaction-submit-cancelled'];
 							break;
-						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_CONFIRMED']:
-							visibleElements = ['form-transaction-text', 'form-transaction-submit-received'];
-							break;
-						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_RECEIVED']:
-						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_DECLINED']:
-						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_CANCELLED']:
 						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_RETURNED']:
 						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_OWNER_FEEDBACKED']:
-						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_BORROWER_FEEDBACKED']:
 							visibleElements = ['form-transaction-feedback', 'form-transaction-text', 'form-transaction-submit-feedback'];
 							break;
 					}
@@ -261,7 +263,7 @@ angular.module('app_mybrary')
 			return (visibleElements.indexOf(elementId) >= 0);
 		}
 		
-		$scope.validFormTransaction = function() {
+		$scope.validFormTransaction = function(submitType) {
 			var result = true;
 			
 			if ($scope.showFormElement('form-transaction-start') && _.isEmpty($scope.formTransactionData['start'] )) {
@@ -279,8 +281,21 @@ angular.module('app_mybrary')
 			}
 
 			if ($scope.showFormElement('form-transaction-text') && _.isEmpty($scope.formTransactionData['text'] )) {
-				$scope.formTransactionErrors['text'] = "Please enter a reason.";
-				result = false;
+				switch (submitType) {
+					case 'cancelled':
+					case 'confirmed':
+					case 'returned':
+						result = true;
+						break;
+					case 'declined':
+						$scope.formTransactionErrors['text'] = "Please explain the reason to decline.";
+						result = false;
+						break;
+					default:
+						$scope.formTransactionErrors['text'] = "Please make a decent explanation.";
+						result = false;
+						break;
+				}
 			} else {
 				$scope.formTransactionErrors['text'] = null;
 			}
@@ -296,7 +311,7 @@ angular.module('app_mybrary')
 		};
 		
 		$scope.submitForm = function (submitType) {
-			if ($scope.validFormTransaction()) {
+			if ($scope.validFormTransaction(submitType)) {
 				var data = angular.copy($scope.transaction);
 				
 				// fill form data
@@ -312,6 +327,7 @@ angular.module('app_mybrary')
 				if ($scope.userRole == 'owner') { // owner role
 					switch (parseInt($scope.transaction.status)) {
 						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_REQUESTED']:
+						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_REQUEST_CHANGED']:							
 							if (submitType == 'confirmed') {
 								data['new_status'] = AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_CONFIRMED'];
 							} else if (submitType == 'declined') {
@@ -325,15 +341,7 @@ angular.module('app_mybrary')
 								data['new_status'] = AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_RETURNED'];
 							}
 							break;
-						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_RECEIVED']:
-							if (submitType == 'returned') {
-								data['new_status'] = AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_RETURNED'];
-							}
-							break;
-						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_DECLINED']:
-						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_CANCELLED']:
 						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_RETURNED']:
-						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_OWNER_FEEDBACKED']:
 						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_BORROWER_FEEDBACKED']:
 							if (submitType == 'feedback') {
 								data['new_status'] = AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_OWNER_FEEDBACKED'];
@@ -349,22 +357,15 @@ angular.module('app_mybrary')
 							}
 							break;
 						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_REQUESTED']:
-							if (submitType == 'requested') {
-								data['new_status'] = AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_REQUESTED'];
+						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_REQUEST_CHANGED']:
+							if (submitType == 'request_changed') {
+								data['new_status'] = AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_REQUEST_CHANGED'];
 							} else if (submitType == 'cancelled') {
 								data['new_status'] = AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_CANCELLED'];
 							}
 							break;
-						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_CONFIRMED']:
-							if (submitType == 'received') {
-								data['new_status'] = AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_RECEIVED'];
-							}
-							break;
-						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_DECLINED']:
-						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_CANCELLED']:
 						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_RETURNED']:
 						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_OWNER_FEEDBACKED']:
-						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_BORROWER_FEEDBACKED']:
 							if (submitType == 'feedback') {
 								data['new_status'] = AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_BORROWER_FEEDBACKED'];
 								data['feedback_borrower'] = parseInt($scope.formTransactionData['feedback']);

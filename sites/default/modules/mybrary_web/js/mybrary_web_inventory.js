@@ -51,8 +51,8 @@ angular.module('app_mybrary')
 	}
 	refreshList();
 	
-	$scope.editInventory = function (nid) {
-		$state.go('inventory-edit', {nid: nid});
+	$scope.editInventory = function (item) {
+		$state.go('inventory-edit', {nid: item.nid});
 	};
 }])
 
