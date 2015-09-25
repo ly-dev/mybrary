@@ -72,10 +72,17 @@ function mybrary_web_dashboard() {
 }
 
 /**
- * Page callback for connection.
+ * Page callback for connection list.
  */
-function mybrary_web_connection() {
-    return theme_render_template(drupal_get_path('module', 'mybrary_web') . '/tpl/mybrary_web_connection.tpl.php', array());
+function mybrary_web_connection_list() {
+    return theme_render_template(drupal_get_path('module', 'mybrary_web') . '/tpl/mybrary_web_connection-list.tpl.php', array());
+}
+
+/**
+ * Page callback for connection view.
+ */
+function mybrary_web_connection_view() {
+    return theme_render_template(drupal_get_path('module', 'mybrary_web') . '/tpl/mybrary_web_connection-view.tpl.php', array());
 }
 
 /**

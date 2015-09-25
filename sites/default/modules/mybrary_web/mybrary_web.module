@@ -29,9 +29,17 @@ function mybrary_web_menu ()
             'access callback' => 'user_is_logged_in'
     );
     
-    $items['tpl/connection'] = array(
+    $items['tpl/connection-list'] = array(
             'title' => t('Connection'),
-            'page callback' => 'mybrary_web_connection',
+            'page callback' => 'mybrary_web_connection_list',
+            'file' => 'mybrary_web.page.inc',
+            'type' => MENU_NORMAL_ITEM,
+            'access callback' => 'user_is_logged_in'
+    );
+    
+    $items['tpl/connection-view'] = array(
+            'title' => t('Connection'),
+            'page callback' => 'mybrary_web_connection_view',
             'file' => 'mybrary_web.page.inc',
             'type' => MENU_NORMAL_ITEM,
             'access callback' => 'user_is_logged_in'

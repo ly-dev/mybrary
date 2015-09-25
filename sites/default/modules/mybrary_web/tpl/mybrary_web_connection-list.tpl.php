@@ -9,11 +9,11 @@
 	<div class="row">
 		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
 			<div class="list-group">
-				<div class="list-group-item"><span>My Connections ({{friendsMeta.count}})</span></div>
-				<div class="list-group-item" ng-show="friendsMeta.count < 1">Oops! Nothing found.</div>
-				<button type="button" class="list-group-item" ng-repeat="(id, friend) in friends">
-					<img ng-src="{{friend.pictureUrl}}" alt="avatar" class="app-icon app-icon-avatar-small">
-					<span>{{friend.name}}</span>
+				<div class="list-group-item"><span>My Connections ({{usersMeta.count}})</span></div>
+				<div class="list-group-item" ng-show="usersMeta.count < 1">Oops! Nothing found.</div>
+				<button type="button" class="list-group-item" ng-repeat="user in users | orderBy:'name' | limitTo : 3"  ng-click="viewConnection(user)">
+					<img ng-src="{{user.pictureUrl}}" alt="avatar" class="app-icon app-icon-avatar-small">
+					<span>{{user.name}}</span>
 				</button>
 			</div>
 		</div>

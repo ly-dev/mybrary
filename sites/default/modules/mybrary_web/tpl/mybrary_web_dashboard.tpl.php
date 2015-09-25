@@ -2,12 +2,12 @@
 	<div class="row">
 		<div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
 			<div class="list-group">
-				<a class="list-group-item" ui-sref="connection"><span>My Connections ({{friendsMeta.count}})</span></a>
-				<div class="list-group-item" ng-show="friendsMeta.count < 1">Oops! Nothing found.</div>
-				<div class="list-group-item" ng-repeat="friend in friends | orderBy:'name' | limitTo : 3">
-					<img ng-src="{{friend.pictureUrl}}" alt="avatar" class="app-icon app-icon-avatar-small">
-					<span>{{friend.name}}</span>
-				</div>
+				<a class="list-group-item" ui-sref="connection-list"><span>My Connections ({{usersMeta.count}})</span></a>
+				<div class="list-group-item" ng-show="usersMeta.count < 1">Oops! Nothing found.</div>
+				<button type="button" class="list-group-item" ng-repeat="user in users | orderBy:'name' | limitTo : 3" ng-click="viewConnection(user)">
+					<img ng-src="{{user.pictureUrl}}" alt="avatar" class="app-icon app-icon-avatar-small">
+					<span>{{user.name}}</span>
+				</button>
 			</div>
 		</div>
 		<div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">

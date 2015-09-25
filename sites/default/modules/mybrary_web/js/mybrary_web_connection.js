@@ -4,23 +4,29 @@ angular.module('app_mybrary')
 
 .config(['$stateProvider', function($stateProvider) {
 	$stateProvider
-    .state('connection', {
-		url: "/connection",
-		templateUrl: Drupal.settings.angularjsApp.basePath + '/tpl/connection',
-    	controller: 'ConnectionController'
+    .state('connection-list', {
+		url: "/connection-list",
+		templateUrl: Drupal.settings.angularjsApp.basePath + '/tpl/connection-list',
+    	controller: 'ConnectionListController'
+    })
+    .state('connection-view', {
+		url: "/connection-view/:uid",
+		templateUrl: Drupal.settings.angularjsApp.basePath + '/tpl/connection-view',
+    	controller: 'ConnectionViewController'
     });
 }])
 
-.controller('ConnectionController', ['AppLog', 'AppHelper', 'AppApi', '$scope', function(AppLog, AppHelper, AppApi, $scope) {
-    AppLog.debug("ConnectionController");
+.controller('ConnectionListController', ['AppLog', 'AppHelper', 'AppApi', '$state', '$scope',
+    function(AppLog, AppHelper, AppApi, $state, $scope) {
+    AppLog.debug("ConnectionListController");
     
 	var refreshList = function() {
 	    AppHelper.showLoading();
 
-	    AppApi.connectionList().then(function(data) {
-			$scope.friends = data;
-			$scope.friendsMeta = {
-				count: _.values($scope.friends).length
+	    AppApi.connectionList().then(function(users) {
+			$scope.users = _.values(users);
+			$scope.usersMeta = {
+				count: $scope.users.length
 			};
 			
 			AppHelper.hideLoading();
@@ -52,6 +58,62 @@ angular.module('app_mybrary')
 				jQuery('#modalInviteFriend button[data-dismiss=modal]').click();
 			});
 		}
-	}
-}]);
+	};
+	
+	$scope.viewConnection = function (user) {
+		$state.go('connection-view', {uid: user.uid});
+	};
+}])
 
+.controller('ConnectionViewController', ['AppLog', 'AppHelper', 'AppApi', '$state', '$stateParams', '$scope', 
+    function(AppLog, AppHelper, AppApi, $state, $stateParams, $scope) {
+    AppLog.debug("ConnectionViewController");
+    
+	var refreshView = function() {
+	    AppHelper.showLoading();
+
+	    AppApi.connectionView({uid:$stateParams.uid, 'feedback_as_borrower_summary': true, 'feedback_as_borrower': true, 'feedback_as_owner_summary': true, 'feedback_as_owner': true}).then(function(user) {
+			$scope.user = user;
+			var feedback_default = {
+				uid: user.uid, 
+				negative: 0, 
+				neutral: 0, 
+				positive: 0, 
+				negative_percent: 0, 
+				neutral_percent: 0, 
+				positive_percent: 0
+			};
+			
+			if ($scope.user['feedback_as_borrower_summary']) {
+				var tempSum = parseInt($scope.user['feedback_as_borrower_summary']['negative']) + parseInt($scope.user['feedback_as_borrower_summary']['neutral']) + parseInt($scope.user['feedback_as_borrower_summary']['positive']);
+				$scope.user['feedback_as_borrower_summary']['negative_percent'] = Math.round(parseInt($scope.user['feedback_as_borrower_summary']['negative']) / tempSum * 100);
+				$scope.user['feedback_as_borrower_summary']['neutral_percent'] = Math.round(parseInt($scope.user['feedback_as_borrower_summary']['neutral']) / tempSum * 100);
+				$scope.user['feedback_as_borrower_summary']['positive_percent'] = Math.round(parseInt($scope.user['feedback_as_borrower_summary']['positive']) / tempSum * 100);
+				
+			} else {
+				$scope.user['feedback_as_borrower_summary'] = feedback_default;
+	    	}
+			
+			if ($scope.user['feedback_as_owner_summary']) {
+				var tempSum = parseInt($scope.user['feedback_as_owner_summary']['negative']) + parseInt($scope.user['feedback_as_owner_summary']['neutral']) + parseInt($scope.user['feedback_as_owner_summary']['positive']);
+				$scope.user['feedback_as_owner_summary']['negative_percent'] = Math.round(parseInt($scope.user['feedback_as_owner_summary']['negative']) / tempSum * 100);
+				$scope.user['feedback_as_owner_summary']['neutral_percent'] = Math.round(parseInt($scope.user['feedback_as_owner_summary']['neutral']) / tempSum * 100);
+				$scope.user['feedback_as_owner_summary']['positive_percent'] = Math.round(parseInt($scope.user['feedback_as_owner_summary']['positive']) / tempSum * 100);
+			} else {
+				$scope.user['feedback_as_owner_summary'] = feedback_default;
+	    	}
+			
+			if ($scope.user['feedback_as_borrower']) {
+				$scope.user['feedback_as_borrower'] = _.values($scope.user['feedback_as_borrower']);
+			}
+			
+			if ($scope.user['feedback_as_owner']) {
+				$scope.user['feedback_as_owner'] = _.values($scope.user['feedback_as_owner']);
+			}
+
+			AppHelper.hideLoading();
+		});
+	}
+	refreshView();
+
+}]);

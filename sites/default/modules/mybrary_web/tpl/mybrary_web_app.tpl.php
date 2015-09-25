@@ -8,9 +8,9 @@ $items = array (
             'label' => t('Dashboard'),
             'state' => 'dashboard',
     ),
-    'connection' => array(
+    'connection-list' => array(
             'label' => t('Connection'),
-            'state' => 'connection',
+            'state' => 'connection-list',
     ),
     'inventory-list' => array(
             'label' => t('Inventory'),

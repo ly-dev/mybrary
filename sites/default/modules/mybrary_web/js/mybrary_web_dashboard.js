@@ -26,14 +26,14 @@ angular.module('app_mybrary')
 			AppHelper.showLoading();
 			
 			$q.all({
-				'friends': AppApi.connectionList(),
+				'users': AppApi.connectionList(),
 				'items': AppApi.inventoryList(),
 				'transactionCollection': AppApi.transactionList()
 			}).then(function (data) {
 				
-				$scope.friends = _.values(data['friends']);
-				$scope.friendsMeta = {
-					count: $scope.friends.length
+				$scope.users = _.values(data['users']);
+				$scope.usersMeta = {
+					count: $scope.users.length
 				};
 	
 				$scope.items = _.values(data['items']);
@@ -73,6 +73,10 @@ angular.module('app_mybrary')
 		};
 		refreshList();
 		
+		$scope.viewConnection = function (user) {
+			$state.go('connection-view', {uid: user.uid});
+		};
+
 		$scope.editInventory = function (item) {
 			$state.go('inventory-edit', {nid: item.nid});
 		};
