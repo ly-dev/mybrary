@@ -33,7 +33,7 @@
 					<div class="form-group" ng-class="{'has-error has-feedback' : formItemErrors['title']}">
 						<span class="help-block" ng-show="formItemErrors['title']">{{formItemErrors['title']}}</span>
 						<span class="glyphicon glyphicon-warning-sign form-control-feedback" aria-hidden="true" ng-show="formItemErrors['title']"></span>
-                        <input type="text" class="form-control" id="form-item-title" name="form-item-title" placeholder="Tool name" ng-model="formItemData['title']">
+                        <input type="text" class="form-control" id="form-item-title" name="form-item-title" placeholder="Tool name" ng-model="formItemData['title']" maxlength="50">
 					</div>				
 					<div class="form-group" ng-class="{'has-error has-feedback' : formItemErrors['field_type']}">
 						<span class="help-block" ng-show="formItemErrors['field_type']">{{formItemErrors['field_type']}}</span>
@@ -50,10 +50,11 @@
 						</select>
 					</div>
 					<div class="form-group">
-                        <input type="text" class="form-control" id="form-item-field_model" name="form-item-field_model" placeholder="Tool model (optional)" ng-model="formItemData['field_model']">
+                        <input type="text" class="form-control" id="form-item-field_model" name="form-item-field_model" placeholder="Tool model (optional)" ng-model="formItemData['field_model']" maxlength="50">
 					</div>									
 					<div class="form-group">
-						<textarea class="form-control" id="form-item-body" name="form-item-body" placeholder="Tool description (optional)" ng-model="formItemData['body']"></textarea>
+						<div>{{150-formItemData['body'].length}} characters left</div>
+						<textarea class="form-control" id="form-item-body" name="form-item-body" placeholder="Tool description (optional)" ng-model="formItemData['body']" maxlength="150"></textarea>
 					</div>									
 				</form>
 				

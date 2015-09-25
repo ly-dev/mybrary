@@ -101,7 +101,8 @@
 	        				<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="margin-top: 15px;">
         						<span class="help-block" ng-show="formTransactionErrors['text']">{{formTransactionErrors['text']}}</span>
         						<span class="glyphicon glyphicon-warning-sign form-control-feedback" aria-hidden="true" ng-show="formTransactionErrors['text']"></span>
-        						<textarea rows="5" class="form-control" id="form-transaction-text" name="form-transaction-text" placeholder="Give a decent explanation." ng-model="formTransactionData['text']"></textarea>
+        						<div>{{150-formTransactionData['text'].length}} characters left</div>
+        						<textarea rows="4" class="form-control" id="form-transaction-text" name="form-transaction-text" placeholder="Give a decent explanation." ng-model="formTransactionData['text']" maxlength="150"></textarea>
         					</div>
         				</div>
     				</form>
