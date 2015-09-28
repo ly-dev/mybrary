@@ -1,11 +1,12 @@
 {
     "name": "mybrary",
     "type": "drupal",
-    "core": "drupal\/cores\/drupal-7.38.tar.gz",
+    "core": "drupal\/cores\/drupal-7.39.tar.gz",
     "modules": [
     	"project_root"
     ],
     "path_mappings": {
         "sites": "sites"
-    }
+    },
+    "domain": "mybrary"
 }

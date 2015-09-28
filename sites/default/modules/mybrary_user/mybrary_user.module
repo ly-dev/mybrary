@@ -12,6 +12,22 @@ define("MYBRARY_USER_TYPE_FACEBOOK", 2);
 define("MYBRARY_USER_RELATIONSHIP_STATUS_UNKNOWN", 0);
 define("MYBRARY_USER_RELATIONSHIP_STATUS_CONFIRMED", 1);
 define("MYBRARY_USER_RELATIONSHIP_STATUS_REJECTED", 2);
+define("MYBRARY_USER_RELATIONSHIP_STATUS_REQUESTED", 3);
+
+function _mybrary_user_get_status_label ($key) {
+    $labels = array(
+            MYBRARY_USER_RELATIONSHIP_STATUS_UNKNOWN => t('unknown'),
+            MYBRARY_USER_RELATIONSHIP_STATUS_CONFIRMED => t('confirmed'),
+            MYBRARY_USER_RELATIONSHIP_STATUS_REJECTED => t('declined'),
+            MYBRARY_USER_RELATIONSHIP_STATUS_REQUESTED => t('requested'),
+    );
+
+    if (array_key_exists($key, $labels)) {
+        return $labels[$key];
+    } else {
+        return t('Unknown status label for key: !key', array('!key' => $key));
+    }
+}
 
 /**
  * Hook to manually save Facebook data after a user has connected.
@@ -178,7 +194,7 @@ function mybrary_user_user_cancel($edit, $account, $method) {
  * 
  * @param integer $uid
  */
-function _mybrary_user_get_friends ($uid) {
+function _mybrary_user_get_friends ($uid, $status = NULL) {
     
     $result = array();
     
@@ -186,6 +202,15 @@ function _mybrary_user_get_friends ($uid) {
         $query = db_select('mybrary_user_net', 'n');
         $query->addField('n', 'uid_to');
         $query->condition('n.uid_from', $uid);
+        
+        // default only show confirmed
+        if (empty($status)) {
+            $status = array(
+                MYBRARY_USER_RELATIONSHIP_STATUS_CONFIRMED
+            );
+        }
+        
+        $query->condition('n.status', $status);
         $dbResult = $query->execute();
 
         while ($row = $dbResult->fetchAssoc()) {

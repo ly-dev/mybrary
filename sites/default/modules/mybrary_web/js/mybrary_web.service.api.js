@@ -58,6 +58,18 @@ angular.module('app_mybrary')
         });
 	};
 
+	service.connectionRequestToAdd = function(data) {
+        return service.callRestApi('POST', '/connection/request-to-add', data).then(function(response) {
+        	return response.data;
+        });
+	};
+
+	service.connectionResponseToAdd = function(data) {
+        return service.callRestApi('POST', '/connection/response-to-add', data).then(function(response) {
+        	return response.data;
+        });
+	};
+
 	service.connectionList = function(data) {
         return service.callRestApi('POST', '/connection/list', data).then(function(response) {
         	return response.data;

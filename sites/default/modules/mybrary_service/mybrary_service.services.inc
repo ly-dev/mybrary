@@ -42,6 +42,12 @@ function mybrary_service_default_services_endpoint() {
         'invite' => array(
           'enabled' => '1',
         ),
+        'request-to-add' => array(
+          'enabled' => '1',
+        ),
+        'response-to-add' => array(
+          'enabled' => '1',
+        ),
         'list' => array(
           'enabled' => '1',
         ),

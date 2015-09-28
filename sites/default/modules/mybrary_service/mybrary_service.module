@@ -236,6 +236,48 @@ function mybrary_service_services_resources ()
                                             )
                                     )
                             ),
+                            'request-to-add' => array(
+                                    'help' => t('Request to add friend'),
+                                    'file' => array(
+                                            'type' => 'inc',
+                                            'module' => 'mybrary_service',
+                                            'name' => 'mybrary_service.connection.api'
+                                    ),
+                                    'callback' => 'mybrary_service_connection_request_to_add',
+                                    'access callback' => 'mybrary_service_connection_resource_access',
+                                    'access arguments' => array('request-to-add'),
+                                    'access arguments append' => TRUE,
+                                    'args' => array(
+                                            array(
+                                                    'name' => 'data',
+                                                    'type' => 'array',
+                                                    'description' => t('Parameters of the action'),
+                                                    'source' => 'data',
+                                                    'optional' => FALSE
+                                            )
+                                    )
+                            ),                            
+                            'response-to-add' => array(
+                                    'help' => t('Response to add friend'),
+                                    'file' => array(
+                                            'type' => 'inc',
+                                            'module' => 'mybrary_service',
+                                            'name' => 'mybrary_service.connection.api'
+                                    ),
+                                    'callback' => 'mybrary_service_connection_response_to_add',
+                                    'access callback' => 'mybrary_service_connection_resource_access',
+                                    'access arguments' => array('response-to-add'),
+                                    'access arguments append' => TRUE,
+                                    'args' => array(
+                                            array(
+                                                    'name' => 'data',
+                                                    'type' => 'array',
+                                                    'description' => t('Parameters of the action'),
+                                                    'source' => 'data',
+                                                    'optional' => FALSE
+                                            )
+                                    )
+                            ),                            
                             'list' => array(
                                     'help' => t('List connection'),
                                     'file' => array(

@@ -16,19 +16,29 @@ angular.module('app_mybrary')
     });
 }])
 
-.controller('ConnectionListController', ['AppLog', 'AppHelper', 'AppApi', '$state', '$scope',
-    function(AppLog, AppHelper, AppApi, $state, $scope) {
+.controller('ConnectionListController', ['AppLog', 'AppHelper', 'AppApi', '$state', '$scope', '$q',
+    function(AppLog, AppHelper, AppApi, $state, $scope, $q) {
     AppLog.debug("ConnectionListController");
     
 	var refreshList = function() {
 	    AppHelper.showLoading();
 
-	    AppApi.connectionList().then(function(users) {
-			$scope.users = _.values(users);
-			$scope.usersMeta = {
-				count: $scope.users.length
+	    $q.all({
+			'frds': AppApi.connectionList(),
+			'fofs': AppApi.connectionList({uid: 'frd'})
+		}).then(function (data) {
+			$scope.frds = _.values(data['frds']);
+			$scope.frdsMeta = {
+				count: $scope.frds.length
 			};
 			
+			// fofs omit members in frds and self
+			var user = AppApi.getUser();
+			$scope.fofs = _.chain(data['fofs']).omit(_.keys(data['frds'])).omit(user.uid).values().value();
+			$scope.fofsMeta = {
+				count: $scope.fofs.length
+			};
+
 			AppHelper.hideLoading();
 		});
 	}
@@ -60,8 +70,8 @@ angular.module('app_mybrary')
 		}
 	};
 	
-	$scope.viewConnection = function (user) {
-		$state.go('connection-view', {uid: user.uid});
+	$scope.viewConnection = function (frd) {
+		$state.go('connection-view', {uid: frd.uid});
 	};
 }])
 
@@ -115,5 +125,37 @@ angular.module('app_mybrary')
 		});
 	}
 	refreshView();
+	
+	$scope.allowToAddFriend = function () {
+		return ($scope.user && !$scope.user.isFriend && !_.isEmpty($scope.user.commonFriends));
+	};
+
+	$scope.requestToAddFriend = function(user) {
+		AppHelper.showLoading();
+		
+		AppApi.connectionRequestToAdd({uid: user.uid}).then(function(response) {
+			AppHelper.showAlert(response.message, response.status);
+			
+			refreshView();
+		});
+	};
+	
+	var responseToAddFriend = function (user, status) {
+		AppHelper.showLoading();
+		
+		AppApi.connectionResponseToAdd({uid: user.uid, status: status}).then(function(response) {
+			AppHelper.showAlert(response.message, response.status);
+			
+			refreshView();
+		});
+	};
+	
+	$scope.confirmToAddFriend = function (user) {
+		responseToAddFriend(user, AppHelper.CONST.MYBRARY_USER_RELATIONSHIP_STATUS_CONFIRMED);
+	};
+	
+	$scope.rejectToAddFriend = function (user) {
+		responseToAddFriend(user, AppHelper.CONST.MYBRARY_USER_RELATIONSHIP_STATUS_REJECTED);
+	};
 
 }]);

@@ -2,11 +2,21 @@
 	<div class="row">
 		<div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
 			<div class="list-group">
-				<a class="list-group-item" ui-sref="connection-list"><span>My Connections ({{usersMeta.count}})</span></a>
-				<div class="list-group-item" ng-show="usersMeta.count < 1">Oops! Nothing found.</div>
-				<button type="button" class="list-group-item" ng-repeat="user in users | orderBy:'name' | limitTo : 3" ng-click="viewConnection(user)">
-					<img ng-src="{{user.pictureUrl}}" alt="avatar" class="app-icon app-icon-avatar-small">
-					<span>{{user.name}}</span>
+				<a class="list-group-item" ui-sref="connection-list"><span>My Friends ({{frdsMeta.count}})</span></a>
+				<div class="list-group-item" ng-show="frdsMeta.count < 1">Oops! Nothing found.</div>
+				<button type="button" class="list-group-item" ng-repeat="frd in frds | orderBy:'name' | limitTo : 3" ng-click="viewConnection(frd)">
+					<img ng-src="{{frd.pictureUrl}}" alt="avatar" class="app-icon app-icon-avatar-small">
+					<span>{{frd.name}}</span>
+				</button>
+			</div>
+			<div class="list-group">
+				<a class="list-group-item" ui-sref="connection-list"><span>Friends of Friends ({{fofsMeta.count}})</span></a>
+				<div class="list-group-item" ng-show="fofsMeta.count < 1">Oops! Nothing found.</div>
+				<button type="button" class="list-group-item" ng-repeat="fof in fofs | orderBy:'name' | limitTo : 3"  ng-click="viewConnection(fof)">
+					<img ng-src="{{fof.pictureUrl}}" alt="avatar" class="app-icon app-icon-avatar-small">
+					<span>{{fof.name}}</span>
+					<span ng-if="fof.req_status == 3">(already requested)</span>
+					<span ng-if="fof.res_status == 3">(wait to response)</span>
 				</button>
 			</div>
 		</div>

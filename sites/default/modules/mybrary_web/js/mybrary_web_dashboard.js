@@ -26,23 +26,29 @@ angular.module('app_mybrary')
 			AppHelper.showLoading();
 			
 			$q.all({
-				'users': AppApi.connectionList(),
+				'frds': AppApi.connectionList(),
+				'fofs': AppApi.connectionList({uid: 'frd'}),
 				'items': AppApi.inventoryList(),
 				'transactionCollection': AppApi.transactionList()
 			}).then(function (data) {
 				
-				$scope.users = _.values(data['users']);
-				$scope.usersMeta = {
-					count: $scope.users.length
+				$scope.frds = _.values(data['frds']);
+				$scope.frdsMeta = {
+					count: $scope.frds.length
 				};
 	
+				var user = AppApi.getUser();
+				AppLog.debug(user);
+				$scope.fofs = _.chain(data['fofs']).omit(_.keys(data['frds'])).omit(user.uid).values().value();
+				$scope.fofsMeta = {
+					count: $scope.fofs.length
+				};
+
 				$scope.items = _.values(data['items']);
 				$scope.itemsMeta = {
 					count: $scope.items.length
 				};
 				
-				
-				var user = AppApi.getUser();
 				$scope.transactions = {
 						'owner': [],
 						'borrower': []

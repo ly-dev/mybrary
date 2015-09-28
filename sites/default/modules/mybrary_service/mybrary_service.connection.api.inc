@@ -7,6 +7,8 @@ function mybrary_service_connection_resource_access($op = 'view', $args = array(
 
     switch ($op) {
         case 'invite':
+        case 'request-to-add':
+        case 'response-to-add':
         case 'list':
         case 'view':
         default:
@@ -84,6 +86,7 @@ function mybrary_service_connection_invite_facebook ($data)
     return $response;
 }
 
+
 /**
  * Callback for for connection resource.
  * List
@@ -97,10 +100,24 @@ function mybrary_service_connection_list ($data)
     
     $response = NULL;
     
-    if (empty($data['uid'])) {
-        $data['uid'] = $user->uid; 
+    if (empty($data)) {
+        $data = array(
+            'uid' => $user->uid
+        ); 
     }
-        
+    
+    $relationship = 'frd';
+    $requestedToAdd = array();
+    // convert to friends ids to get fof
+    if ($data['uid'] == 'frd') {
+        $data['uid'] = _mybrary_user_get_friends($user->uid);
+        $relationship = 'fof';
+    }
+    
+    if (empty($data['status'])) {
+        $data['status'] = array(MYBRARY_USER_RELATIONSHIP_STATUS_CONFIRMED); 
+    }
+    
     try {
         $query = db_select('mybrary_user_net', 'n');
         $query->join('users', 'u', 'n.uid_to = u.uid');
@@ -112,12 +129,26 @@ function mybrary_service_connection_list ($data)
         $query->addField('e', 'type', 'externalType');
         $query->addField('f', 'uri', 'pictureUri');
         $query->condition('n.uid_from', $data['uid']);
+        $query->condition('n.status', $data['status']);
+        
+        if ($relationship == 'fof') {
+            $query->leftjoin('mybrary_user_net', 'req', 'req.uid_from = :uid and req.uid_to = n.uid_to and req.status = :status', array(':uid'=>$user->uid, ':status'=>MYBRARY_USER_RELATIONSHIP_STATUS_REQUESTED));
+            $query->leftjoin('mybrary_user_net', 'res', 'res.uid_from = n.uid_to and res.uid_to = :uid and res.status = :status', array(':uid'=>$user->uid, ':status'=>MYBRARY_USER_RELATIONSHIP_STATUS_REQUESTED));
+            $query->addField('req', 'status', 'req_status');
+            $query->addField('res', 'status', 'res_status');
+        }
+        
         $dbResult = $query->execute();
         
         $response = array();
         while ($row = $dbResult->fetchAssoc()) {
             $row['pictureUrl'] = ($row['pictureUri'] ? file_create_url($row['pictureUri'])
                         : $base_path . drupal_get_path('theme', 'mybrary') . '/images/unknown-user.png');
+            $row['relationship'] = $relationship;
+            if (in_array($row['uid'], $requestedToAdd)) {
+                $row['requestToAdd'] = TRUE;
+            }
+            
             $response[$row['uid']] = $row;
         }
     } catch (Exception $e) {
@@ -132,12 +163,195 @@ function mybrary_service_connection_list ($data)
 
 /**
  * Callback for for connection resource.
+ * request to add
+ *
+ * @return array
+ */
+function mybrary_service_connection_request_to_add ($data)
+{
+    global $user;
+
+    $response = array(
+            'status' => 'error',
+            'message' => t('Oops! Something goes wrong.')
+    );
+
+    // check required fields
+    $errors = array();
+    if (empty($data['uid'])) {
+        $errors[] = t('User Id is missing');
+    }
+    
+    if (empty($errors)) {
+        // double check relationship
+        $myFriends = _mybrary_user_get_friends($user->uid);
+        $yourFriends = _mybrary_user_get_friends($data['uid']);
+    
+        if (in_array($data['uid'], $myFriends)) {
+            $errors[] = t('The user has already been your friend');
+        }
+    
+        $common = array_intersect($myFriends, $yourFriends);
+        if (empty($common)) {
+            $errors[] = t('No common friends between you two.');
+        }
+    }
+
+    if (empty($errors)) {
+        try {
+            // break any existing connection or request
+            $dbResult = db_delete('mybrary_user_net')
+            ->condition('uid_from', $user->uid)
+            ->condition('uid_to', $data['uid'])
+            ->execute();
+        
+            $dbResult = db_delete('mybrary_user_net')
+            ->condition('uid_from', $data['uid'])
+            ->condition('uid_to', $user->uid)
+            ->execute();
+                
+            // insert request
+            $dbResult = db_insert('mybrary_user_net')->fields(
+                    array(
+                            'uid_from' => $user->uid,
+                            'uid_to' => $data['uid'],
+                            'status' => MYBRARY_USER_RELATIONSHIP_STATUS_REQUESTED,
+                            'update_timestamp' => time()
+                    ))->execute();
+            
+            $response = array(
+                    'status' => 'success',
+                    'message' => t('Request sent successfully')
+            );
+        } catch (Exception $e) {
+            watchdog('mybrary_service_connection',
+                    'Connection request to add error  [' . $e->getCode() . '] ' .
+                    $e->getMessage(), NULL, WATCHDOG_ERROR);
+            $response = services_error($e->getMessage(), 500);
+        }
+
+    } else {
+        $response['message'] = implode("; ", $errors);
+    }
+
+    return $response;
+}
+
+/**
+ * Callback for for connection resource.
+ * request to add
+ *
+ * @return array
+ */
+function mybrary_service_connection_response_to_add ($data)
+{
+    global $user;
+
+    $response = array(
+            'status' => 'error',
+            'message' => t('Oops! Something goes wrong.')
+    );
+
+    // check required fields
+    $errors = array();
+    if (empty($data['uid'])) {
+        $errors[] = t('User Id is missing');
+    }
+
+    if (empty($data['status']) || !in_array($data['status'], array(MYBRARY_USER_RELATIONSHIP_STATUS_CONFIRMED, MYBRARY_USER_RELATIONSHIP_STATUS_REJECTED))) {
+        $errors[] = t('Status is missing or invalid');
+    }
+
+    if (empty($errors)) {
+        // double check relationship
+        $myFriends = _mybrary_user_get_friends($user->uid);
+        $yourFriends = _mybrary_user_get_friends($data['uid']);
+    
+        if (in_array($data['uid'], $myFriends)) {
+            $errors[] = t('The user has already been your friend');
+        }
+    
+        $common = array_intersect($myFriends, $yourFriends);
+        if (empty($common)) {
+            $errors[] = t('No common friends between you two.');
+        }
+    }
+
+    if (empty($errors)) {
+        try {
+            // check existing
+            $dbResult = db_select('mybrary_user_net', 'n')
+            ->fields('n', array('uid_from', 'uid_to'))
+            ->condition('n.uid_from', $data['uid'])
+            ->condition('n.uid_to', $user->uid)
+            ->condition('n.status', MYBRARY_USER_RELATIONSHIP_STATUS_REQUESTED)
+            ->range(0, 1)
+            ->execute()
+            ->rowCount();
+            
+            if ($dbResult) {
+                // found and update request
+                $dbResult = db_update('mybrary_user_net')->fields(
+                        array(
+                                'status' => $data['status'],
+                                'update_timestamp' => time()
+                        ))
+                        ->condition('uid_from', $data['uid'])
+                        ->condition('uid_to', $user->uid)
+                        ->condition('status', MYBRARY_USER_RELATIONSHIP_STATUS_REQUESTED)
+                        ->execute();
+                
+                // break any existing connection or request
+                $dbResult = db_delete('mybrary_user_net')
+                ->condition('uid_from', $user->uid)
+                ->condition('uid_to', $data['uid'])
+                ->execute();
+                
+                // add bi-direction connection if confirmed
+                if ($data['status'] == MYBRARY_USER_RELATIONSHIP_STATUS_CONFIRMED) {
+                    $dbResult = db_insert('mybrary_user_net')->fields(
+                            array(
+                                    'uid_from' => $user->uid,
+                                    'uid_to' => $data['uid'],
+                                    'status' => $data['status'],
+                                    'update_timestamp' => time()
+                            ))->execute();
+                    $response['message'] = t('Accepted request to add friend');
+                } else {
+                    $response['message'] = t('Rejected request to add friend');                    
+                }
+            } else {
+                $errors[] = t('No requested to add the user as friend');
+            }
+
+            if (empty($errors)) {
+                $response['status'] = 'success';
+            } else {
+                $response['message'] = implode("; ", $errors);
+            }
+        } catch (Exception $e) {
+            watchdog('mybrary_service_connection',
+                    'Connection request to add error  [' . $e->getCode() . '] ' .
+                    $e->getMessage(), NULL, WATCHDOG_ERROR);
+            $response = services_error($e->getMessage(), 500);
+        }
+
+    } else {
+        $response['message'] = implode("; ", $errors);
+    }
+
+    return $response;
+}
+
+/**
+ * Callback for for connection resource.
  * View
  *
  * @return array
  */
 function mybrary_service_connection_view ($data)
 {
+    global $user;
     global $base_path;
     
     $response = NULL;
@@ -149,12 +363,29 @@ function mybrary_service_connection_view ($data)
             $query->fields('u', array('uid', 'name', 'mail', 'created'));
             $query->addField('f', 'uri', 'pictureUri');
             $query->condition('u.uid', $data['uid']);
+
+            $query->leftjoin('mybrary_user_net', 'req', 'req.uid_from = :uid and req.uid_to = u.uid', array(':uid'=>$user->uid));
+            $query->leftjoin('mybrary_user_net', 'res', 'res.uid_from = u.uid and res.uid_to = :uid', array(':uid'=>$user->uid));
+            $query->addField('req', 'status', 'req_status');
+            $query->addField('req', 'update_timestamp', 'req_timestamp');
+            $query->addField('res', 'status', 'res_status');
+            $query->addField('res', 'update_timestamp', 'res_timestamp');
+            
             $dbResult = $query->execute();
             
             while ($row = $dbResult->fetchAssoc()) {
+                // should only return single result
                 $row['pictureUrl'] = ($row['pictureUri'] ? file_create_url($row['pictureUri'])
                             : $base_path . drupal_get_path('theme', 'mybrary') . '/images/unknown-user.png');
-                $response = $row; // should only return single result
+
+                // determine relationship
+                $myFriends = _mybrary_user_get_friends($user->uid);
+                $yourFriends = _mybrary_user_get_friends($data['uid']);
+                
+                $row['isFriend'] = in_array($data['uid'], $myFriends);
+                $row['commonFriends'] = array_intersect($myFriends, $yourFriends);
+                
+                $response = $row;
             }
 
             // append feedback_as_borrower_summary
