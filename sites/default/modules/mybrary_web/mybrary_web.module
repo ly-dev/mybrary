@@ -5,12 +5,30 @@
  */
 function mybrary_web_menu ()
 {
+    $items['admin/config/development/mybrary_web'] = array(
+            'title' => 'Mybrary Web',
+            'description' => 'Mybrary web settings.',
+            'page callback' => 'drupal_get_form',
+            'page arguments' => array('mybrary_web_admin_form'),
+            'file'               => 'mybrary_web.admin.inc',
+            'type' => MENU_NORMAL_ITEM,
+            'access arguments' => array('administer'),
+    );
+    
     $items['welcome'] = array(
             'title' => t('Welcome'),
             'page callback' => 'mybrary_web_welcome_page',
             'file' => 'mybrary_web.page.inc',
             'type' => MENU_NORMAL_ITEM,
             'access callback' => TRUE
+    );
+    
+    $items['fblogout'] = array(
+            'title' => t('Welcome'),
+            'page callback' => 'mybrary_web_fblogout_page',
+            'file' => 'mybrary_web.page.inc',
+            'type' => MENU_NORMAL_ITEM,
+            'access callback' => 'user_is_logged_in'
     );
     
     $items['app'] = array(

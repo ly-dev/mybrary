@@ -3,4 +3,5 @@ description = Web UI related stuffs for Mybrary
 package = Mybrary
 core = 7.x
 dependencies[] = angularjs
+configure = admin/config/development/mybrary_web
 

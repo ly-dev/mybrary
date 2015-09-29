@@ -15,6 +15,24 @@ function mybrary_web_welcome_page ()
 }
 
 /**
+ * Page callback for /fblogout.
+ */
+function mybrary_web_fblogout_page ()
+{
+    global $user;
+    global $base_url;
+    
+    $url = $base_url;
+    $access_token = $_SESSION['fboauth']['access_token']; 
+    if ($access_token && $user->uid) {
+        $url = 'https://www.facebook.com/logout.php?next=' . $base_url . '&access_token=' . $access_token;
+        session_destroy();
+    }
+
+    header('Location: ' . $url);
+}
+
+/**
  * Page callback for app.
  */
 function mybrary_web_app() {
@@ -26,6 +44,7 @@ function mybrary_web_app() {
     // Add CSRF token and base url required by service api.
     $js_settings = array(
             'mybrary_web' => array(
+                    'debug' => (variable_get('mybrary_web_debug_mode', 0) ? TRUE : FALSE),
                     'csrf_token' => drupal_get_token('services'),
                     'service_base_url' =>  $base_url,
                     'user' => array(

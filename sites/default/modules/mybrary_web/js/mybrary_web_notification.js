@@ -40,7 +40,6 @@ angular.module('app_mybrary')
 			statusFilter.push(AppHelper.CONST.MYBRARY_NOTIFICATION_STATUS_ARCHIVED);
 		}
 		
-		AppLog.debug(statusFilter);
 		refreshList();
     };
     

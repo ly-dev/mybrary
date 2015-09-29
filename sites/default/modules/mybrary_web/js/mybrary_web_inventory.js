@@ -100,8 +100,6 @@ angular.module('app_mybrary')
 	    (function() {
 	    	return AppApi.inventoryView({nid: $stateParams.nid});
 		})().then(function(item) {
-			AppLog.debug(item);
-			
 			$scope.item = item;
 			$scope.formItemData = angular.copy($scope.item);
 			
@@ -157,7 +155,6 @@ angular.module('app_mybrary')
 			var data = angular.copy($scope.formItemData);
 			
 			// only update image when changed
-			AppLog.debug($scope.cropper);
 			if ($scope.cropper.confirmedCroppedImage != $scope.cropper.originalCroppedImage) {
 				data['field_image'] = {
 						'data': $scope.cropper.confirmedCroppedImage

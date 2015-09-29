@@ -42,7 +42,7 @@ $items = array (
             	<?php foreach($items as $key=>$item): ?>
                 <li ui-sref-active="active"><a ui-sref="<?php print $item['state']; ?>"><?php print $item['label']; ?></a></li>
                 <?php endforeach;?>
-                <li><a href="<?php print url('user/logout'); ?>"><?php print t('Log out @username', array('@username' => $user->name)); ?></a></li>
+                <li><a href="<?php print url('fblogout'); ?>"><?php print t('Log out @username', array('@username' => $user->name)); ?></a></li>
             </ul>
         </div><!--/.nav-collapse -->
     </div>

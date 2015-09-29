@@ -38,7 +38,6 @@ angular.module('app_mybrary')
 				};
 	
 				var user = AppApi.getUser();
-				AppLog.debug(user);
 				$scope.fofs = _.chain(data['fofs']).omit(_.keys(data['frds'])).omit(user.uid).values().value();
 				$scope.fofsMeta = {
 					count: $scope.fofs.length

@@ -84,10 +84,20 @@ function mybrary_user_fboauth_actions_alter(&$actions) {
 function mybrary_user_fboauth_action_connect($app_id, $access_token) {
     global $user;
     
-    //@TODO logout the current user if current user has not been associated with a facebook account.
+    // logout the current drupal user if it has not been associated with a facebook account.
+    module_load_include('inc', 'fboauth', 'includes/fboauth.fboauth');
+    if ($user->uid) {
+        $fbid = fboauth_fbid_load($user->uid);
+        if (!$fbid) {
+            watchdog('user', 'Session closed for %name to proceed facebook login.', array('%name' => $user->name));
+            module_invoke_all('user_logout', $user);
+            // Destroy the current session, and reset $user to the anonymous user.
+            session_destroy();
+            return;
+        }
+    }
     
     // call the original function to initialize the connection
-    module_load_include('inc', 'fboauth', 'includes/fboauth.fboauth');
     fboauth_action_connect($app_id, $access_token);
     
     $fbuser = fboauth_graph_query('me', $access_token);

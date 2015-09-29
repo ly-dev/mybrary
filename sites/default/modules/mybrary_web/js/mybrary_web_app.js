@@ -5,7 +5,7 @@ angular.module('app_mybrary', ['ngSanitize', 'ui.router', 'angular-img-cropper',
 .config(['$logProvider', '$urlRouterProvider', '$httpProvider', 
     function ($logProvider, $urlRouterProvider, $httpProvider) {
         // disable debug log for production
-        $logProvider.debugEnabled(true);
+        $logProvider.debugEnabled(Drupal.settings.mybrary_web.debug);
 
     	// For any unmatched url, redirect to /dashboard
     	$urlRouterProvider.otherwise("/dashboard");
