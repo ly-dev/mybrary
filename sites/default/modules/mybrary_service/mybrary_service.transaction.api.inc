@@ -9,6 +9,7 @@ function mybrary_service_transaction_resource_access($op = 'view', $args = array
         case 'list':
         case 'view':
         case 'update':
+        case 'remind-return':            
         case 'delete':
         default:
             return user_is_logged_in();
@@ -69,7 +70,7 @@ function mybrary_service_transaction_list ($data)
         }
         
         module_load_include('inc', 'mybrary_service', 'mybrary_service.connection.api');
-        $response['users'] =  mybrary_service_connection_list(array('uid' => array_keys($relatedUsers)));
+        $response['users'] =  _mybrary_user_list(array('uid' => array_keys($relatedUsers)));
     } catch (Exception $e) {
         watchdog('mybrary_service_connection',
                 'Connection list error  [' . $e->getCode() . '] ' .
@@ -343,7 +344,8 @@ function mybrary_service_transaction_update ($data)
                 
                 switch ($data['new_status']) {
                     case MYBRARY_TRANSACTION_STATUS_REQUESTED:
-                    case MYBRARY_TRANSACTION_STATUS_CONFIRMED:
+                    case MYBRARY_TRANSACTION_STATUS_REQUEST_CHANGED:
+                        case MYBRARY_TRANSACTION_STATUS_CONFIRMED:
                         $item['text'] = json_encode(array(
                                 'text' => $data['text'],
                                 'start'=> $data['start'],
@@ -366,6 +368,30 @@ function mybrary_service_transaction_update ($data)
                 
                 $item[] = db_insert('mybrary_transaction_items')->fields($item)->execute();
                 
+                // add notification
+                $node = node_load($data['entity_id']);
+                $notificationUidTo = NULL;
+                $notificationTitle  = _mybrary_transaction_get_status_label($data['new_status']) . ' on ' . $node->title;
+                $notificationBody = $notificationTitle;
+                $notificationUri = json_encode(array('state' =>'transaction', 'params' => array ('transaction_id'=>$data['transaction_id'], 'nid'=>0)));
+                switch ($data['new_status']) {
+                    case MYBRARY_TRANSACTION_STATUS_REQUESTED:
+                    case MYBRARY_TRANSACTION_STATUS_REQUEST_CHANGED:
+                    case MYBRARY_TRANSACTION_STATUS_BORROWER_FEEDBACKED:
+                        $notificationUidTo = $node->uid;
+                        break;
+                    case MYBRARY_TRANSACTION_STATUS_CONFIRMED:
+                    case MYBRARY_TRANSACTION_STATUS_DECLINED:                        
+                    case MYBRARY_TRANSACTION_STATUS_OWNER_FEEDBACKED:
+                        $notificationUidTo = $data['uid_borrower'];
+                        break;
+                }
+                        
+                if ($notificationUidTo) {
+                    _mybrary_notification_add ($notificationUidTo, $notificationTitle, $notificationBody, $notificationUri);
+                }
+                
+                // prepare return data
                 $data['status'] = $data['new_status'];
                 unset($data['new_status']);
                 
@@ -389,6 +415,83 @@ function mybrary_service_transaction_update ($data)
     
     return $response;
 }
+
+/**
+ * Callback for for transaction resource.
+ * Remind return
+ *
+ * @return array
+ */
+function mybrary_service_transaction_remind_return ($data)
+{
+    global $user;
+
+    $response = array(
+            'status' => 'error',
+            'message' => t('Oops! Something goes wrong.')
+    );
+
+    if (!isset($data['transaction_id'])) {
+        $errors[] = t('Transaction id is missing');
+    }
+
+    if (empty($errors)) {
+        try {
+            // tricky to get open transaction against the entity_id, uid_borrower
+            // double check transaction existing
+            $queryStatement = 'select ti.transaction_id, ti.status, th.uid_borrower, it.title as item_name from'
+                    . ' (select * from mybrary_transaction_items'
+                    . ' where transaction_id = :transaction_id'
+                    . ' order by transaction_id, update_timestamp desc) ti'
+                    . ' join mybrary_transaction_head th on th.transaction_id = ti.transaction_id'
+                    . ' join node it on it.nid = th.entity_id'
+                    . ' group by ti.transaction_id';
+            
+            $dbResult = db_query($queryStatement, array(
+                    ':transaction_id' => $data['transaction_id']
+            ));
+
+            $data = null;
+            $errors[] = t('Matched transaction could not be found');
+            while ($row = $dbResult->fetchAssoc()) {
+                // should only existing one matched transaction
+                $errors = array(); // clear error
+
+                if ($row['status'] != MYBRARY_TRANSACTION_STATUS_CONFIRMED) {
+                    $errors[] = t('Operation cancelled due to status changed by others.');
+                } else {
+                    $data = $row;
+                }
+            }
+
+            if (empty($errors)) {
+                // add notification
+                $notificationUidTo = $data['uid_borrower'];
+                $notificationTitle  = t('Please return !item_name in time.', array('!item_name' => $data['item_name']));
+                $notificationBody = $notificationTitle;
+                $notificationUri = json_encode(array('state' =>'transaction', 'params' => array ('transaction_id'=>$data['transaction_id'], 'nid'=>0)));
+                _mybrary_notification_add ($notificationUidTo, $notificationTitle, $notificationBody, $notificationUri);
+
+                $response = array(
+                        'status' => 'success',
+                        'message' => t('Notification sent successfully.'),
+                );
+            } else {
+                $response['message'] = implode('; ', $errors);
+            }
+        } catch (Exception $e) {
+            watchdog('mybrary_service_transaction',
+                    'Transaction update error  [' . $e->getCode() . '] ' .
+                    $e->getMessage(), NULL, WATCHDOG_ERROR);
+            $response = services_error($e->getMessage(), 500);
+        }
+    } else {
+        $response['message'] = implode('; ', $errors);
+    }
+
+    return $response;
+}
+
 
 /**
  * Callback for for transaction resource.

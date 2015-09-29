@@ -6,7 +6,7 @@ angular.module('app_mybrary')
 	$stateProvider
     .state('transaction-list', {
 		url: "/transaction-list",
-		templateUrl: Drupal.settings.angularjsApp.basePath + '/tpl/transaction-list',
+		templateUrl: Drupal.settings.angularjsApp.basePath + 'tpl/transaction-list',
     	controller: 'TransactionListController',
     	resolve:{
             termListPromise:  ['AppApi', function(AppApi) {
@@ -17,7 +17,7 @@ angular.module('app_mybrary')
     
     .state('transaction', {
 		url: "/transaction/:transaction_id/:nid",
-		templateUrl: Drupal.settings.angularjsApp.basePath + '/tpl/transaction',
+		templateUrl: Drupal.settings.angularjsApp.basePath + 'tpl/transaction',
     	controller: 'TransactionResultController',
     	resolve:{
             termListPromise:  ['AppApi', function(AppApi) {
@@ -215,6 +215,7 @@ angular.module('app_mybrary')
 				AppHelper.hideLoading();
 			});
 		};
+		refreshTransaction();
 		
 		$scope.validateBorrowPeriod = function(source) {
 			var start = new Date($scope.formTransactionData['start']),
@@ -245,7 +246,7 @@ angular.module('app_mybrary')
 							visibleElements = ['form-transactio-start', 'form-transactio-end', 'form-transaction-text', 'form-transaction-submit-confirmed', 'form-transaction-submit-declined'];
 							break;
 						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_CONFIRMED']:
-							visibleElements = ['form-transaction-text', 'form-transaction-submit-declined', 'form-transaction-submit-returned'];
+							visibleElements = ['form-transaction-text', 'form-transaction-submit-remind-return', 'form-transaction-submit-declined', 'form-transaction-submit-returned'];
 							break;
 						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_RETURNED']:
 						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_BORROWER_FEEDBACKED']:
@@ -259,6 +260,7 @@ angular.module('app_mybrary')
 							visibleElements = ['form-transactio-start', 'form-transactio-end', 'form-transaction-text', 'form-transaction-submit-requested'];
 							break;
 						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_REQUESTED']:
+						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_REQUEST_CHANGED']:
 							visibleElements = ['form-transactio-start', 'form-transactio-end', 'form-transaction-text', 'form-transaction-submit-request-changed', 'form-transaction-submit-cancelled'];
 							break;
 						case AppHelper.CONST['MYBRARY_TRANSACTION_STATUS_RETURNED']:
@@ -414,6 +416,10 @@ angular.module('app_mybrary')
 			}
 		};
 		
-		refreshTransaction();
+		$scope.remindReturn = function (transaction) {
+			AppApi.transactionRemindReturn({transaction_id: transaction['transaction_id']}).then(function(response) {
+				AppHelper.showAlert(response.message, response.statue);
+			});
+		};
 }]);
 

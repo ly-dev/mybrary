@@ -59,6 +59,7 @@ function mybrary_web_app() {
     drupal_add_js(drupal_get_path('module', 'mybrary_web') . '/js/mybrary_web_inventory.js');
     drupal_add_js(drupal_get_path('module', 'mybrary_web') . '/js/mybrary_web_search.js');
     drupal_add_js(drupal_get_path('module', 'mybrary_web') . '/js/mybrary_web_transaction.js');
+    drupal_add_js(drupal_get_path('module', 'mybrary_web') . '/js/mybrary_web_notification.js');
     
 
     return theme_render_template(drupal_get_path('module', 'mybrary_web') . '/tpl/mybrary_web_app.tpl.php', array());
@@ -120,6 +121,12 @@ function mybrary_web_transaction_list() {
     return theme_render_template(drupal_get_path('module', 'mybrary_web') . '/tpl/mybrary_web_transaction-list.tpl.php', array());
 }
 
+/**
+ * Page callback for notification list.
+ */
+function mybrary_web_notification_list() {
+    return theme_render_template(drupal_get_path('module', 'mybrary_web') . '/tpl/mybrary_web_notification-list.tpl.php', array());
+}
 
 /**
  * Implement ajax delivery call back
@@ -139,7 +146,7 @@ function mybrary_web_ajax_delivery_callback ($page_callback_result)
 }
 
 /**
- * Page callback for transaction list.
+ * Page callback for ajax image upload.
  */
 function mybrary_web_ajax_image_upload() {
     $response = array(

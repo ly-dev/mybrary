@@ -247,3 +247,37 @@ function _mybrary_user_get_friends_of_friends ($uid, $friendIncluded = FALSE) {
     return $result;
 }
 
+function _mybrary_user_list ($uid)
+{
+    global $user;
+    global $base_path;
+
+    $response = array();
+    try {
+        $query = db_select('users', 'u');
+        $query->join('mybrary_user_ext', 'e', 'e.uid = u.uid');
+        $query->leftJoin('file_managed', 'f', 'u.picture = f.fid');
+        $query->fields('u', array('uid', 'name'));
+        $query->addField('e', 'ext_id', 'externalId');
+        $query->addField('e', 'ext_name', 'externalName');
+        $query->addField('e', 'type', 'externalType');
+        $query->addField('f', 'uri', 'pictureUri');
+        $query->condition('u.uid', $uid);
+
+        $dbResult = $query->execute();
+
+        $response = array();
+        while ($row = $dbResult->fetchAssoc()) {
+            $row['pictureUrl'] = ($row['pictureUri'] ? file_create_url($row['pictureUri'])
+                    : $base_path . drupal_get_path('theme', 'mybrary') . '/images/unknown-user.png');
+            $response[$row['uid']] = $row;
+        }
+    } catch (Exception $e) {
+        watchdog('_mybrary_user_list',
+                'User list error  [' . $e->getCode() . '] ' .
+                $e->getMessage(), NULL, WATCHDOG_ERROR);
+        throw $e;
+    }
+
+    return $response;
+}

@@ -9,6 +9,7 @@ dependencies[] = basic_page_suite
 dependencies[] = contributed_modules
 dependencies[] = project_shared
 dependencies[] = mybrary_inventory
+dependencies[] = mybrary_notification
 dependencies[] = mybrary_transaction
 dependencies[] = mybrary_service
 dependencies[] = mybrary_user

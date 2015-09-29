@@ -96,3 +96,6 @@ body {
 .app-text.app-text-tiny {
   font-size: 60%;
 }
+.app-text.app-text-strong {
+  font-weight: 600;
+}

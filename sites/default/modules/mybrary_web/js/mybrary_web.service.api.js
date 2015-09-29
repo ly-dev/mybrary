@@ -124,6 +124,24 @@ angular.module('app_mybrary')
         });
 	};
 
+	service.transactionRemindReturn = function(data) {
+        return service.callRestApi('POST', '/transaction/remind-return', data).then(function(response) {
+        	return response.data;
+        });
+	};
+
+	service.notificationList = function(data) {
+        return service.callRestApi('POST', '/notification/list', data).then(function(response) {
+        	return response.data;
+        });
+	};
+
+	service.notificationUpdate = function(data) {
+        return service.callRestApi('POST', '/notification/update', data).then(function(response) {
+        	return response.data;
+        });
+	};
+
 	service.searchParams = {
 	    key: ''
 	};

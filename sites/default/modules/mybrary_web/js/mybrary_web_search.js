@@ -6,7 +6,7 @@ angular.module('app_mybrary')
 	$stateProvider
     .state('search', {
 		url: "/search/:key",
-		templateUrl: Drupal.settings.angularjsApp.basePath + '/tpl/search',
+		templateUrl: Drupal.settings.angularjsApp.basePath + 'tpl/search',
     	controller: 'SearchResultController',
     	resolve:{
             termListPromise:  ['AppApi', function(AppApi) {
@@ -45,8 +45,18 @@ angular.module('app_mybrary')
 		}
 		refreshList();
 		
-		$scope.fofMessage = function() {
-			AppHelper.showAlert('You can\'t borrow from friends of friends at current stage.', 'warning');
+		$scope.fofMessage = function(item) {
+			AppHelper.showAlert('You can\'t borrow from friends of friends. You may <a href="#/connection-view/' + item.uid + '.">request to add friend</a>', 'warning');
 		}
+}])
+
+.controller('SearchBarController', ['AppLog', 'AppHelper', 'AppApi', '$state', 
+    function(AppLog, AppHelper, AppApi, $state) {
+	    AppLog.debug("SearchBarController");
+	    
+	    this.searchParams = AppApi.searchParams;
+		this.goSearch = function() {
+			$state.go('search', AppApi.searchParams);
+		};	    
 }]);
 

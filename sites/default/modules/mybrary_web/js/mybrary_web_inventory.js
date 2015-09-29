@@ -6,7 +6,7 @@ angular.module('app_mybrary')
 	$stateProvider
     .state('inventory-list', {
 		url: "/inventory-list",
-		templateUrl: Drupal.settings.angularjsApp.basePath + '/tpl/inventory-list',
+		templateUrl: Drupal.settings.angularjsApp.basePath + 'tpl/inventory-list',
     	controller: 'InventoryListController',
     	resolve:{
             termListPromise:  ['AppApi', function(AppApi) {
@@ -16,7 +16,7 @@ angular.module('app_mybrary')
     })
     .state('inventory-edit', {
 		url: "/inventory-edit/:nid",
-		templateUrl: Drupal.settings.angularjsApp.basePath + '/tpl/inventory-edit',
+		templateUrl: Drupal.settings.angularjsApp.basePath + 'tpl/inventory-edit',
     	controller: 'InventoryEditController',
     	resolve:{
             termListPromise:  ['AppApi', function(AppApi) {

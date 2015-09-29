@@ -72,6 +72,16 @@ function mybrary_service_default_services_endpoint() {
         ),
       ),
     ),
+    'notification' => array(
+      'actions' => array(
+        'list' => array(
+          'enabled' => '1',
+        ),
+        'update' => array(
+          'enabled' => '1',
+        ),
+      ),
+    ),
     'term' => array(
       'actions' => array(
         'list' => array(
@@ -88,6 +98,9 @@ function mybrary_service_default_services_endpoint() {
           'enabled' => '1',
         ),
         'update' => array(
+          'enabled' => '1',
+        ),
+        'remind-return' => array(
           'enabled' => '1',
         ),
         'delete' => array(

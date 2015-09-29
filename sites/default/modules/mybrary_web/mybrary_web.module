@@ -85,6 +85,14 @@ function mybrary_web_menu ()
             'access callback' => 'user_is_logged_in'
     );
     
+    $items['tpl/notification-list'] = array(
+            'title' => t('Transaction'),
+            'page callback' => 'mybrary_web_notification_list',
+            'file' => 'mybrary_web.page.inc',
+            'type' => MENU_NORMAL_ITEM,
+            'access callback' => 'user_is_logged_in'
+    );
+    
     $items['ajax/image-upload'] = array(
             'page callback' => 'mybrary_web_ajax_image_upload',
             'delivery callback' => 'mybrary_web_ajax_delivery_callback',

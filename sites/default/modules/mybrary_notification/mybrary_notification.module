@@ -1,0 +1,54 @@
+<?php
+/**
+ * @file
+ * Code for the Mybrary Notification feature.
+ */
+
+include_once 'mybrary_notification.features.inc';
+
+/**
+ * Notification status constant
+*/
+define("MYBRARY_NOTIFICATION_STATUS_NEW", 0);
+define("MYBRARY_NOTIFICATION_STATUS_READ", 1);
+define("MYBRARY_NOTIFICATION_STATUS_ARCHIVED", 2);
+
+function _mybrary_notification_get_status_label ($key) {
+    $labels = array(
+            MYBRARY_NOTIFICATION_STATUS_NEW => t('unread'),
+            MYBRARY_NOTIFICATION_STATUS_READ => t('read'),
+            MYBRARY_NOTIFICATION_STATUS_ARCHIVED => t('archived'),
+    );
+
+    if (array_key_exists($key, $labels)) {
+        return $labels[$key];
+    } else {
+        return t('Unknown notification status label for key: !key', array('!key' => $key));
+    }
+}
+
+/**
+ * Create new notification
+ */
+function _mybrary_notification_add ($uid_to, $title, $body, $uri = NULL) {
+    global $user;
+    
+    $node = new stdClass();
+    $node->type = 'notification';
+    node_object_prepare($node); // Sets some defaults. Invokes hook_prepare() and hook_node_prepare().
+    $node->language = LANGUAGE_NONE; // Or e.g. 'en' if locale is enabled
+    $node->uid = $user->uid;
+    $node->status = 1; //(1 or 0): published or not
+    
+    $node = node_submit($node); // Prepare node for saving
+    
+    $node->field_uid_to[$node->language] = array(array('uid' => $uid_to));
+    $node->title = $title;
+    $node->body[$node->language] = array(array('value' => $body));
+    $node->field_status[$node->language] = array(array('value' => MYBRARY_NOTIFICATION_STATUS_NEW));
+    if (isset($uri)) {
+        $node->field_uri[$node->language] = array(array('value' => $uri));
+    }
+    
+    node_save($node);
+}

@@ -190,6 +190,27 @@ function mybrary_service_services_resources ()
                                             )
                                     )
                             ),
+                            'remind-return' => array(
+                                    'help' => t('Remind return'),
+                                    'file' => array(
+                                            'type' => 'inc',
+                                            'module' => 'mybrary_service',
+                                            'name' => 'mybrary_service.transaction.api'
+                                    ),
+                                    'callback' => 'mybrary_service_transaction_remind_return',
+                                    'access callback' => 'mybrary_service_transaction_resource_access',
+                                    'access arguments' => array('remind-return'),
+                                    'access arguments append' => TRUE,
+                                    'args' => array(
+                                            array(
+                                                    'name' => 'data',
+                                                    'type' => 'array',
+                                                    'description' => t('Parameters of the action'),
+                                                    'source' => 'data',
+                                                    'optional' => FALSE
+                                            )
+                                    )
+                            ),
                             'delete' => array(
                                     'help' => t('Delete transaction'),
                                     'file' => array(
@@ -321,6 +342,52 @@ function mybrary_service_services_resources ()
                                     )
                             )
                     )
+            ),
+            'notification' => array(
+                    'actions' => array(
+                            'list' => array(
+                                    'help' => t('List notification'),
+                                    'file' => array(
+                                            'type' => 'inc',
+                                            'module' => 'mybrary_service',
+                                            'name' => 'mybrary_service.notification.api'
+                                    ),
+                                    'callback' => 'mybrary_service_notification_list',
+                                    'access callback' => 'mybrary_service_notification_resource_access',
+                                    'access arguments' => array('list'),
+                                    'access arguments append' => TRUE,
+                                    'args' => array(
+                                            array(
+                                                    'name' => 'data',
+                                                    'type' => 'array',
+                                                    'description' => t('Parameters of the action'),
+                                                    'source' => 'data',
+                                                    'optional' => FALSE
+                                            )
+                                    )
+                            ),
+                            'update' => array(
+                                    'help' => t('Update notification'),
+                                    'file' => array(
+                                            'type' => 'inc',
+                                            'module' => 'mybrary_service',
+                                            'name' => 'mybrary_service.notification.api'
+                                    ),
+                                    'callback' => 'mybrary_service_notification_update',
+                                    'access callback' => 'mybrary_service_notification_resource_access',
+                                    'access arguments' => array('update'),
+                                    'access arguments append' => TRUE,
+                                    'args' => array(
+                                            array(
+                                                    'name' => 'data',
+                                                    'type' => 'array',
+                                                    'description' => t('Parameters of the action'),
+                                                    'source' => 'data',
+                                                    'optional' => FALSE
+                                            )
+                                    )
+                            )
+                    )
             )
     );
 }
@@ -374,7 +441,7 @@ function _mybrary_service_get_entity_field_value ($entity, $fik, $fio)
  *******************************************************************/
 
 function _mybrary_service_entity_field_value_convertor_default ($v, $entity, $fik, $fio) {
-    return (isset($v['value']) ? $v['value'] : (isset($v['tid']) ? $v['tid'] : (isset($v['nid']) ? $v['nid'] : $v)));
+    return (isset($v['value']) ? $v['value'] : (isset($v['tid']) ? $v['tid'] : (isset($v['nid']) ? $v['nid'] : (isset($v['uid']) ? $v['uid'] : $v))));
 }
 
 function _mybrary_service_entity_field_value_convertor_image ($v, $entity, $fik, $fio) {

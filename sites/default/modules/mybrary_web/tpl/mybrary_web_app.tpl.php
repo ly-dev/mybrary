@@ -20,6 +20,10 @@ $items = array (
             'label' => t('Transaction'),
             'state' => 'transaction-list',
     ),
+    'notification-list' => array(
+            'label' => t('Notification'),
+            'state' => 'notification-list',
+    ),
 );
 ?>
 <nav class="navbar navbar-default navbar-fixed-top">
@@ -44,6 +48,20 @@ $items = array (
     </div>
 </nav>
 <div class="container" style="padding-top: 50px">
+	<div class="row">
+		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+			<div id="app-notification-container" ng-controller="NotificationReminderController as notificationReminder" ng-click="notificationReminder.openNotificationList()">
+				<div ng-repeat="notification in notificationReminder.notifications | orderBy:'-changed'">
+					<div>
+            			<img ng-src="{{notificationReminder.users[notification.uid].pictureUrl}}" alt="avatar" class="app-icon app-icon-avatar-tiny">
+            			<span class="app-text app-text-tiny">{{notificationReminder.users[notification.uid].name}}</span>
+	        			<span class="app-text app-text-tiny">{{notification.changed * 1000 | date : 'dd/MM/yyyy HH:mm:ss'}}</span>
+					</div>
+					<div ng-bind-html="notification.body"></div>
+				</div>
+			</div>
+		</div>
+    </div>
 	<div class="row">
 		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
 			<div id="app-alert-container"></div>

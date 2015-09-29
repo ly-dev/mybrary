@@ -6,7 +6,7 @@ angular.module('app_mybrary')
 	$stateProvider
     .state('dashboard', {
 		url: "/dashboard",
-		templateUrl: Drupal.settings.angularjsApp.basePath + '/tpl/dashboard',
+		templateUrl: Drupal.settings.angularjsApp.basePath + 'tpl/dashboard',
     	controller: 'DashboardController',
     	resolve:{
             termListPromise:  ['AppApi', function(AppApi) {

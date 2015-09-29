@@ -38,7 +38,7 @@
 						<img ng-src="{{transaction.item.field_image[0].url}}" alt="picture" class="app-icon app-icon-avatar-small">
 					</div>
 					<div class="pull-left" style="padding-left: 1em;">
-            			<span class="app-text app-text-tiny">{{transaction.update_timestamp * 1000 | date : 'short'}}</span>
+            			<span class="app-text app-text-tiny">{{transaction.update_timestamp * 1000 | date : 'dd/MM/yyyy HH:mm:ss'}}</span>
     					<span class="app-text app-text-tiny">{{transaction.status_label}}</span><br/>
     					<span>{{transaction.item.title}}</span>
 					</div>

@@ -37,7 +37,7 @@ function _mybrary_transaction_get_status_label ($key) {
     if (array_key_exists($key, $labels)) {
         return $labels[$key];
     } else {
-        return t('Unknown status label for key: !key', array('!key' => $key));
+        return t('Unknown transaction status label for key: !key', array('!key' => $key));
     }
 }
 

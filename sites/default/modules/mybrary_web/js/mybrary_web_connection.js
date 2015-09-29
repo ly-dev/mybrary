@@ -6,12 +6,12 @@ angular.module('app_mybrary')
 	$stateProvider
     .state('connection-list', {
 		url: "/connection-list",
-		templateUrl: Drupal.settings.angularjsApp.basePath + '/tpl/connection-list',
+		templateUrl: Drupal.settings.angularjsApp.basePath + 'tpl/connection-list',
     	controller: 'ConnectionListController'
     })
     .state('connection-view', {
 		url: "/connection-view/:uid",
-		templateUrl: Drupal.settings.angularjsApp.basePath + '/tpl/connection-view',
+		templateUrl: Drupal.settings.angularjsApp.basePath + 'tpl/connection-view',
     	controller: 'ConnectionViewController'
     });
 }])

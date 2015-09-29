@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('app_mybrary', ['ui.router', 'angular-img-cropper', '720kb.datepicker'])
+angular.module('app_mybrary', ['ngSanitize', 'ui.router', 'angular-img-cropper', '720kb.datepicker'])
 
 .config(['$logProvider', '$urlRouterProvider', '$httpProvider', 
     function ($logProvider, $urlRouterProvider, $httpProvider) {
@@ -29,14 +29,4 @@ angular.module('app_mybrary', ['ui.router', 'angular-img-cropper', '720kb.datepi
 	    	// collapse the dropdown menu
 	    	jQuery('#navbar.collapse.in').removeClass('in').attr('aria-expanded', false);
 		});
-}])
-
-.controller('SearchBarController', ['AppLog', 'AppHelper', 'AppApi', '$state', 
-    function(AppLog, AppHelper, AppApi, $state) {
-	    AppLog.debug("SearchBarController");
-	    
-	    this.searchParams = AppApi.searchParams;
-		this.goSearch = function() {
-			$state.go('search', AppApi.searchParams);
-		};	    
 }]);
