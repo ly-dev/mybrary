@@ -219,6 +219,13 @@ function mybrary_service_connection_request_to_add ($data)
                             'update_timestamp' => time()
                     ))->execute();
             
+            // add notification
+            $notificationUidTo = $data['uid'];
+            $notificationTitle  = t('Requested to add friend');
+            $notificationBody = $notificationTitle;
+            $notificationUri = json_encode(array('state' =>'connection-view', 'params' => array ('uid'=>$user->uid)));
+            _mybrary_notification_add ($notificationUidTo, $notificationTitle, $notificationBody, $notificationUri);
+
             $response = array(
                     'status' => 'success',
                     'message' => t('Request sent successfully')
@@ -326,6 +333,14 @@ function mybrary_service_connection_response_to_add ($data)
 
             if (empty($errors)) {
                 $response['status'] = 'success';
+                
+                // add notification
+                $notificationUidTo = $data['uid'];
+                $notificationTitle  = $response['message'];
+                $notificationBody = $notificationTitle;
+                $notificationUri = json_encode(array('state' =>'connection-view', 'params' => array ('uid'=>$user->uid)));
+                _mybrary_notification_add ($notificationUidTo, $notificationTitle, $notificationBody, $notificationUri);
+                
             } else {
                 $response['message'] = implode("; ", $errors);
             }
