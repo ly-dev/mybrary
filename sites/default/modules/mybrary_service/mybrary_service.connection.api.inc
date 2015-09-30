@@ -110,7 +110,11 @@ function mybrary_service_connection_list ($data)
     $requestedToAdd = array();
     // convert to friends ids to get fof
     if ($data['uid'] == 'frd') {
+        $a=1;
         $data['uid'] = _mybrary_user_get_friends($user->uid);
+        if (empty($data['uid'])) {
+            $data['uid'] = array(0);
+        }
         $relationship = 'fof';
     }
     

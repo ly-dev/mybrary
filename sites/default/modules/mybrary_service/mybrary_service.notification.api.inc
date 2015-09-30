@@ -92,7 +92,7 @@ function mybrary_service_notification_list ($data)
             }
             
             module_load_include('inc', 'mybrary_service', 'mybrary_service.connection.api');
-            $response['users'] =  _mybrary_user_list(array('uid' => array_keys($relatedUsers)));
+            $response['users'] =  _mybrary_user_list(array_keys($relatedUsers));
         }
     }
         
